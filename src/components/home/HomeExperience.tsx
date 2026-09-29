@@ -10,6 +10,9 @@ import { CURSOR_RESET_EVENT } from "@/components/cursor/Cursor";
 import { useFinePointer, useReducedMotion } from "@/motion/useMediaQuery";
 import { Hero } from "./Hero";
 import { Manifesto } from "./Manifesto";
+import { AfterHours } from "@/components/music/AfterHours";
+import { Frequencies } from "@/components/music/Frequencies";
+import { SoundOfTheClub } from "@/components/music/SoundOfTheClub";
 import styles from "./HomeExperience.module.css";
 
 /**
@@ -106,6 +109,9 @@ export function HomeExperience() {
           onToggleMotion={reducedMotion ? undefined : () => setMotionPaused((p) => !p)}
         />
         <Manifesto ref={manifestoRef} headingRef={headingRef} />
+        <SoundOfTheClub />
+        <Frequencies />
+        <AfterHours />
       </main>
       <DiscLayer />
       <div ref={flashRef} className={styles.flash} aria-hidden="true" />

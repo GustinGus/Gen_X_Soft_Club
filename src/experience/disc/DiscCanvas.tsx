@@ -53,10 +53,10 @@ export default function DiscCanvas({ reducedMotion, coarse, onReady }: Props) {
   );
   const [awake, setAwake] = useState(true);
 
-  // Sleep once the reader has scrolled past the manifesto; wake on return.
+  // Sleep once the reader has scrolled past the disc's last station; wake on return.
   useEffect(() => {
     const onScroll = () => {
-      const next = window.scrollY < experience.anchors.manifestoBottom;
+      const next = window.scrollY < experience.anchors.sleepAfter;
       setAwake((prev) => (prev === next ? prev : next));
       experience.invalidate();
     };

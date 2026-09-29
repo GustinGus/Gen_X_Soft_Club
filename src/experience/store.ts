@@ -14,10 +14,14 @@ type ExperienceState = {
   anchors: {
     hero: Rect | null;
     manifesto: Rect | null;
-    /** Document y where the manifesto section starts; scroll progress 0→1 ends here. */
+    /** THE SOUND OF THE CLUB — the disc's third station (Phase 2A). */
+    sound: Rect | null;
+    /** Document y where the manifesto section starts; hero → manifesto ends here. */
     manifestoTop: number;
-    /** Document y where the manifesto section ends; past it the disc layer can sleep. */
-    manifestoBottom: number;
+    /** Document y where the sound section starts; manifesto → sound ends here. */
+    soundTop: number;
+    /** Document y past which the disc is off-screen for good; the layer sleeps. */
+    sleepAfter: number;
   };
   /** Horizontal drag on the disc (yaw), radians per second of release inertia. */
   drag: { active: boolean; delta: number; velocity: number };
@@ -43,7 +47,7 @@ type ExperienceState = {
 
 export const experience: ExperienceState = {
   pointer: { x: 0, y: 0 },
-  anchors: { hero: null, manifesto: null, manifestoTop: 1, manifestoBottom: Infinity },
+  anchors: { hero: null, manifesto: null, sound: null, manifestoTop: 1, soundTop: Infinity, sleepAfter: Infinity },
   drag: { active: false, delta: 0, velocity: 0 },
   enter: { pushStart: null, cutAt: null, focal: null, locked: false, pointer: null },
   reducedMotion: false,

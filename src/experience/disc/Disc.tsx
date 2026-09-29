@@ -35,6 +35,8 @@ const TAU = Math.PI * 2;
 /** Resting tilt: seen slightly from above, like a disc lifted from a tray. */
 const HERO_TILT = -0.42;
 const MANIFESTO_TILT = -0.62;
+/** THE SOUND OF THE CLUB: the disc opens up toward the reader, like one lifted to the light. */
+const SOUND_TILT = -0.3;
 
 /** Viewport-space pose the disc is drawn at. */
 type Pose = { x: number; y: number; size: number; tilt: number };
@@ -179,12 +181,27 @@ export function Disc({ monoFamily }: { monoFamily: string }) {
     });
     manPose.tilt = MANIFESTO_TILT;
 
-    const progress = easeInOutCubic(clamp01(scrollY / Math.max(1, experience.anchors.manifestoTop)));
+    // Stations in scroll order: hero → manifesto → sound. The disc travels
+    // one segment at a time and rides with the page at each station.
+    const { manifestoTop, soundTop } = experience.anchors;
+    const soundPose = experience.anchors.sound
+      ? { ...toViewport(experience.anchors.sound, scrollY, manPose), tilt: SOUND_TILT }
+      : null;
+    const segment2 = soundPose ? clamp01((scrollY - manifestoTop) / Math.max(1, soundTop - manifestoTop)) : 0;
+
+    let from = heroPose;
+    let to = manPose;
+    let progress = easeInOutCubic(clamp01(scrollY / Math.max(1, manifestoTop)));
+    if (soundPose && segment2 > 0) {
+      from = manPose;
+      to = soundPose;
+      progress = easeInOutCubic(segment2);
+    }
     const base: Pose = {
-      x: lerp(heroPose.x, manPose.x, progress),
-      y: lerp(heroPose.y, manPose.y, progress),
-      size: lerp(heroPose.size, manPose.size, progress),
-      tilt: lerp(HERO_TILT, MANIFESTO_TILT, progress),
+      x: lerp(from.x, to.x, progress),
+      y: lerp(from.y, to.y, progress),
+      size: lerp(from.size, to.size, progress),
+      tilt: lerp(from.tilt, to.tilt, progress),
     };
 
     // ------------------------------------------------ ENTER: push, cut, settle

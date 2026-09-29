@@ -12,7 +12,7 @@ const SAMPLE_WINDOW_MS = 50;
 const STALE_MS = 80;
 
 type Props = {
-  name: "hero" | "manifesto";
+  name: "hero" | "manifesto" | "sound";
   className?: string;
   /** Horizontal drag rotates the disc (yaw). Vertical movement still scrolls. */
   rotatable?: boolean;

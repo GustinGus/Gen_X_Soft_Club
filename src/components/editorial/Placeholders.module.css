@@ -1,0 +1,128 @@
+/* ================================================================ photo plate */
+.plate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Empty exposure: cool, low-contrast, one light source — clearly not a photo. */
+.frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 11px, rgb(231 229 219 / 0.035) 11px 12px),
+    radial-gradient(70% 22% at 62% 30%, rgb(198 216 167 / 0.12), transparent 70%),
+    linear-gradient(180deg, transparent 29.6%, rgb(236 240 230 / 0.35) 30%, transparent 30.5%),
+    linear-gradient(180deg, #1c2421 0%, #121815 70%, #1a2220 100%);
+  box-shadow: inset 0 0 0 1px rgb(231 229 219 / 0.08);
+}
+
+.plate[data-tone="day"] .frame {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 11px, rgb(23 26 24 / 0.05) 11px 12px),
+    linear-gradient(180deg, #b7c1bb, #8e9c95 65%, #76877e);
+}
+
+/* Printer's crop marks, inside the frame. */
+.crop {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid rgb(231 229 219 / 0.4);
+}
+.crop[data-corner="tl"] { top: 10px; left: 10px; border-top-width: 1px; border-left-width: 1px; }
+.crop[data-corner="tr"] { top: 10px; right: 10px; border-top-width: 1px; border-right-width: 1px; }
+.crop[data-corner="bl"] { bottom: 10px; left: 10px; border-bottom-width: 1px; border-left-width: 1px; }
+.crop[data-corner="br"] { bottom: 10px; right: 10px; border-bottom-width: 1px; border-right-width: 1px; }
+
+.mark {
+  position: absolute;
+  left: var(--space-5);
+  bottom: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgb(231 229 219 / 0.6);
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+  color: var(--ink-night-muted);
+}
+
+.caption span:first-child {
+  color: var(--ink-night);
+}
+
+.flag {
+  margin-left: auto;
+  color: var(--signal-night);
+}
+
+/* ================================================================ jewel case */
+/* 142 × 125 mm case; the booklet window is square. */
+.case {
+  position: relative;
+  aspect-ratio: 142 / 125;
+  width: 100%;
+  background:
+    linear-gradient(90deg, rgb(231 229 219 / 0.1), rgb(231 229 219 / 0.03) 30%, rgb(231 229 219 / 0.06)),
+    #151b18;
+  box-shadow:
+    inset 0 0 0 1px rgb(231 229 219 / 0.16),
+    0 24px 40px -28px rgb(0 0 0 / 0.9);
+}
+
+/* Moulded hinge / spine on the left. */
+.hinge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8.5%;
+  border-right: 1px solid rgb(231 229 219 / 0.14);
+  background: repeating-linear-gradient(180deg, rgb(231 229 219 / 0.07) 0 1px, transparent 1px 5px);
+}
+
+/* Square booklet window. */
+.tray {
+  position: absolute;
+  top: 5%;
+  bottom: 5%;
+  right: 4%;
+  aspect-ratio: 1;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 9px, rgb(231 229 219 / 0.03) 9px 10px),
+    linear-gradient(160deg, #26302c, #171d1a);
+  box-shadow: inset 0 0 0 1px rgb(231 229 219 / 0.08);
+}
+
+.trayLabel {
+  position: absolute;
+  left: 8%;
+  bottom: 8%;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: var(--tracking-meta);
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgb(231 229 219 / 0.55);
+}
+
+/* Polycarbonate lid catching one tube of light. */
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(118deg, transparent 38%, rgb(255 255 255 / 0.07) 44%, transparent 52%);
+}

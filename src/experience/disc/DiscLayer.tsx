@@ -15,14 +15,20 @@ function useAnchorMeasurement() {
     const measure = () => {
       const hero = document.querySelector("[data-disc-anchor='hero']");
       const manifesto = document.querySelector("[data-disc-anchor='manifesto']");
-      const section = document.getElementById("manifesto");
+      const sound = document.querySelector("[data-disc-anchor='sound']");
+      const manifestoSection = document.getElementById("manifesto");
+      const soundSection = document.getElementById("sound");
+      const top = (el: Element) => el.getBoundingClientRect().top + window.scrollY;
+      const bottom = (el: Element) => el.getBoundingClientRect().bottom + window.scrollY;
+
       experience.anchors.hero = hero ? measureAnchor(hero) : null;
       experience.anchors.manifesto = manifesto ? measureAnchor(manifesto) : null;
-      if (section) {
-        const r = section.getBoundingClientRect();
-        experience.anchors.manifestoTop = r.top + window.scrollY;
-        experience.anchors.manifestoBottom = r.bottom + window.scrollY;
-      }
+      experience.anchors.sound = sound ? measureAnchor(sound) : null;
+      if (manifestoSection) experience.anchors.manifestoTop = top(manifestoSection);
+      experience.anchors.soundTop = soundSection ? top(soundSection) : Infinity;
+      // The layer sleeps once the last station's section has left the viewport.
+      const last = soundSection ?? manifestoSection;
+      experience.anchors.sleepAfter = last ? bottom(last) : Infinity;
       experience.invalidate();
     };
 

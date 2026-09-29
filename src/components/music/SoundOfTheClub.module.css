@@ -1,0 +1,305 @@
+/*
+ * THE SOUND OF THE CLUB.
+ * Same rule as Phase 1: the section must not become a stacking context,
+ * so the fixed disc layer can sit between the background and the type.
+ *
+ * Material: the manifesto's night, now with polycarbonate — a faint clear
+ * plastic sheen crossing the lower field, like light on a jewel case.
+ */
+
+.sound {
+  --disc-size: min(100svh, 66vw);
+  --title-size: min(11.6vw, 24svh);
+
+  position: relative;
+  min-height: 170svh;
+  padding: var(--margin);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  grid-template-rows: 38svh auto 1fr auto;
+  column-gap: var(--grid-gap);
+  color: var(--ink-night);
+  background:
+    /* polycarbonate sheen */
+    linear-gradient(
+      112deg,
+      transparent 52%,
+      rgb(168 201 193 / 0.05) 58%,
+      rgb(231 229 219 / 0.035) 60%,
+      transparent 66%
+    ),
+    /* continues exactly where the manifesto's gradient ends */
+    linear-gradient(180deg, var(--surface-night-deep) 0%, #0b0f0d 55%, var(--surface-night-deep) 100%);
+  overflow: clip;
+}
+
+/* ------------------------------------------------------------ dissolving grid */
+.grid {
+  position: absolute;
+  inset: 0 var(--margin) auto;
+  height: 46svh;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  pointer-events: none;
+  /* emerges from the manifesto, then dissolves */
+  mask: linear-gradient(180deg, transparent 0%, #000 14%, transparent 100%);
+}
+
+.grid span {
+  border-right: 1px solid var(--rule-night);
+}
+
+/* ------------------------------------------------------------ archive metadata */
+.archive {
+  grid-column: 1 / span 3;
+  grid-row: 1;
+  align-self: end;
+  position: relative;
+  z-index: var(--z-type-front);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  padding-bottom: var(--space-6);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.archiveId {
+  color: var(--signal-night);
+}
+
+.muted {
+  color: var(--ink-night-muted);
+}
+
+/* LCD-like format readout — medium facts, set small. */
+.format {
+  grid-column: 8 / -1;
+  grid-row: 1;
+  align-self: end;
+  justify-self: end;
+  position: relative;
+  z-index: var(--z-type-front);
+  display: flex;
+  gap: var(--space-5);
+  padding-bottom: var(--space-6);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  /* casing lives in the data: units keep their case (kHz) */
+  color: var(--ink-night-muted);
+}
+
+.format span + span::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-right: var(--space-5);
+  vertical-align: 0.15em;
+  background: var(--palette-dark-steel);
+}
+
+/* ------------------------------------------------------------ title */
+.title {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+  z-index: var(--z-type-front);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--rule-night);
+  font-size: var(--title-size);
+  line-height: 0.84;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.line {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.03em;
+}
+
+.lineInner {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* "The sound" — light, extended: air. */
+.line[data-line="0"] .lineInner {
+  font-weight: var(--weight-light);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: -0.045em;
+}
+
+/* "of the club" — heavy, pushed off the grid, running into the right edge. */
+.line[data-line="1"] {
+  padding-left: calc(100% / 12 * 2);
+}
+
+.line[data-line="1"] .lineInner {
+  font-weight: var(--weight-black);
+}
+
+/* ------------------------------------------------------------ disc station */
+.disc {
+  right: calc(var(--disc-size) * -0.28);
+  top: calc(38svh + var(--title-size) * 0.6);
+  width: var(--disc-size);
+  --disc-tilt: 17deg;
+}
+
+/* ------------------------------------------------------------ question */
+.question {
+  grid-column: 1 / span 5;
+  grid-row: 4;
+  position: relative;
+  z-index: var(--z-type-front);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-5);
+  row-gap: var(--space-5);
+  padding-top: var(--space-9);
+  padding-bottom: var(--space-6);
+}
+
+.questionLabel {
+  grid-row: 1 / span 2;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  color: var(--signal-night);
+  padding-top: 0.6em;
+}
+
+.questionText {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(1.75rem, 1rem + 2.2vw, 3.25rem);
+  font-weight: var(--weight-medium);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.deck {
+  max-width: var(--measure);
+  font-size: var(--type-caption);
+  line-height: 1.55;
+  color: var(--ink-night-muted);
+  text-wrap: pretty;
+}
+
+/* ================================================================ reveal */
+.sound[data-reveal="pending"] .lineInner {
+  transform: translateY(106%);
+}
+
+.sound[data-reveal="pending"] .archive,
+.sound[data-reveal="pending"] .format,
+.sound[data-reveal="pending"] .question {
+  opacity: 0;
+}
+
+.sound[data-reveal="revealed"] .lineInner {
+  transform: none;
+  transition: transform var(--duration-reveal) var(--ease-out);
+  transition-delay: calc(240ms + var(--i) * var(--stagger-line));
+}
+
+.sound[data-reveal="revealed"] .archive,
+.sound[data-reveal="revealed"] .format,
+.sound[data-reveal="revealed"] .question {
+  opacity: 1;
+  transition: opacity var(--duration-slow) linear;
+}
+
+.sound[data-reveal="revealed"] .question {
+  transition-delay: 520ms;
+}
+
+/* ================================================================ tablet */
+@media (max-width: 1023px) {
+  .sound {
+    --disc-size: min(88vw, 80svh);
+    --title-size: min(11.4vw, 18svh);
+    min-height: 150svh;
+  }
+
+  .archive {
+    grid-column: 1 / span 6;
+  }
+
+  .format {
+    grid-column: 7 / -1;
+    gap: var(--space-3);
+  }
+
+  .format span + span::before {
+    margin-right: var(--space-3);
+  }
+
+  .question {
+    grid-column: 1 / span 8;
+  }
+}
+
+/* ================================================================ mobile */
+@media (max-width: 699px) {
+  .sound {
+    --disc-size: 104vw;
+    --title-size: 17vw;
+    grid-template-rows: 30svh auto auto auto;
+    /* archive · format · title · question */
+    min-height: 0;
+  }
+
+  .archive {
+    grid-column: 1 / -1;
+    padding-bottom: var(--space-4);
+  }
+
+  /* format reads before the title on mobile, clear of the disc */
+  .format {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    padding: 0 0 var(--space-5);
+  }
+
+  .title {
+    grid-row: 3;
+  }
+
+  .format span + span::before {
+    margin-right: var(--space-3);
+  }
+
+  .line[data-line="1"] {
+    padding-left: 0;
+  }
+
+  .lineInner,
+  .line[data-line="1"] .lineInner {
+    white-space: normal;
+  }
+
+  .disc {
+    right: -34vw;
+    top: calc(30svh + var(--title-size) * 2.6);
+  }
+
+  .question {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    padding-top: calc(var(--disc-size) * 0.72);
+  }
+}
