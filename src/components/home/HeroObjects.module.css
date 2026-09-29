@@ -1,0 +1,120 @@
+/* ================================================================ MiniDisc */
+/* Real cartridge ratio 68 × 72 mm. */
+.minidisc {
+  position: absolute;
+  aspect-ratio: 68 / 72;
+  border-radius: var(--radius-object);
+  background:
+    linear-gradient(160deg, rgb(255 255 255 / 0.5), transparent 38%),
+    var(--material-plastic);
+  box-shadow:
+    inset 0 0 0 1px var(--material-plastic-edge),
+    inset 0 -10px 18px -12px rgb(23 26 24 / 0.25),
+    0 22px 40px -24px rgb(23 26 24 / 0.45);
+  overflow: hidden;
+}
+
+/* The disc inside, seen through the shell. */
+.mdDisc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 88%;
+  aspect-ratio: 1;
+  translate: -50% -48%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, rgb(84 93 91 / 0.35) 0 16%, transparent 17%),
+    conic-gradient(from 120deg, #c9d3cf, #e3e6da, #bfcdd0, #dde3cf, #c9d3cf);
+  opacity: 0.55;
+}
+
+/* Brushed aluminium shutter. */
+.mdShutter {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 58%;
+  height: 46%;
+  background: var(--material-aluminium);
+  box-shadow: inset 0 -1px 0 rgb(23 26 24 / 0.25);
+}
+
+.mdLabel {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 8%;
+  display: flex;
+  justify-content: space-between;
+  padding: 4% 6%;
+  background: var(--material-paper);
+  color: var(--material-paper-ink);
+  font-family: var(--font-mono);
+  font-size: clamp(5px, 0.42vw, 7px);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.mdTab {
+  position: absolute;
+  right: 7%;
+  top: 8%;
+  width: 7%;
+  aspect-ratio: 1 / 1.6;
+  background: var(--palette-dark-steel);
+  opacity: 0.6;
+}
+
+/* ================================================================ Paper slip */
+.slip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-4);
+  background: var(--material-paper);
+  color: var(--material-paper-ink);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 28px 50px -30px rgb(23 26 24 / 0.5),
+    0 2px 6px -2px rgb(23 26 24 / 0.18);
+}
+
+.folio,
+.slipCaption {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.slipCaption {
+  opacity: 0.6;
+}
+
+/* Empty photographic plate — cool, low-contrast, visibly a placeholder. */
+.plate {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 9px, rgb(23 26 24 / 0.05) 9px 10px),
+    linear-gradient(180deg, #aeb9b3, #8e9c95 60%, #76877e);
+  display: grid;
+  place-items: end start;
+  padding: var(--space-3);
+}
+
+.plateLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--palette-off-white);
+}

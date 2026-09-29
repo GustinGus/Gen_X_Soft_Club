@@ -1,0 +1,229 @@
+/*
+ * INSIDE THE CLUB — first editorial composition.
+ * Same rule as the lobby: no stacking context on the section, so the
+ * fixed disc layer can sit between the background and the type.
+ */
+
+.manifesto {
+  --disc-size: min(56svh, 36vw);
+
+  position: relative;
+  min-height: 100svh;
+  padding: var(--margin);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  grid-template-rows: auto 1fr auto;
+  column-gap: var(--grid-gap);
+  color: var(--ink-night);
+  background:
+    /* a single tube somewhere above-left */
+    radial-gradient(60% 40% at 18% -6%, rgb(198 216 167 / 0.1), transparent 70%),
+    linear-gradient(180deg, var(--surface-night) 0%, var(--surface-night-deep) 100%);
+  overflow: clip;
+}
+
+/* ------------------------------------------------------------ folio row */
+.folio {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: var(--z-type-front);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-top: calc(var(--space-7) + var(--space-3)); /* clears the fixed sound readout */
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule-night);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.id {
+  color: var(--signal-night);
+}
+
+.range {
+  color: var(--ink-night-muted);
+}
+
+/* ------------------------------------------------------------ headline */
+.headline {
+  grid-column: 1 / -1;
+  align-self: center;
+  position: relative;
+  z-index: var(--z-type-front);
+  padding-block: var(--space-7);
+  /* height-aware: three lines must fit with the folio and body */
+  font-size: min(clamp(3.4rem, 0.6rem + 9.4vw, 11rem), 15svh);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-headline);
+  letter-spacing: var(--tracking-headline);
+  text-transform: uppercase;
+}
+
+/* Receives programmatic focus after ENTER (for screen readers / keyboard
+   continuity). It is not interactive, so no ring is drawn. */
+.headline:focus,
+.headline:focus-visible {
+  outline: none;
+}
+
+/* Mask for the line reveal. Slight bottom allowance for descender-free caps. */
+.line {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.04em;
+}
+
+.lineInner {
+  display: inline-block;
+}
+
+.line[data-line="0"] .lineInner {
+  font-weight: var(--weight-light);
+  font-variation-settings: "wdth" var(--width-extended);
+}
+
+.line[data-line="1"] {
+  padding-left: calc(100% / 12 * 1);
+}
+
+/* The statement lands heavy, indented off the grid. */
+.line[data-line="2"] {
+  padding-left: calc(100% / 12 * 3);
+}
+
+.line[data-line="2"] .lineInner {
+  font-weight: var(--weight-black);
+  letter-spacing: -0.05em;
+  word-spacing: 0.14em;
+}
+
+/* ------------------------------------------------------------ disc slot */
+.disc {
+  right: calc(var(--margin) + 2vw);
+  top: 54%;
+  width: var(--disc-size);
+  translate: 0 -50%;
+  --disc-tilt: 36deg;
+}
+
+/* ------------------------------------------------------------ body */
+.body {
+  grid-column: 1 / span 4;
+  position: relative;
+  z-index: var(--z-type-front);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule-night);
+}
+
+.deck {
+  max-width: var(--measure);
+  text-wrap: pretty;
+  font-size: var(--type-deck);
+  line-height: 1.4;
+  color: var(--ink-night);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--ink-night-muted);
+}
+
+/* LCD status pip. Static — nothing blinks. */
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--signal-night);
+}
+
+/* ================================================================ reveal */
+/* "static": server / no-JS — everything visible. "pending": waiting for the
+   cut or for the section to scroll in. "revealed": editorial line reveal. */
+.manifesto[data-reveal="pending"] .lineInner {
+  transform: translateY(108%);
+}
+
+.manifesto[data-reveal="pending"] .folio,
+.manifesto[data-reveal="pending"] .body {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.manifesto[data-reveal="revealed"] .lineInner {
+  transform: none;
+  transition: transform var(--duration-reveal) var(--ease-out);
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i) * var(--stagger-line));
+}
+
+.manifesto[data-reveal="revealed"] .folio,
+.manifesto[data-reveal="revealed"] .body {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-slow) linear,
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.manifesto[data-reveal="revealed"] .folio {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 180ms);
+}
+
+.manifesto[data-reveal="revealed"] .body {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 520ms);
+}
+
+/* ================================================================ tablet */
+@media (max-width: 1023px) {
+  .manifesto {
+    --disc-size: min(52vw, 46svh);
+  }
+
+  .body {
+    grid-column: 1 / span 7;
+  }
+}
+
+/* ================================================================ mobile */
+@media (max-width: 699px) {
+  .manifesto {
+    --disc-size: 70vw;
+    grid-template-rows: auto auto 1fr auto;
+  }
+
+  .headline {
+    font-size: 15.5vw;
+    padding-top: calc(var(--disc-size) * 0.62);
+    padding-bottom: var(--space-7);
+  }
+
+  .line[data-line="1"] {
+    padding-left: 0;
+  }
+
+  .line[data-line="2"] {
+    padding-left: 12vw;
+  }
+
+  .disc {
+    top: calc(var(--space-7) + 5rem);
+    right: -14vw;
+    translate: 0 0;
+  }
+
+  .body {
+    grid-column: 1 / -1;
+  }
+}

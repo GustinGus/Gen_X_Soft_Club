@@ -1,0 +1,368 @@
+/*
+ * THE LOBBY — first viewport.
+ * Clinical daylight, fluorescent bloom, layered type around a disc.
+ *
+ * IMPORTANT: the section and the h1 must never become stacking contexts
+ * (no transform / opacity / filter / z-index on them), otherwise the
+ * back-type → disc → front-type interleave with the fixed WebGL layer breaks.
+ */
+
+.hero {
+  /* Composition variables — every breakpoint re-art-directs these. */
+  --display-back: min(19.5vw, 36svh);
+  --display-front: min(11.2vw, 21svh);
+  --disc-size: min(66svh, 47vw);
+  --disc-x: 61%;
+  --disc-y: 51%;
+  --parallax-travel: 10px;
+
+  position: relative;
+  height: 100svh;
+  min-height: 36rem;
+  overflow: clip;
+  color: var(--ink-day);
+  background:
+    /* fluorescent ceiling bloom */
+    radial-gradient(90% 55% at 58% -8%, rgb(250 251 247 / 0.95), transparent 70%),
+    /* cool falloff toward the floor */
+    linear-gradient(180deg, #e2e5df 0%, var(--palette-fog) 48%, #c9cfc8 100%);
+}
+
+/* Parallax: layers marked `data-parallax` get an inline `translate` from
+   usePointerField (per-layer --depth × this section's --parallax-travel).
+   `translate` composes with the ENTER sequence, which animates `transform`. */
+
+/* ------------------------------------------------------------ print registration */
+.registration {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  opacity: 0.45;
+  background:
+    linear-gradient(currentColor, currentColor) center / 1px 100% no-repeat,
+    linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat;
+}
+.registration[data-corner="tl"] { top: calc(var(--margin) * 0.5); left: calc(var(--margin) * 0.5); }
+.registration[data-corner="tr"] { top: calc(var(--margin) * 0.5); right: calc(var(--margin) * 0.5); }
+.registration[data-corner="bl"] { bottom: calc(var(--margin) * 0.5); left: calc(var(--margin) * 0.5); }
+.registration[data-corner="br"] { bottom: calc(var(--margin) * 0.5); right: calc(var(--margin) * 0.5); }
+
+/* ------------------------------------------------------------ rail (metadata) */
+.rail {
+  position: absolute;
+  top: var(--margin);
+  left: var(--margin);
+  right: calc(var(--margin) + 12rem); /* leaves room for the fixed sound readout */
+  z-index: var(--z-ui);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--border-rule);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+}
+
+.masthead {
+  grid-column: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.axes {
+  grid-column: 5 / span 5;
+  display: flex;
+  gap: var(--space-6);
+}
+
+.axes li {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Pause ambient motion — a system switch, not a feature. */
+.motion {
+  grid-column: 11 / span 2;
+  justify-self: end;
+  align-self: start;
+  min-height: 24px;
+  display: flex;
+  gap: var(--space-2);
+  letter-spacing: inherit;
+  text-transform: inherit;
+  font-weight: inherit;
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  .motion {
+    min-height: var(--target-min);
+    align-items: center;
+  }
+}
+
+@media (hover: hover) {
+  .motion:hover .muted {
+    color: var(--ink-day);
+  }
+}
+
+.muted {
+  color: var(--ink-day-muted);
+}
+
+/* ------------------------------------------------------------ title */
+.title {
+  font-weight: var(--weight-black);
+  text-transform: uppercase;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.titleBack,
+.titleFront {
+  position: absolute;
+  display: block;
+  white-space: nowrap;
+}
+
+/* GEN X — heavy, behind the disc. */
+.titleBack {
+  z-index: var(--z-type-back);
+  top: calc(var(--margin) + 3.25rem);
+  left: calc(var(--margin) - 0.06em);
+  font-size: var(--display-back);
+  font-variation-settings: "wdth" var(--width-normal);
+}
+
+/* SOFT CLUB — light and extended, in front of the disc. "Soft" is literal. */
+.titleFront {
+  z-index: var(--z-type-front);
+  top: calc(var(--margin) + 3.25rem + var(--display-back) * 0.86);
+  left: calc(var(--margin) + 10vw);
+  font-size: var(--display-front);
+  font-weight: var(--weight-light);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: -0.04em;
+}
+
+.titleFront > span {
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------ disc slot */
+.disc {
+  left: var(--disc-x);
+  top: var(--disc-y);
+  width: var(--disc-size);
+  translate: -50% -50%;
+}
+
+.caption {
+  position: absolute;
+  z-index: var(--z-ui);
+  /* lower-left of the disc, clear of the paper slip */
+  left: calc(var(--disc-x) - var(--disc-size) * 0.66);
+  top: calc(var(--disc-y) + var(--disc-size) * 0.33);
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+  color: var(--ink-day-muted);
+  --depth: 0.3;
+}
+
+/* Leader line from the caption back to the object. */
+.caption::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: var(--space-4);
+  height: 1px;
+  background: currentColor;
+}
+
+.caption span:first-child {
+  color: var(--ink-day);
+}
+
+/* 199X—200X — vertical, transit-sign condensed. */
+.span {
+  position: absolute;
+  z-index: var(--z-ui);
+  right: var(--margin);
+  top: 50%;
+  writing-mode: vertical-rl;
+  transform-origin: center;
+  margin-top: -6em;
+  font-size: var(--type-caption);
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wdth" var(--width-condensed);
+  letter-spacing: var(--tracking-signage);
+  --depth: 0.2;
+}
+
+/* ------------------------------------------------------------ secondary objects */
+.minidisc {
+  z-index: var(--z-object-back);
+  top: 17svh;
+  right: calc(var(--margin) + 7vw);
+  width: clamp(4.5rem, 7vw, 7.5rem);
+  rotate: -9deg;
+}
+
+.slip {
+  z-index: var(--z-object-back);
+  right: calc(var(--margin) + 3rem);
+  bottom: -12svh;
+  width: clamp(9rem, 14vw, 13.5rem);
+  rotate: 4deg;
+}
+
+/* ------------------------------------------------------------ entry */
+.entry {
+  position: absolute;
+  z-index: var(--z-ui);
+  left: var(--margin);
+  bottom: var(--margin);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.intro {
+  font-size: var(--type-deck);
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wdth" var(--width-normal);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* ================================================================ tablet */
+@media (max-width: 1023px) {
+  .hero {
+    --display-back: min(24vw, 30svh);
+    --display-front: min(10.8vw, 17svh);
+    --disc-size: min(76vw, 56svh);
+    --disc-x: 62%;
+    /* high enough that SOFT CLUB crosses in front of the disc */
+    --disc-y: 49%;
+    --parallax-travel: 5px;
+  }
+
+  .rail {
+    right: calc(var(--margin) + 9rem);
+  }
+
+  .masthead {
+    grid-column: 1 / span 5;
+  }
+
+  .axes {
+    grid-column: 7 / span 6;
+    gap: var(--space-4);
+  }
+
+  /* Second row, under the masthead. */
+  .motion {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .titleFront {
+    left: var(--margin);
+  }
+
+  .caption {
+    left: auto;
+    right: var(--margin);
+    top: calc(var(--disc-y) + var(--disc-size) * 0.42);
+  }
+
+  .span,
+  .slip {
+    display: none;
+  }
+
+  .minidisc {
+    top: auto;
+    bottom: calc(var(--margin) + 1rem);
+    right: calc(var(--margin) + 1rem);
+  }
+}
+
+/* ================================================================ mobile */
+/* Its own vertical composition — not the desktop shrunk. */
+@media (max-width: 699px) {
+  .hero {
+    --display-back: 30vw;
+    --display-front: 25vw;
+    --disc-size: 96vw;
+    --disc-x: 74%;
+    --disc-y: 47%;
+    --parallax-travel: 0px;
+
+    min-height: 40rem;
+  }
+
+  .rail {
+    right: calc(var(--margin) + 7.5rem);
+    display: block;
+    border-bottom: 0;
+  }
+
+  .axes {
+    display: none;
+  }
+
+  .titleBack {
+    top: calc(var(--margin) + 4.5rem);
+  }
+
+  /* SOFT / CLUB stacked, the disc passing between the words. */
+  .titleFront {
+    top: calc(var(--margin) + 4.5rem + var(--display-back) * 0.9);
+    left: var(--margin);
+    line-height: 0.84;
+  }
+
+  .titleFront > span {
+    display: block;
+  }
+
+  .caption,
+  .minidisc {
+    display: none;
+  }
+
+  .entry {
+    right: var(--margin);
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  .intro {
+    font-size: 1rem;
+  }
+}
+
+@media (max-height: 560px) and (min-width: 700px) {
+  .minidisc,
+  .slip,
+  .caption {
+    display: none;
+  }
+}

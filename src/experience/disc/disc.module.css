@@ -1,0 +1,79 @@
+/* Fixed WebGL layer — drawn between back type (z 10) and front type (z 30). */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-disc);
+  pointer-events: none;
+  opacity: 0;
+  animation: layer-in var(--duration-slow) var(--ease-out) forwards;
+}
+
+.layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@keyframes layer-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ anchor */
+/* Sections position/size the anchor; this only defines its nature. */
+.anchor {
+  position: absolute;
+  z-index: var(--z-disc);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  perspective: 1400px;
+}
+
+/* ENTER sequence running: the disc is not grabbable (no drag, no [ ROTATE ]). */
+:global(html[data-enter="active"]) .anchor {
+  pointer-events: none;
+}
+
+.rotatable {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/*
+ * Poster disc — CSS only. First paint, loading state and no-WebGL fallback.
+ * Muted conic "diffraction" rather than a rainbow: it should read as a disc
+ * under fluorescent light, not a hologram.
+ */
+.poster {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform: rotateX(var(--disc-tilt, 24deg));
+  background:
+    /* sizes are fractions of the radius — same proportions as discGeometry.ts */
+    radial-gradient(circle closest-side, transparent 0 26.5%, rgb(23 26 24 / 0.1) 26.5% 31%, transparent 31%),
+    radial-gradient(circle closest-side, rgb(236 240 236 / 0.6) 0 37%, transparent 37.2%),
+    conic-gradient(
+      from 208deg,
+      #cfd7d3,
+      #e9ecdd 9%,
+      #c3d1d6 19%,
+      #dde6cc 29%,
+      #cdd5d2 42%,
+      #e7e3d8 56%,
+      #c5d4cd 71%,
+      #e3e8da 86%,
+      #cfd7d3
+    );
+  box-shadow:
+    inset 0 0 0 1px rgb(23 26 24 / 0.1),
+    inset 0 0 0 2px rgb(255 255 255 / 0.35);
+  /* The spindle hole is genuinely empty. */
+  mask: radial-gradient(circle closest-side, transparent 0 12.5%, #000 12.8%);
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+:global(html[data-disc="webgl"]) .poster {
+  opacity: 0;
+}

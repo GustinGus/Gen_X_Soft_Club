@@ -1,0 +1,157 @@
+/*
+ * GEN X SOFT CLUB — design tokens
+ * Glass + concrete + paper + CD + aluminium + fluorescent light.
+ *
+ * Layers:
+ *   1. palette      raw material colours (never used directly by components)
+ *   2. semantic     what a colour *does* (surface, ink, rule, signal)
+ *   3. type         families, scale, tracking
+ *   4. space        spacing scale + editorial grid
+ *   5. depth        z-index ladder
+ *   6. motion       durations + easings (mirrored in src/motion/tokens.ts)
+ *   7. material     borders, surfaces, grain
+ */
+
+:root {
+  /* ---------------------------------------------------------------- 1. palette */
+  --palette-concrete: #c8c5bb;
+  --palette-off-white: #e7e5db;
+  --palette-fog: #d8d9d3;
+  --palette-hospital: #b9c6ae;
+  --palette-glass: #a8c9c1;
+  --palette-phosphor: #c6d8a7;
+  --palette-muted-green: #8b9b91;
+  --palette-transit-green: #76877e;
+  --palette-steel: #879291;
+  --palette-dark-steel: #545d5b;
+  --palette-ink: #171a18;
+  --palette-night: #080a09;
+  --palette-deep-green: #101512;
+  /* Exposure white — only for the photographic flash. */
+  --palette-flash: #f6f6f1;
+
+  /* ---------------------------------------------------------------- 2. semantic */
+  /* Daylight — the lobby. Clinical, editorial, fluorescent-lit. */
+  --surface-day: var(--palette-fog);
+  --surface-day-raised: var(--palette-off-white);
+  --ink-day: var(--palette-ink);
+  --ink-day-muted: var(--palette-dark-steel);
+  --rule-day: color-mix(in srgb, var(--palette-ink) 22%, transparent);
+
+  /* Night — inside the club. */
+  --surface-night: var(--palette-deep-green);
+  --surface-night-deep: var(--palette-night);
+  --ink-night: var(--palette-off-white);
+  --ink-night-muted: var(--palette-steel);
+  --rule-night: color-mix(in srgb, var(--palette-off-white) 18%, transparent);
+  --signal-night: var(--palette-phosphor);
+
+  --focus-ring: var(--palette-transit-green);
+  --focus-ring-night: var(--palette-phosphor);
+
+  /* ---------------------------------------------------------------- 3. type */
+  /* Families are injected by next/font in app/layout.tsx. */
+  --font-grotesk: var(--font-archivo), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Scale: extreme contrast by design. Metadata is tiny, display is architectural. */
+  --type-meta: 0.6875rem; /* 11px — archive labels, transit signage */
+  --type-caption: 0.8125rem; /* 13px */
+  --type-body: 1rem;
+  --type-deck: clamp(1.0625rem, 0.9rem + 0.5vw, 1.375rem);
+  --type-headline: clamp(2.5rem, 1.2rem + 5vw, 6rem);
+  --type-display: clamp(4.75rem, 0.5rem + 17.5vw, 21rem);
+
+  --leading-display: 0.8;
+  --leading-headline: 0.88;
+  --leading-body: 1.5;
+  --leading-meta: 1.35;
+
+  --tracking-display: -0.055em;
+  --tracking-headline: -0.035em;
+  --tracking-body: 0;
+  --tracking-meta: 0.14em;
+  --tracking-signage: 0.28em;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 800;
+
+  /* Archivo's width axis: condensed signage ↔ extended display. */
+  --width-condensed: 72;
+  --width-normal: 100;
+  --width-extended: 125;
+
+  /* ---------------------------------------------------------------- 4. space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+
+  /* Page margin (the "gutter" of the publication). */
+  --margin: clamp(1rem, 0.4rem + 2.2vw, 2.25rem);
+  --grid-columns: 12;
+  --grid-gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+
+  --measure: 34ch;
+  --target-min: 44px;
+
+  /* ---------------------------------------------------------------- 5. depth */
+  /* Explicit ladder. The WebGL disc lives *between* type layers. */
+  --z-base: 0;
+  --z-type-back: 10;
+  --z-object-back: 15;
+  --z-disc: 20;
+  --z-type-front: 30;
+  --z-ui: 40;
+  --z-chrome: 50;
+  --z-flash: 80;
+  --z-grain: 90;
+  --z-cursor: 100;
+
+  /* ---------------------------------------------------------------- 6. motion */
+  /* Keep in sync with src/motion/tokens.ts */
+  --duration-instant: 90ms;
+  --duration-quick: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 640ms;
+  --duration-reveal: 1100ms;
+
+  /* Heavy, damped, physical. No elastic. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* expo-like settle */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-in: cubic-bezier(0.55, 0, 0.9, 0.3); /* departure, gathering speed */
+  --ease-mechanical: cubic-bezier(0.3, 0, 0.1, 1); /* tray / shutter */
+
+  --stagger-line: 90ms;
+
+  /* ---------------------------------------------------------------- 7. material */
+  --border-hairline: 1px;
+  --border-rule: 1px solid var(--rule-day);
+  --radius-none: 0;
+  --radius-object: 3px; /* moulded plastic edge, never a "card" radius */
+
+  /* Frosted translucent plastic — used sparingly, for objects not panels. */
+  --material-plastic: color-mix(in srgb, var(--palette-glass) 38%, transparent);
+  --material-plastic-edge: color-mix(in srgb, var(--palette-off-white) 55%, transparent);
+  --material-paper: #ecebe4;
+  --material-paper-ink: #2a2d2b;
+  --material-aluminium: linear-gradient(
+    100deg,
+    #b8bdbb 0%,
+    #dfe2df 22%,
+    #a9afad 48%,
+    #d2d6d3 70%,
+    #9ea5a3 100%
+  );
+
+  /* Static film grain (SVG turbulence, rendered once, never animated). */
+  --grain-opacity: 0.07;
+}

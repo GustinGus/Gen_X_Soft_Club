@@ -1,0 +1,38 @@
+/* Fixed transport readout. `difference` keeps it legible on day and night surfaces. */
+.status {
+  position: fixed;
+  top: var(--margin);
+  right: var(--margin);
+  z-index: var(--z-chrome);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--palette-off-white);
+  mix-blend-mode: difference;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.value {
+  opacity: 0.6;
+}
+
+/* Flat LCD level meter — four segments at rest. */
+.meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9px;
+}
+
+.meter span {
+  width: 2px;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.8;
+}

@@ -1,0 +1,136 @@
+/*
+ * Camera focus marker. `difference` blending keeps it legible on the
+ * daylight lobby and inside the dark club without per-section theming.
+ */
+.cursor {
+  --cursor-ink: var(--palette-off-white);
+  --frame: 18px;
+  --arm: 5px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-cursor);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity var(--duration-quick) linear;
+  will-change: transform;
+}
+
+.cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- centre point */
+.point {
+  position: absolute;
+  top: -1.5px;
+  left: -1.5px;
+  width: 3px;
+  height: 3px;
+  background: var(--cursor-ink);
+}
+
+/* ---------------------------------------------------------------- focus brackets */
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.bracket {
+  position: absolute;
+  width: var(--arm);
+  height: var(--arm);
+  border: 0 solid var(--cursor-ink);
+  transition: translate var(--duration-quick) var(--ease-out);
+}
+
+.bracket[data-corner="tl"] {
+  top: calc(var(--frame) / -2);
+  left: calc(var(--frame) / -2);
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.bracket[data-corner="tr"] {
+  top: calc(var(--frame) / -2);
+  right: calc(var(--frame) / -2);
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+.bracket[data-corner="bl"] {
+  bottom: calc(var(--frame) / -2);
+  left: calc(var(--frame) / -2);
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+.bracket[data-corner="br"] {
+  bottom: calc(var(--frame) / -2);
+  right: calc(var(--frame) / -2);
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+/* Focusing on a target: the frame opens up (translate only — no layout). */
+.cursor:not([data-state="idle"]) .bracket[data-corner="tl"] {
+  translate: -9px -9px;
+}
+.cursor:not([data-state="idle"]) .bracket[data-corner="tr"] {
+  translate: 9px -9px;
+}
+.cursor:not([data-state="idle"]) .bracket[data-corner="bl"] {
+  translate: -9px 9px;
+}
+.cursor:not([data-state="idle"]) .bracket[data-corner="br"] {
+  translate: 9px 9px;
+}
+
+/* Shutter press: the frame snaps in (scale, never layout). */
+.frame {
+  transition: scale var(--duration-quick) var(--ease-out);
+}
+
+.cursor[data-pressed="true"] .frame {
+  scale: 0.62;
+  transition-duration: var(--duration-instant);
+}
+
+/* ---------------------------------------------------------------- label */
+.label {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  display: flex;
+  gap: 0.5ch;
+  color: var(--cursor-ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  translate: -4px 0;
+  transition:
+    opacity var(--duration-quick) linear,
+    translate var(--duration-quick) var(--ease-out);
+}
+
+.cursor:not([data-state="idle"]) .label {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Scene cut: state changes land instantly (see CURSOR_RESET_EVENT). */
+.cursor[data-snap="true"],
+.cursor[data-snap="true"] * {
+  transition: none !important;
+}
+
+.bracketText {
+  opacity: 0.6;
+}

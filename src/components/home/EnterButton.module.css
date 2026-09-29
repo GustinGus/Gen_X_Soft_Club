@@ -1,0 +1,82 @@
+/* Transit-sign panel: ink plate, phosphor index, hairline construction. */
+.enter {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: min(100%, 22rem);
+  min-height: 3.5rem;
+  padding: 0 var(--space-5) 0 var(--space-4);
+  background: var(--palette-ink);
+  color: var(--palette-off-white);
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale var(--duration-quick) var(--ease-out);
+}
+
+.enter:active {
+  scale: 0.985;
+}
+
+/* Phosphor wipe on hover — transform only. */
+.fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--palette-phosphor);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  color: var(--palette-phosphor);
+  transition: color var(--duration-quick) linear;
+}
+
+.label {
+  font-size: 0.9375rem;
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: var(--tracking-signage);
+  text-transform: uppercase;
+  line-height: 1;
+  transition: color var(--duration-quick) linear;
+}
+
+.arrow {
+  font-size: 1.125rem;
+  line-height: 1;
+  transition:
+    translate var(--duration-base) var(--ease-out),
+    color var(--duration-quick) linear;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .enter:hover .fill {
+    transform: scaleX(1);
+  }
+
+  .enter:hover .label,
+  .enter:hover .arrow,
+  .enter:hover .index {
+    color: var(--palette-ink);
+  }
+
+  .enter:hover .arrow {
+    translate: 4px 0;
+  }
+}
+
+.enter:focus-visible {
+  outline: 2px solid var(--palette-ink);
+  outline-offset: 4px;
+}

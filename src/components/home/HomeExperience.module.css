@@ -1,0 +1,13 @@
+.home {
+  position: relative;
+}
+
+/* Photographic exposure. Driven only by WAAPI (opacity). */
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-flash);
+  background: var(--palette-flash);
+  opacity: 0;
+  pointer-events: none;
+}
