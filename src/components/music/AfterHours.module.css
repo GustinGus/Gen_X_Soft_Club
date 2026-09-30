@@ -232,6 +232,50 @@
   grid-column: 9 / -1;
 }
 
+/* Each record opens its file: the whole object is the hit area, and the
+   case rises out of the table under the hand (transform only). */
+.object {
+  position: relative;
+}
+
+.sleeve {
+  transition: translate var(--duration-base) var(--ease-mechanical);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .object:hover .sleeve {
+    translate: 0 -10px;
+  }
+}
+
+.object:has(.recordLink:focus-visible) .sleeve {
+  translate: 0 -10px;
+}
+
+.object:has(.recordLink:focus-visible) {
+  outline: 2px solid var(--focus-ring-night);
+  outline-offset: 8px;
+}
+
+.recordLink {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.recordLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.recordLink:focus-visible {
+  outline: none;
+}
+
 .label {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -301,6 +345,22 @@
   letter-spacing: var(--tracking-meta);
   text-transform: uppercase;
   color: var(--ink-night-muted);
+}
+
+.continuesLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  color: var(--signal-night);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .continuesLink:hover {
+    color: var(--ink-night);
+  }
 }
 
 /* ================================================================ reveal */

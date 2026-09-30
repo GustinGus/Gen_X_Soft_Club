@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, type CSSProperties } from "react";
-import { JewelCase, PhotoPlate } from "@/components/editorial/Placeholders";
+import { ArchiveSleeve } from "@/components/archive/ArchiveSleeve";
+import { PhotoPlate } from "@/components/editorial/Placeholders";
 import { afterHours as copy, frequencies, pad2, recordsIn, spanOf } from "@/content/music";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./AfterHours.module.css";
@@ -12,6 +14,7 @@ const frequency = frequencies.find((f) => f.id === "after-hours")!;
  * 01 / AFTER HOURS — the first real listening file.
  *
  * Records are archive objects (case + museum-style label), not cards.
+ * Each opens its file (/music/[slug]); the case is the shared element.
  * Identity data comes from content/music.ts; the year span is derived from
  * the records themselves. The curatorial note is labelled as interpretation.
  */
@@ -89,15 +92,23 @@ export function AfterHours() {
               data-hero={record.hero || undefined}
               style={{ "--i": i } as CSSProperties}
             >
-              <article aria-labelledby={`record-${record.number}`}>
-                <JewelCase artist={record.artist} album={record.album} catalogue={record.catalogue} />
+              <article className={styles.object} aria-labelledby={`record-${record.number}`}>
+                <ArchiveSleeve record={record} className={styles.sleeve} />
                 <div className={styles.label}>
                   <p className={styles.recordNo} aria-hidden="true">
                     {pad2(record.number)}
                   </p>
                   <h3 id={`record-${record.number}`} className={styles.recordTitle}>
-                    <span className={styles.artist}>{record.artist}</span>
-                    <span className={styles.album}>{record.album}</span>
+                    <Link
+                      className={styles.recordLink}
+                      href={`/music/${record.slug}`}
+                      transitionTypes={["archive-open"]}
+                      data-cursor="open"
+                    >
+                      <span className={styles.artist}>{record.artist}</span>
+                      <span className="visually-hidden"> — </span>
+                      <span className={styles.album}>{record.album}</span>
+                    </Link>
                   </h3>
                   <dl className={styles.facts}>
                     <div>
@@ -116,7 +127,11 @@ export function AfterHours() {
         </ol>
       </div>
 
-      <p className={styles.continues}>{copy.continues}</p>
+      <p className={styles.continues}>
+        <Link className={styles.continuesLink} href="/music">
+          {copy.continues} <span aria-hidden="true">→</span>
+        </Link>
+      </p>
     </section>
   );
 }

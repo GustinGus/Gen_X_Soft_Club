@@ -1,0 +1,54 @@
+/*
+ * FREQUENCY ATMOSPHERES — the four rooms, as backgrounds for drawers and files.
+ *
+ * Same CSS-only art direction as the Frequencies tuner (Phase 2A), restated
+ * here so the archive pages don't reach into another section's module.
+ * Static: nothing here animates.
+ */
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 01 — AFTER HOURS: empty platform, one fluorescent tube, wet glass. */
+.atmosphere[data-atmosphere="after-hours"] {
+  background:
+    /* the tube, on the ceiling line — clear of the type */
+    linear-gradient(rgb(236 240 230 / 0.4), rgb(236 240 230 / 0.4)) 0 3px / 100% 1px no-repeat,
+    radial-gradient(55% 18% at 58% 0%, rgb(198 216 167 / 0.12), transparent 70%) 0 0 / 100% 100svh no-repeat,
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.02) 0 1px, transparent 1px 9px),
+    linear-gradient(180deg, #0f1513 0%, #0b100e 60%, var(--palette-night) 100%);
+}
+
+/* 02 — SOFT FUTURE: pale plastic, lounge light, no edges. */
+.atmosphere[data-atmosphere="soft-future"] {
+  background:
+    radial-gradient(60% 55% at 72% 18%, rgb(255 255 255 / 0.95), transparent 70%) 0 0 / 100% 100svh no-repeat,
+    radial-gradient(45% 50% at 18% 70%, rgb(168 201 193 / 0.34), transparent 70%) 0 0 / 100% 100svh no-repeat,
+    radial-gradient(30% 30% at 88% 86%, rgb(198 216 167 / 0.26), transparent 70%) 0 0 / 100% 100svh no-repeat,
+    linear-gradient(180deg, #eceee9, #dfe3dd);
+}
+
+/* 03 — CITY FREQUENCY: transit colour field, passing light, signage band. */
+.atmosphere[data-atmosphere="city-frequency"] {
+  background:
+    linear-gradient(90deg, transparent 8%, rgb(231 229 219 / 0.14) 34%, transparent 62%) 0 31svh / 100% 2px no-repeat,
+    linear-gradient(90deg, transparent 30%, rgb(198 216 167 / 0.12) 58%, transparent 86%) 0 47svh / 100% 3px no-repeat,
+    linear-gradient(90deg, transparent 0%, rgb(231 229 219 / 0.09) 22%, transparent 48%) 0 63svh / 100% 1px no-repeat,
+    /* signage band along the floor edge */
+    linear-gradient(var(--palette-transit-green), var(--palette-transit-green)) 0 100% / 100% 10px no-repeat,
+    linear-gradient(180deg, #34403b 0%, #2b3531 100svh, #252e2a 100%);
+}
+
+/* 04 — ALTERNATIVE SIGNAL: print — halftone field, off-register ink. */
+.atmosphere[data-atmosphere="alternative-signal"] {
+  background:
+    /* off-register block, printed into the left margin */
+    linear-gradient(rgb(198 216 167 / 0.55), rgb(198 216 167 / 0.55)) 0 62% / var(--margin) 22svh no-repeat,
+    linear-gradient(rgb(23 26 24 / 0.08), rgb(23 26 24 / 0.08)) 4px calc(62% + 4px) / var(--margin) 22svh no-repeat,
+    radial-gradient(circle, rgb(23 26 24 / 0.1) 0.9px, transparent 1.4px) 0 0 / 7px 7px,
+    #e6e4da;
+}

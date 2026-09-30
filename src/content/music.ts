@@ -5,11 +5,11 @@
  * records under — not an official or historical genre classification.
  *
  * Records hold only identity data (artist / album / year). Everything that
- * needs a source (labels, cities, credits, context) is left out until the
- * research phase; `verification` tracks that.
+ * needs a source (labels, origin, runtime, tracklist…) lives per record in
+ * content/records.ts, as `Sourced` fields that stay PENDING until sourced.
  *
- * The full 12-record list exists so Phase 2B (Disc Wall / Record View) can
- * build on it. Phase 2A renders only AFTER HOURS in depth.
+ * Phase 2A renders AFTER HOURS in depth on the home; Phase 2B opens the full
+ * index (/music) and one file per record (/music/[slug]).
  */
 
 export type FrequencyId = "after-hours" | "soft-future" | "city-frequency" | "alternative-signal";
@@ -24,8 +24,10 @@ export type Artwork =
   | { status: "licensed"; src: string; credit: string; source: string };
 
 export type MusicRecord = {
-  /** Position in the archive's record index (future Disc Wall order). */
+  /** Position in the archive's record index (index order, 01—12). */
   number: number;
+  /** URL segment of the record's file: /music/[slug]. */
+  slug: string;
   artist: string;
   album: string;
   year: number;
@@ -37,7 +39,7 @@ export type MusicRecord = {
   artwork: Artwork;
   /** Future long-form article, when written. */
   articleSlug?: string;
-  /** Identity fields above are well documented; anything added later must be sourced. */
+  /** Identity fields above (artist / album / year) checked against a source. */
   verification: Verification;
 };
 
@@ -49,8 +51,10 @@ export type Frequency = {
   status: "open" | "in-preparation";
   /** Atmosphere words for the index — editorial, not taxonomy. */
   atmosphere: readonly string[];
-  /** DOM id of the section this frequency opens, when open. */
-  anchor?: string;
+  /** Where "Open file" leads: the home's own file (AFTER HOURS) or its drawer in /music. */
+  href?: string;
+  /** Night frequencies print light on dark (same split as the tuner). */
+  tone: "night" | "day";
 };
 
 // ---------------------------------------------------------------- frequencies
@@ -62,28 +66,35 @@ export const frequencies: readonly Frequency[] = [
     name: "After Hours",
     status: "open",
     atmosphere: ["Night city", "Glass", "Fluorescent", "Empty station"],
-    anchor: "after-hours",
+    href: "#after-hours",
+    tone: "night",
   },
   {
     id: "soft-future",
     code: "02",
     name: "Soft Future",
-    status: "in-preparation",
+    status: "open",
     atmosphere: ["Pale plastic", "Lounge", "Diffuse light", "Calm technology"],
+    href: "/music#soft-future",
+    tone: "day",
   },
   {
     id: "city-frequency",
     code: "03",
     name: "City Frequency",
-    status: "in-preparation",
+    status: "open",
     atmosphere: ["Transit", "Signage", "Motion", "Rhythm"],
+    href: "/music#city-frequency",
+    tone: "night",
   },
   {
     id: "alternative-signal",
     code: "04",
     name: "Alternative Signal",
-    status: "in-preparation",
+    status: "open",
     atmosphere: ["Print", "Fragment", "Analogue / digital", "Tension"],
+    href: "/music#alternative-signal",
+    tone: "day",
   },
 ];
 
@@ -92,21 +103,21 @@ export const frequencies: readonly Frequency[] = [
 const placeholder: Artwork = { status: "placeholder" };
 
 export const records: readonly MusicRecord[] = [
-  { number: 1, artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: placeholder, verification: "pending" },
-  { number: 2, artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: placeholder, verification: "pending" },
-  { number: 3, artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: placeholder, verification: "pending" },
+  { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: placeholder, verification: "sourced" },
+  { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: placeholder, verification: "sourced" },
+  { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: placeholder, verification: "sourced" },
 
-  { number: 4, artist: "AIR", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: placeholder, verification: "pending" },
-  { number: 5, artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: placeholder, verification: "pending" },
-  { number: 6, artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: placeholder, verification: "pending" },
+  { number: 4, slug: "air-moon-safari", artist: "Air", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: placeholder, verification: "sourced" },
+  { number: 5, slug: "moby-play", artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: placeholder, verification: "sourced" },
+  { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: placeholder, verification: "sourced" },
 
-  { number: 7, artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: placeholder, verification: "pending" },
-  { number: 8, artist: "The Chemical Brothers", album: "Surrender", year: 1999, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: placeholder, verification: "pending" },
-  { number: 9, artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: placeholder, verification: "pending" },
+  { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: placeholder, verification: "sourced" },
+  { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: placeholder, verification: "sourced" },
+  { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: placeholder, verification: "sourced" },
 
-  { number: 10, artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: placeholder, verification: "pending" },
-  { number: 11, artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: placeholder, verification: "pending" },
-  { number: 12, artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: placeholder, verification: "pending" },
+  { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: placeholder, verification: "sourced" },
+  { number: 11, slug: "stereolab-dots-and-loops", artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: placeholder, verification: "sourced" },
+  { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: placeholder, verification: "sourced" },
 ];
 
 // ---------------------------------------------------------------- queries
@@ -124,6 +135,22 @@ export function spanOf(id: FrequencyId) {
 }
 
 export const pad2 = (n: number) => String(n).padStart(2, "0");
+
+export const recordBySlug = (slug: string) => records.find((r) => r.slug === slug);
+
+export const frequencyOf = (id: FrequencyId) => frequencies.find((f) => f.id === id)!;
+
+/** Neighbours in index order — the file tabs. No wrap-around: the index has ends. */
+export function neighboursOf(record: MusicRecord) {
+  const i = records.indexOf(record);
+  return { prev: records[i - 1] ?? null, next: records[i + 1] ?? null };
+}
+
+/** Year span of the whole archive, derived from the records. */
+export function archiveSpan() {
+  const years = records.map((r) => r.year);
+  return `${Math.min(...years)}—${Math.max(...years)}`;
+}
 
 // ---------------------------------------------------------------- section copy
 
@@ -152,6 +179,40 @@ export const frequenciesCopy = {
   open: "Open file",
 } as const;
 
+/** /music — the complete ARCHIVE_002 index. */
+export const archiveIndex = {
+  archive: "ARCHIVE_002",
+  label: "Listening index",
+  titleLines: ["Listening", "index"],
+  deck: "Twelve records, filed under four frequencies. Each one can be drawn from its drawer and read as a file.",
+  note: "Editorial curation — atmospheres, not genres.",
+  entrance: "Entrance",
+  drawer: "Drawer",
+  open: "Open file",
+} as const;
+
+/** /music/[slug] — the record file. */
+export const recordFileCopy = {
+  index: "Index",
+  card: "Catalogue card",
+  pending: "Pending",
+  sourceRequired: "Source required",
+  curatorialNote: "Curatorial note",
+  interpretation: "Editorial interpretation — Gen X Soft Club",
+  context: "Context",
+  documented: "Documented history",
+  tracklist: "Tracklist",
+  linerNotes: "Liner notes",
+  notes: "Notes & sources",
+  prev: "Previous file",
+  next: "Next file",
+  startOfIndex: "Start of index",
+  endOfIndex: "End of index",
+  backToIndex: "Return to the index",
+  artworkPending: "Scan pending",
+  artworkNote: "Artwork not digitised — awaiting a licensed scan.",
+} as const;
+
 export const afterHours = {
   file: "ARCHIVE_002.1",
   titleLines: ["The city", "after", "midnight."],
@@ -164,5 +225,5 @@ export const afterHours = {
     number: "Plate 02",
     subject: "Station platform, after midnight",
   },
-  continues: "File continues — 02 / Soft Future — in preparation",
+  continues: "File continues — the full listening index, ARCHIVE_002",
 } as const;

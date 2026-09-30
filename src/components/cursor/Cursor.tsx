@@ -14,6 +14,7 @@ export const CURSOR_RESET_EVENT = "softclub:cursor-reset";
 /** Contextual states. Elements opt in with `data-cursor="<state>"`. */
 const LABELS: Record<string, string> = {
   enter: "Enter",
+  open: "Open",
   rotate: "Rotate",
   view: "View",
   drag: "Drag",

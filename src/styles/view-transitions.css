@@ -1,0 +1,130 @@
+/*
+ * VIEW TRANSITIONS — navigation inside the archive (Phase 2B).
+ *
+ * React's <ViewTransition> names the elements; this file choreographs them.
+ * Values mirror the motion tokens (tokens.css). Nothing here runs outside a
+ * navigation, and browsers without the API simply navigate.
+ *
+ *   archive-open    drawer → file   the case travels to the table; the page
+ *                                   cuts under it; the catalogue card slides
+ *                                   out from beneath the case
+ *   archive-return  file → drawer   the case travels back into its drawer
+ *   file-next/prev  file → file     the file is leafed in the tab direction
+ *   (untyped)       back / forward  the case still travels; the page cuts
+ *
+ * View transitions can't be interrupted, so every shot stays under ~0.6 s.
+ */
+
+/* ---------------------------------------------------------------- the page cut */
+/* A short dissolve: the old room leaves quickly, the new one arrives under the object. */
+::view-transition-old(root) {
+  animation: 180ms linear both vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 280ms linear 80ms both vt-fade-in;
+}
+
+/* ---------------------------------------------------------------- the case */
+/* Heavy, mechanical travel — a tray, not a spring. */
+::view-transition-group(.sleeve-morph) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.3, 0, 0.1, 1); /* --ease-mechanical */
+}
+
+/* Old and new are the same object: no ghosting between them. */
+::view-transition-old(.sleeve-morph) {
+  animation: 200ms linear both vt-fade-out;
+}
+
+::view-transition-new(.sleeve-morph) {
+  animation: none;
+}
+
+/* ---------------------------------------------------------------- the card */
+/*
+ * Played in the live new page while the case is still travelling, only for
+ * archive-open. Starts under the case (--card-from, set per breakpoint by
+ * the file layout) and settles in place; ends inside the case's 560 ms.
+ */
+:root:active-view-transition-type(archive-open) [data-vt="catalogue-card"] {
+  animation: vt-card-out 360ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both; /* --ease-out */
+}
+
+@keyframes vt-card-out {
+  from {
+    transform: var(--card-from, translateY(-30%));
+  }
+}
+
+/* ---------------------------------------------------------------- leafing */
+::view-transition-old(.file-out-next) {
+  animation: 200ms cubic-bezier(0.55, 0, 0.9, 0.3) both vt-leaf-out-left; /* --ease-in */
+}
+
+::view-transition-new(.file-in-next) {
+  animation: 380ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both vt-leaf-in-right; /* --ease-out */
+}
+
+::view-transition-old(.file-out-prev) {
+  animation: 200ms cubic-bezier(0.55, 0, 0.9, 0.3) both vt-leaf-out-right;
+}
+
+::view-transition-new(.file-in-prev) {
+  animation: 380ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both vt-leaf-in-left;
+}
+
+/* ---------------------------------------------------------------- keyframes */
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-leaf-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes vt-leaf-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+
+@keyframes vt-leaf-out-right {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes vt-leaf-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+/* The global `*` rule in base.css doesn't reach these pseudo-elements. State changes only. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  [data-vt="catalogue-card"] {
+    animation: none !important;
+  }
+}

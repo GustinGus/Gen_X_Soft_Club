@@ -1,0 +1,120 @@
+/*
+ * A library index card: paper stock, ruled rows, punched hole.
+ * Lies slightly off-square on the table; the case sits on top of it.
+ */
+.card {
+  --card-ink: var(--material-paper-ink);
+  --card-rule: rgb(42 45 43 / 0.16);
+
+  position: relative;
+  /* --card-tuck(-top): the part of the card still under the case, set by the table layout */
+  padding: calc(var(--space-5) + var(--card-tuck-top, 0px)) var(--space-5) var(--space-6)
+    calc(var(--space-5) + var(--card-tuck, 0px));
+  background:
+    /* faint ruling, like the printed card stock */
+    repeating-linear-gradient(180deg, transparent 0 31px, rgb(118 135 126 / 0.1) 31px 32px) 0 var(--space-8) / 100% 100% no-repeat,
+    var(--material-paper);
+  color: var(--card-ink);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.4) inset,
+    0 30px 50px -30px rgb(0 0 0 / 0.65);
+  rotate: -1.2deg;
+}
+
+/* ---------------------------------------------------------------- head */
+.head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-4);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  border-bottom: 2px solid var(--card-ink);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* The punched hole the card rod runs through. */
+.punch {
+  position: absolute;
+  bottom: var(--space-3);
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--card-ink) 70%, transparent);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.5);
+}
+
+.issuer {
+  grid-column: 1 / -1;
+  /* same deepened transit green as the paper rooms' signal — AA on card stock */
+  color: #456052;
+}
+
+.kind {
+  font-family: var(--font-grotesk);
+  font-size: clamp(1.25rem, 0.9rem + 1vw, 1.75rem);
+  font-weight: var(--weight-black);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.number {
+  color: var(--palette-dark-steel);
+}
+
+/* ---------------------------------------------------------------- fields */
+.fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: var(--space-4);
+  align-items: baseline;
+  padding-block: var(--space-2);
+  border-bottom: 1px dotted var(--card-rule);
+}
+
+.row dt {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--palette-dark-steel);
+}
+
+.row dd {
+  margin: 0;
+  font-size: var(--type-caption);
+  font-weight: var(--weight-medium);
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.row[data-pending] dd {
+  color: var(--palette-dark-steel);
+}
+
+.divider {
+  height: var(--space-3);
+  border-bottom: 1px solid var(--card-ink);
+}
+
+@media (max-width: 699px) {
+  .card {
+    padding: calc(var(--space-4) + var(--card-tuck-top, 0px)) var(--space-4) var(--space-6);
+  }
+
+  .row {
+    grid-template-columns: 6.5rem 1fr;
+    gap: var(--space-3);
+  }
+}

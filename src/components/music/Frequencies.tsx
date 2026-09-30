@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useRef, useState, type CSSProperties } from "react";
 import {
   artistsIn,
@@ -107,10 +108,10 @@ export function Frequencies() {
               <div id={metaId} className={styles.meta}>
                 <p className={styles.artists}>{artists.join(" / ")}</p>
                 <p className={styles.atmosphereWords}>{f.atmosphere.join(" · ")}</p>
-                {f.status === "open" && f.anchor ? (
-                  <a className={styles.open} href={`#${f.anchor}`}>
-                    {copy.open} <span aria-hidden="true">↓</span>
-                  </a>
+                {f.status === "open" && f.href ? (
+                  <Link className={styles.open} href={f.href}>
+                    {copy.open} <span aria-hidden="true">{f.href.startsWith("#") ? "↓" : "→"}</span>
+                  </Link>
                 ) : (
                   <p className={styles.pending}>{copy.inPreparation}</p>
                 )}

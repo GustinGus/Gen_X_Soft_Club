@@ -1,0 +1,432 @@
+/*
+ * THE RECORD FILE — a table in the frequency's room.
+ *
+ * Room colours are variables (--sh-*) so every child prints correctly on
+ * night (AFTER HOURS, CITY FREQUENCY) and paper (SOFT FUTURE, ALTERNATIVE
+ * SIGNAL) — the same split as the Phase 2A tuner.
+ */
+
+.sheet {
+  --sh-ink: var(--material-paper-ink);
+  --sh-muted: var(--palette-dark-steel);
+  --sh-rule: rgb(23 26 24 / 0.2);
+  /* transit green (same hue, ~148°) taken deeper so small type clears AA on
+     paper — still a green, distinct from the neutral dark-steel of --sh-muted */
+  --sh-signal: #456052;
+  --sh-tab: var(--material-paper);
+  --title-size: min(7.2vw, 15svh);
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  padding: var(--space-7) var(--margin) var(--space-8);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-content: start;
+  color: var(--sh-ink);
+  overflow: clip;
+}
+
+.sheet[data-tone="night"] {
+  --sh-ink: var(--palette-off-white);
+  --sh-muted: var(--palette-steel);
+  --sh-rule: rgb(231 229 219 / 0.18);
+  --sh-signal: var(--palette-phosphor);
+  --sh-tab: #1a211e;
+}
+
+/* CITY FREQUENCY is the lightest night room: steel alone falls under AA here. */
+.sheet[data-frequency="city-frequency"] {
+  --sh-muted: color-mix(in srgb, var(--palette-steel) 65%, var(--palette-off-white));
+}
+
+/* Overscroll / below-the-sheet colour follows the room. */
+:global(html):has(.sheet[data-frequency="after-hours"]) {
+  background: var(--palette-night);
+}
+:global(html):has(.sheet[data-frequency="city-frequency"]) {
+  background: #252e2a;
+}
+:global(html):has(.sheet[data-frequency="soft-future"]) {
+  background: #dfe3dd;
+}
+:global(html):has(.sheet[data-frequency="alternative-signal"]) {
+  background: #e6e4da;
+}
+
+.muted {
+  color: var(--sh-muted);
+}
+
+/* ---------------------------------------------------------------- folio */
+.folio {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3) var(--space-6);
+  /* clear the fixed SOUND readout on the right */
+  padding-right: 11rem;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--sh-rule);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  margin-block: -6px;
+  color: var(--sh-signal);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back:hover {
+    color: var(--sh-ink);
+  }
+}
+
+.fileCode {
+  color: var(--sh-ink);
+}
+
+.count {
+  margin-left: auto;
+  color: var(--sh-muted);
+}
+
+/* ---------------------------------------------------------------- the table */
+.sleeve {
+  grid-column: 1 / span 5;
+  grid-row: 2 / span 2;
+  align-self: start;
+  position: relative;
+  z-index: 3;
+  margin-top: var(--space-7);
+}
+
+.heading {
+  grid-column: 7 / -1;
+  grid-row: 2;
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-9);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  text-transform: uppercase;
+}
+
+/* Programmatic focus target only (after navigation) — never a visible ring. */
+.title:focus {
+  outline: none;
+}
+
+.artist {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--title-size);
+  font-weight: var(--weight-bold);
+  line-height: 0.86;
+  letter-spacing: var(--tracking-display);
+}
+
+.line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Each room sets its display type the way the tuner does. */
+.sheet[data-frequency="after-hours"] .artist {
+  font-weight: var(--weight-black);
+}
+.sheet[data-frequency="soft-future"] .artist {
+  font-weight: var(--weight-light);
+  font-variation-settings: "wdth" var(--width-extended);
+}
+.sheet[data-frequency="city-frequency"] .artist {
+  font-weight: var(--weight-bold);
+  font-variation-settings: "wdth" var(--width-condensed);
+}
+.sheet[data-frequency="alternative-signal"] .artist {
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wdth" 80;
+}
+
+.album {
+  max-width: 22ch;
+  font-size: clamp(1.25rem, 0.8rem + 1.6vw, 2.5rem);
+  font-weight: var(--weight-regular);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.year {
+  margin-top: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+}
+
+.yearKey {
+  color: var(--sh-muted);
+  margin-right: var(--space-3);
+}
+
+/* The card lies half under the case: it comes out from beneath it. */
+.card {
+  --card-from: translate(-30%, -24%) rotate(-3deg);
+  /* the strip of card still tucked under the case: blank stock, no print */
+  --card-tuck: 4.5rem;
+
+  grid-column: 6 / span 7;
+  grid-row: 4;
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--space-8) * -1);
+  margin-left: calc(var(--card-tuck) * -1);
+}
+
+/* ---------------------------------------------------------------- sections */
+.section {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  row-gap: var(--space-4);
+  margin-top: var(--space-9);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--sh-rule);
+}
+
+.section + .section {
+  margin-top: var(--space-8);
+}
+
+.sectionHead {
+  grid-column: 1 / span 3;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+}
+
+.sectionNo {
+  color: var(--sh-signal);
+}
+
+.sectionAside {
+  flex-basis: 100%;
+  color: var(--sh-muted);
+}
+
+.sectionBody {
+  grid-column: 4 / span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.sectionBody[data-wide] {
+  grid-column: 4 / span 8;
+  align-items: stretch;
+}
+
+.interpretation {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--sh-signal);
+}
+
+.noteText {
+  max-width: 30ch;
+  font-size: clamp(1.375rem, 1rem + 1.2vw, 2.25rem);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: pretty;
+}
+
+.contextText {
+  max-width: var(--measure);
+  font-size: var(--type-deck);
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------------- sources */
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--type-caption);
+  line-height: 1.45;
+}
+
+.source {
+  display: grid;
+  grid-template-columns: 2ch 1fr;
+  gap: var(--space-3);
+  scroll-margin-top: var(--space-8);
+}
+
+.source:target {
+  outline: 1px solid var(--sh-signal);
+  outline-offset: 6px;
+}
+
+.sourceNo {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  color: var(--sh-signal);
+  padding-top: 0.2em;
+}
+
+.source cite {
+  font-style: normal;
+  font-weight: var(--weight-medium);
+}
+
+.sourceLink {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: 0.04em;
+  word-break: break-all;
+  text-underline-offset: 3px;
+}
+
+.research {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--sh-rule);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+
+.research li::before {
+  content: "— ";
+}
+
+/* ---------------------------------------------------------------- tabs */
+.tabs {
+  grid-column: 1 / -1;
+  margin-top: var(--space-9);
+}
+
+/* ================================================================ tablet */
+@media (max-width: 1023px) {
+  .sheet {
+    --title-size: min(12vw, 15svh);
+  }
+
+  .heading {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding-bottom: 0;
+  }
+
+  .sleeve {
+    grid-column: 1 / span 7;
+    grid-row: 3;
+    margin-top: var(--space-7);
+  }
+
+  .card {
+    --card-from: translate(-18%, -30%) rotate(-3deg);
+    --card-tuck: 0px;
+    --card-tuck-top: var(--space-8);
+
+    grid-column: 4 / -1;
+    margin-left: 0;
+  }
+
+  .sectionHead {
+    grid-column: 1 / -1;
+  }
+
+  .sectionBody,
+  .sectionBody[data-wide] {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ================================================================ mobile */
+@media (max-width: 699px) {
+  .sheet {
+    --title-size: 14.5vw;
+    padding-top: var(--space-8);
+  }
+
+  .folio {
+    padding-right: 0;
+    gap: var(--space-3) var(--space-4);
+  }
+
+  .count {
+    margin-left: 0;
+  }
+
+  .heading {
+    padding-top: var(--space-6);
+  }
+
+  .line {
+    white-space: normal;
+  }
+
+  .sleeve {
+    grid-column: 1 / span 11;
+    grid-row: 3;
+    margin-top: var(--space-6);
+  }
+
+  .card {
+    --card-from: translate(0, -34%) rotate(-3deg);
+
+    --card-tuck: 0px;
+    --card-tuck-top: var(--space-7);
+
+    grid-column: 1 / -1;
+    grid-row: 4;
+    margin-top: calc(var(--space-7) * -1);
+    margin-left: var(--space-2);
+    margin-right: var(--space-2);
+  }
+
+  .section {
+    margin-top: var(--space-8);
+  }
+
+  .section + .section {
+    margin-top: var(--space-7);
+  }
+}

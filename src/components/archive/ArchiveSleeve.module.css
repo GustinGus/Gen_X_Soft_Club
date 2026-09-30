@@ -1,0 +1,111 @@
+/*
+ * The case as an object. Positioning, lift and scale belong to whoever
+ * places it (drawer, table); this module only dresses it.
+ */
+.sleeve {
+  position: relative;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- scan pending */
+/* Same box as the JewelCase tray: top/bottom 5%, right 4%, square. */
+.scan {
+  position: absolute;
+  top: 5%;
+  bottom: 5%;
+  right: 4%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+/* Scanner registration marks, just outside the tray corners. */
+.reg {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+}
+
+.reg::before,
+.reg::after {
+  content: "";
+  position: absolute;
+  background: rgb(231 229 219 / 0.45);
+}
+
+.reg::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.reg::after {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+
+.reg[data-corner="tl"] { top: 6%; left: 6%; }
+.reg[data-corner="tr"] { top: 6%; right: 6%; }
+.reg[data-corner="bl"] { bottom: 6%; left: 6%; }
+.reg[data-corner="br"] { bottom: 6%; right: 6%; }
+
+.stamp {
+  position: absolute;
+  top: 9%;
+  right: 9%;
+  padding: 0.35em 0.6em 0.3em;
+  border: 1px solid rgb(198 216 167 / 0.7);
+  color: var(--palette-phosphor);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  rotate: -3deg;
+}
+
+/* ---------------------------------------------------------------- licensed */
+/* Future: the scan inside the same case proportions (142 × 125, square tray). */
+.licensed {
+  position: relative;
+  aspect-ratio: 142 / 125;
+  width: 100%;
+  background: #151b18;
+  box-shadow:
+    inset 0 0 0 1px rgb(231 229 219 / 0.16),
+    0 24px 40px -28px rgb(0 0 0 / 0.9);
+}
+
+.hinge {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8.5%;
+  border-right: 1px solid rgb(231 229 219 / 0.14);
+}
+
+.tray {
+  position: absolute;
+  top: 5%;
+  bottom: 5%;
+  right: 4%;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.tray img {
+  object-fit: contain;
+}
+
+.credit {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  opacity: 0.7;
+}

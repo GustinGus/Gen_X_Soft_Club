@@ -1,0 +1,38 @@
+/*
+ * The stamp: hairline frame, hatched ground, mono caps.
+ * Takes its colour from the surface (never faded with opacity), so it
+ * clears AA contrast on the card, on paper and at night. The word leads
+ * by weight, not by brightness.
+ */
+.pending {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6em;
+  padding: 0.35em 0.6em 0.3em;
+  border: 1px solid currentColor;
+  background: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, currentColor 9%, transparent) 5px 6px);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.word {
+  font-weight: var(--weight-medium);
+}
+
+.required {
+  font-weight: var(--weight-regular);
+}
+
+/* Section-sized: the empty drawer of a whole section (e.g. Context). */
+.pending[data-size="block"] {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--type-caption);
+  /* the room's quiet ink (AA on every frequency), not its full ink */
+  color: var(--sh-muted, currentColor);
+  rotate: -1deg;
+}

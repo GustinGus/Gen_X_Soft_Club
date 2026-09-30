@@ -1,0 +1,104 @@
+/*
+ * Two index-card tabs standing up from the drawer's edge.
+ * The tab rises a few pixels under the hand — the card about to be pulled.
+ */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--grid-gap);
+  border-top: 1px solid var(--sh-rule);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  color: var(--sh-ink);
+  text-decoration: none;
+  transition: translate var(--duration-quick) var(--ease-out);
+}
+
+/* The tab's raised lip — sits on the drawer's rule. */
+.tab::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  width: 38%;
+  height: 7px;
+  border: 1px solid var(--sh-rule);
+  border-top: 0;
+  background: var(--sh-tab, transparent);
+}
+
+.tab[data-side="prev"]::before {
+  left: 0;
+}
+
+.tab[data-side="next"] {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.tab[data-side="next"]::before {
+  right: 0;
+}
+
+.tab[data-end] {
+  color: var(--sh-muted);
+}
+
+.dir {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--sh-signal);
+}
+
+.tab[data-end] .dir {
+  color: var(--sh-muted);
+}
+
+.no {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  color: var(--sh-muted);
+}
+
+.name {
+  font-size: clamp(1.125rem, 0.9rem + 0.8vw, 1.75rem);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.tab:hover {
+    translate: 0 -4px;
+  }
+}
+
+a.tab:active {
+  translate: 0 -2px;
+}
+
+@media (max-width: 699px) {
+  .tabs {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .tab + .tab {
+    border-top: 1px solid var(--sh-rule);
+  }
+}

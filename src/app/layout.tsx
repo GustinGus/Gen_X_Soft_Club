@@ -5,6 +5,7 @@ import { SoundStatus } from "@/components/chrome/SoundStatus";
 import { Cursor } from "@/components/cursor/Cursor";
 import "@/styles/tokens.css";
 import "@/styles/base.css";
+import "@/styles/view-transitions.css";
 
 /* Neo-grotesque with a width axis: condensed signage ↔ extended display. */
 const archivo = Archivo({
