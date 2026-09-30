@@ -62,6 +62,51 @@ export const ambient = {
   parallax: 10,
 } as const;
 
+/**
+ * ARCHIVE DECK (SC-AU/02) — a machine working, not a shot. Contained,
+ * precise, with weight: every leg ends on a physical stop.
+ */
+export const deckTimeline = {
+  /** The catalogue card set aside / put back over the deck. */
+  cardTravel: 560,
+  /** The disc waits for the card to clear the slot. */
+  entryDelay: 260,
+  /** Placed at the slot's mouth. */
+  entry: 520,
+  /** The mechanism takes it: a beat, then the pull onto the spindle. */
+  pullPause: 140,
+  pull: 720,
+  /** Reading the table of contents. */
+  spinUp: 700,
+  read: 1800,
+  /** One revolution while reading (~21 rpm: a working speed, not a show). */
+  revolution: 2800,
+  /** Coast to rest on READY; a short brake before an eject. */
+  spinDown: 1100,
+  brake: 280,
+  /** LCD lines printing as segments. */
+  printStagger: 90,
+  eject: 620,
+  /** The ejected disc stands in the slot before it goes back to its case. */
+  ejectHold: 800,
+  lift: 380,
+  /** Reduced motion: state changes as short opacity fades and holds. */
+  fade: 180,
+  hold: 500,
+} as const;
+
+export const deckEasing = {
+  /** Card sliding on the table. */
+  travel: "cubic-bezier(0.22, 1, 0.36, 1)",
+  /** Motor pull / push: gets going, then decelerates into a stop. */
+  motor: "cubic-bezier(0.45, 0, 0.15, 1)",
+  eject: "cubic-bezier(0.2, 0.65, 0.2, 1)",
+  /** Constant angular acceleration from rest (quadratic ease-in). */
+  spinUp: "cubic-bezier(0.333, 0, 0.667, 0.333)",
+  /** Constant deceleration to rest (quadratic ease-out): starts at the running speed. */
+  spinDown: "cubic-bezier(0.333, 0.667, 0.667, 1)",
+} as const;
+
 // ---------------------------------------------------------------- curves (JS)
 
 export const clamp01 = (t: number) => Math.min(1, Math.max(0, t));

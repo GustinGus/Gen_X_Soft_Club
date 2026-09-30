@@ -1,0 +1,37 @@
+/*
+ * Reuses the Phase 1 poster disc as-is (composes — its file is untouched),
+ * laid flat: the deck is seen from above, like everything on the table.
+ */
+.disc {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  /* the disc's own drop onto the tray below it */
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.35));
+}
+
+.face {
+  composes: poster from "@/experience/disc/disc.module.css";
+  --disc-tilt: 0deg;
+}
+
+/* The printed face: a disc-sized layer, so it turns about the spindle. */
+.print {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* The archive's hub print — identity only, never a commercial label. */
+.hub {
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--font-mono);
+  font-size: max(7px, 1.35cqi);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+  color: rgb(23 26 24 / 0.72);
+  white-space: nowrap;
+}

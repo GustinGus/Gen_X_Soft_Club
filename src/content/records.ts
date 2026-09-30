@@ -21,6 +21,7 @@
  * primary sources (label, artist, press of the period), not a reference.
  */
 
+import type { RecordAudio } from "@/audio/types";
 import type { MusicRecord } from "./music";
 
 export type SourceRef = {
@@ -74,8 +75,8 @@ export type RecordFile = {
   sources: readonly SourceRef[];
   /** Archivist's notes on the research itself (why a field is still pending). */
   researchNotes?: readonly string[];
-  /** Audio is architecture only: nothing is hosted or streamed. */
-  audio: { status: "none" } | { status: "licensed"; provider: string; url: string };
+  /** Audio is architecture only: nothing is hosted or streamed (see audio/types). */
+  audio: RecordAudio;
 };
 
 // ---------------------------------------------------------------- helpers
@@ -99,7 +100,8 @@ function tracks(rows: readonly (readonly [string | null, string] | readonly [str
   return rows.map(([title, duration, note], i) => ({ position: i + 1, title, duration, ...(note ? { note } : {}) }));
 }
 
-const none = { status: "none" } as const;
+/** No listening copy is held by the archive. */
+const none: RecordAudio = { availability: "not-held" };
 
 // ---------------------------------------------------------------- files
 

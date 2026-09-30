@@ -195,10 +195,85 @@
 
   grid-column: 6 / span 7;
   grid-row: 4;
+  /* never stretch to the row: the deck under it makes the row taller */
+  align-self: start;
+  /* One card stock for all twelve files (tallest content + margin), so its
+     bottom edge — and the deck's visible strip under it — is the same on
+     every record. The extra is blank ruled stock above the punch hole. */
+  min-height: 31rem;
   position: relative;
   z-index: 2;
   margin-top: calc(var(--space-8) * -1);
   margin-left: calc(var(--card-tuck) * -1);
+}
+
+/* ---------------------------------------------------------------- the deck */
+/*
+ * SC-AU/02 lies on the table under the card. At rest the card covers its
+ * window and display; only the aluminium edges, the keys and the foot show.
+ * Vertical placement: the card's bottom edge (--card-rest-bottom below the
+ * row = card min-height minus its negative top margin) falls just above the
+ * keys, 48% of the deck's width down its plate (percentage margins resolve
+ * against the grid area's width, hence the scale factor).
+ *
+ * Desktop: the deck sits at 90% of its area, flush right under the title's
+ * edge, so the editorial column keeps the hierarchy and some air around it.
+ */
+.deck {
+  --card-rest-bottom: calc(31rem - var(--space-8));
+  --deck-scale: 0.9;
+
+  grid-column: 6 / -1;
+  grid-row: 4;
+  align-self: start;
+  justify-self: end;
+  width: calc(100% * var(--deck-scale));
+  position: relative;
+  z-index: 1;
+  margin-top: calc(var(--card-rest-bottom) - 48% * var(--deck-scale));
+}
+
+/* Media in the deck: the card is set aside, lying over the deck's foot,
+   toward the empty case. The page grows only after the user acts. */
+.sheet[data-deck]:not([data-deck="empty"]) .card {
+  --card-tuck: 0px;
+
+  grid-column: 2 / span 7;
+  grid-row: 5;
+  /* overlaps the deck's foot only — never its window (the foot is ~17% of
+     the deck's width tall, and the tilted card's corner rises into it) */
+  margin-top: calc(clamp(3rem, 6vw, 7rem) * -1);
+  margin-left: 0;
+  rotate: -3deg;
+}
+
+/* The empty case, while its disc is in the deck. */
+.inDeck {
+  grid-column: 1 / span 5;
+  grid-row: 2;
+  align-self: start;
+  justify-self: start;
+  position: relative;
+  z-index: 4;
+  display: none;
+  /* centred on the empty tray (the tray's middle, as a share of the case width) */
+  margin: calc(var(--space-7) + 40%) 0 0 30%;
+  padding: 0.35em 0.6em 0.3em;
+  border: 1px solid rgb(198 216 167 / 0.7);
+  color: var(--palette-phosphor);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  rotate: -3deg;
+}
+
+.sheet[data-deck="inserting"] .inDeck,
+.sheet[data-deck="reading"] .inDeck,
+.sheet[data-deck="ready"] .inDeck {
+  display: block;
 }
 
 /* ---------------------------------------------------------------- sections */
@@ -369,6 +444,29 @@
     margin-left: 0;
   }
 
+  .card {
+    min-height: 36rem;
+  }
+
+  .deck {
+    --card-rest-bottom: calc(36rem - var(--space-8));
+    --deck-scale: 1;
+
+    grid-column: 4 / -1;
+  }
+
+  .sheet[data-deck]:not([data-deck="empty"]) .card {
+    --card-tuck-top: 0px;
+
+    grid-column: 1 / span 7;
+    margin-top: calc(var(--space-6) * -1);
+  }
+
+  .inDeck {
+    grid-column: 1 / span 7;
+    grid-row: 3;
+  }
+
   .sectionHead {
     grid-column: 1 / -1;
   }
@@ -422,11 +520,55 @@
     margin-right: var(--space-2);
   }
 
+  /* Vertical deck: the card covers its window and display (to 140% of its
+     width down the plate), leaving the keys and foot in view. */
+  .card {
+    min-height: 37rem;
+  }
+
+  .deck {
+    --card-rest-bottom: calc(37rem - var(--space-7));
+    --deck-scale: 1;
+
+    grid-column: 1 / -1;
+    margin-top: calc(var(--card-rest-bottom) - 140%);
+  }
+
+  /* Media in the deck: the disc stands up to 53% of the deck's width out of
+     the slot (ejecting), so the deck drops just enough to keep it clear of
+     the case above. Held for the whole cycle so the deck never moves while
+     the disc is in it. */
+  .sheet[data-deck]:not([data-deck="empty"]) .deck {
+    margin-top: max(calc(var(--card-rest-bottom) - 140%), calc(53% + var(--space-4)));
+  }
+
+  .sheet[data-deck]:not([data-deck="empty"]) .card {
+    grid-column: 1 / -1;
+    margin-top: calc(var(--space-8) * -1);
+    margin-left: var(--space-2);
+    rotate: -1.6deg;
+  }
+
+  .inDeck {
+    grid-column: 1 / span 11;
+    grid-row: 3;
+    margin: calc(var(--space-6) + 40%) 0 0 28%;
+  }
+
   .section {
     margin-top: var(--space-8);
   }
 
   .section + .section {
     margin-top: var(--space-7);
+  }
+}
+
+/* Very narrow phones: the deck's foot below the keys (38% of its width less
+   the key height) is too short for the set-aside card's usual overlap, which
+   would cover the keys' lower edge. Overlap less, still over the foot. */
+@media (max-width: 359px) {
+  .sheet[data-deck]:not([data-deck="empty"]) .card {
+    margin-top: calc(var(--space-7) * -1);
   }
 }

@@ -10,6 +10,7 @@ import {
   type MusicRecord,
 } from "@/content/music";
 import type { RecordFile } from "@/content/records";
+import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CatalogueCard } from "./CatalogueCard";
 import { FileTabs } from "./FileTabs";
@@ -63,6 +64,10 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
       </header>
 
       <ArchiveSleeve record={record} variant="file" className={styles.sleeve} />
+      {/* Shown while the disc is out of its case (deck has media). */}
+      <p className={styles.inDeck} aria-hidden="true">
+        Disc out — in deck SC-AU/02
+      </p>
 
       <div className={styles.heading}>
         <h1 id={titleId} className={styles.title} tabIndex={-1}>
@@ -83,6 +88,9 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
       </div>
 
       <CatalogueCard className={styles.card} record={record} file={file} frequency={frequency} />
+
+      {/* The archive's audio unit, lying on the table under the card. New record, empty deck. */}
+      <ArchiveDeck key={record.slug} className={styles.deck} record={record} file={file} />
 
       <section className={styles.section} aria-labelledby={`note-${record.slug}`}>
         <h2 id={`note-${record.slug}`} className={styles.sectionHead}>
@@ -146,9 +154,9 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
             <li>Official artist and label sources are still to be consulted for this file.</li>
             {file.researchNotes?.map((n) => <li key={n}>{n}</li>)}
             <li>
-              {file.audio.status === "none"
+              {file.audio.availability === "not-held"
                 ? "No listening copy is held: the archive hosts no recordings."
-                : `Listening copy: ${file.audio.provider}.`}
+                : `Listening copy: ${file.audio.provider ?? "attached"}.`}
             </li>
             {record.artwork.status === "placeholder" && <li>{copy.artworkNote}</li>}
           </ul>
