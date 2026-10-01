@@ -1,17 +1,8 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
-import {
-  Color,
-  DirectionalLight,
-  DoubleSide,
-  Group,
-  MeshPhysicalMaterial,
-  MeshStandardMaterial,
-  PerspectiveCamera,
-  type Texture,
-} from "three";
+import { useRef } from "react";
+import { DirectionalLight, Group, PerspectiveCamera } from "three";
 import { experience, scaled, type Rect } from "../store";
 import {
   ambient,
@@ -23,13 +14,7 @@ import {
   lerp,
   pushCurve,
 } from "@/motion/tokens";
-import {
-  createDataLayerGeometry,
-  createPrintGeometry,
-  createShellGeometry,
-  createStackRingGeometry,
-} from "./discGeometry";
-import { createLabelTexture } from "./labelTexture";
+import { DiscModel } from "./DiscModel";
 
 const TAU = Math.PI * 2;
 /** Resting tilt: seen slightly from above, like a disc lifted from a tray. */
@@ -68,98 +53,6 @@ export function Disc({ monoFamily }: { monoFamily: string }) {
     lastPushStart: null as number | null,
     lastCutAt: null as number | null,
   });
-
-  // ---------------------------------------------------------------- geometry
-  const geo = useMemo(
-    () => ({
-      shell: createShellGeometry(),
-      data: createDataLayerGeometry(),
-      stack: createStackRingGeometry(),
-      print: createPrintGeometry(),
-    }),
-    [],
-  );
-
-  // ---------------------------------------------------------------- materials
-  const mat = useMemo(() => {
-    // Clear polycarbonate with a faint green-glass tint. No transmission pass:
-    // the page behind is DOM, so real refraction would sample nothing.
-    const shell = new MeshPhysicalMaterial({
-      color: new Color("#b7d3cb"),
-      metalness: 0,
-      roughness: 0.07,
-      transparent: true,
-      opacity: 0.34,
-      clearcoat: 1,
-      clearcoatRoughness: 0.04,
-      iridescence: 0.35,
-      iridescenceIOR: 1.45,
-      iridescenceThicknessRange: [180, 520],
-      side: DoubleSide,
-      depthWrite: false,
-    });
-
-    // Reflective layer: brushed-looking aluminium with thin-film iridescence.
-    // Anisotropy along the circumferential tangents → radial light streaks.
-    const data = new MeshPhysicalMaterial({
-      color: new Color("#d9dedb"),
-      metalness: 1,
-      roughness: 0.24,
-      anisotropy: 0.8,
-      iridescence: 1,
-      iridescenceIOR: 1.7,
-      iridescenceThicknessRange: [320, 900],
-      transparent: true,
-      opacity: 0.9,
-      side: DoubleSide,
-    });
-
-    // Moulded, frosted stacking ring.
-    const stack = new MeshStandardMaterial({
-      color: new Color("#dfe6e1"),
-      roughness: 0.55,
-      metalness: 0,
-      transparent: true,
-      opacity: 0.55,
-      depthWrite: false,
-    });
-
-    const print = new MeshStandardMaterial({
-      color: new Color("#ffffff"),
-      roughness: 0.6,
-      metalness: 0,
-      transparent: true,
-      opacity: 0.82,
-      depthWrite: false,
-    });
-
-    return { shell, data, stack, print };
-  }, []);
-
-  // Printed label: needs the web font to be ready before drawing to canvas.
-  useEffect(() => {
-    let texture: Texture | null = null;
-    let cancelled = false;
-    document.fonts.ready.then(() => {
-      if (cancelled) return;
-      texture = createLabelTexture(monoFamily);
-      mat.print.map = texture;
-      mat.print.needsUpdate = true;
-      experience.invalidate();
-    });
-    return () => {
-      cancelled = true;
-      texture?.dispose();
-    };
-  }, [mat, monoFamily]);
-
-  useEffect(
-    () => () => {
-      Object.values(geo).forEach((g) => g.dispose());
-      Object.values(mat).forEach((mt) => mt.dispose());
-    },
-    [geo, mat],
-  );
 
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 1 / 20) * experience.timeScale;
@@ -312,10 +205,7 @@ export function Disc({ monoFamily }: { monoFamily: string }) {
         <group ref={tiltGroup}>
           <group ref={yawGroup}>
             <group ref={spinGroup}>
-              <mesh geometry={geo.data} material={mat.data} renderOrder={1} />
-              <mesh geometry={geo.shell} material={mat.shell} renderOrder={2} />
-              <mesh geometry={geo.stack} material={mat.stack} renderOrder={3} />
-              <mesh geometry={geo.print} material={mat.print} renderOrder={4} />
+              <DiscModel monoFamily={monoFamily} />
             </group>
           </group>
         </group>
