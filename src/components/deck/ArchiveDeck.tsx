@@ -1,14 +1,17 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useReducer, useRef, useState, useSyncExternalStore } from "react";
 import type { MusicRecord } from "@/content/music";
 import type { RecordFile } from "@/content/records";
+import { CanvasBoundary } from "@/experience/disc/CanvasBoundary";
 import { DeckControls } from "./DeckControls";
 import { DeckDiscPoster } from "./DeckDiscPoster";
 import { DeckDisplay } from "./DeckDisplay";
-import { useReducedMotion } from "@/motion/useMediaQuery";
+import { useFinePointer, useMediaQuery, useReducedMotion } from "@/motion/useMediaQuery";
 import { deckReducer, hasMedia, isDeckState, type DeckState } from "./deckMachine";
 import { useDeckSequence } from "./useDeckSequence";
+import { useDiscModel } from "./useDiscModel";
 import styles from "./ArchiveDeck.module.css";
 
 type Props = {
@@ -35,6 +38,20 @@ const readForced = (): DeckState | null => {
 };
 
 /**
+ * The disc as the physical model (`DeckCanvas`) instead of the CSS posters:
+ * desktop layout with a fine pointer only. It is never part of the page's
+ * first load — when and whether it is fetched is `useDiscModel`'s business,
+ * and until it is ready (or if it never is) the posters are the disc.
+ *
+ * Inspection only (dev builds): `?disc=poster` keeps the posters, to compare.
+ */
+const DeckCanvas = dynamic(() => import("./DeckCanvas"), { ssr: false });
+const loadDeckCanvas = () => import("./DeckCanvas");
+const readPosterOnly = () => INSPECT && new URLSearchParams(window.location.search).get("disc") === "poster";
+/** The deck's horizontal plate (ArchiveDeck.module.css): the only layout the model is placed in. */
+const DESKTOP = "(min-width: 700px)";
+
+/**
  * THE ARCHIVE DECK — SC-AU/02, the archive's own audio unit.
  *
  * Seen from above, lying on the table under the catalogue card: a matte
@@ -55,11 +72,25 @@ export function ArchiveDeck({ record, file, className }: Props) {
   const forced = useSyncExternalStore(subscribe, readForced, () => null);
   const state = forced ?? machine;
   const reduced = useReducedMotion();
+  const fine = useFinePointer();
+  const desktop = useMediaQuery(DESKTOP);
+  const posterOnly = useSyncExternalStore(subscribe, readPosterOnly, () => false);
+  const allowed = fine && desktop && !posterOnly;
+  const model = useDiscModel({ enabled: allowed, deck: ref, state, load: loadDeckCanvas, immediate: forced !== null });
+  // One renderer per cycle, chosen at INSERT: the model if it is ready then,
+  // the posters otherwise — never a change while the disc is in the deck.
+  const [cycle, setCycle] = useState<"poster" | "model">("poster");
+  const drawn = model.ready && (forced !== null || cycle === "model");
+  const modelView = drawn && hasMedia(state);
+  // With the model drawn, the posters stay as its motion and its shade only.
+  const disc = [styles.disc, modelView && styles.ghost].filter(Boolean).join(" ");
   const send = useDeckSequence({ deck: ref, state, dispatch, reduced, still: forced !== null });
 
   // Announce only what the user set going — never the state at first paint.
   const [touched, setTouched] = useState(false);
   const insert = () => {
+    model.arm();
+    setCycle(model.ready ? "model" : "poster");
     setTouched(true);
     send({ type: "INSERT" });
   };
@@ -82,12 +113,14 @@ export function ArchiveDeck({ record, file, className }: Props) {
       className={[styles.deck, className].filter(Boolean).join(" ")}
       data-state={state}
       aria-label="Archive deck SC-AU/02"
+      onPointerEnter={model.arm}
+      onFocus={model.arm}
     >
       <div className={styles.plate}>
         {/* The part of the disc standing out of the slot, above the plate's edge. */}
-        <div className={styles.protrude} aria-hidden="true">
+        <div className={[styles.protrude, modelView && styles.over].filter(Boolean).join(" ")} aria-hidden="true">
           {(state === "inserting" || state === "ejecting") && (
-            <DeckDiscPoster catalogue={record.catalogue} part="slot" className={styles.disc} />
+            <DeckDiscPoster catalogue={record.catalogue} part="slot" className={disc} />
           )}
         </div>
 
@@ -98,11 +131,31 @@ export function ArchiveDeck({ record, file, className }: Props) {
 
         {/* Smoked polycarbonate over the chamber: the disc, seen from above. */}
         <div className={styles.window} aria-hidden="true">
-          <span className={styles.hub} />
+          <span className={styles.hub} data-deck-seat="" />
           <span className={styles.sled} />
-          {hasMedia(state) && <DeckDiscPoster catalogue={record.catalogue} part="window" className={styles.disc} />}
-          <span className={styles.smoke} />
+          {hasMedia(state) && <DeckDiscPoster catalogue={record.catalogue} part="window" className={disc} />}
+          {!modelView && <span className={styles.smoke} />}
         </div>
+
+        {/* The disc as one physical model, following the posters' motion: drawn
+            over the plate, shown only above its edge and through the window,
+            with the polycarbonate laid back over it. Mounted hidden once the
+            reader reaches for the deck; if it is not ready (or never is) the
+            posters are the disc. */}
+        {model.mount && (
+          <CanvasBoundary onFail={model.fail}>
+            <DeckCanvas
+              className={[styles.stage, !modelView && styles.stageOff].filter(Boolean).join(" ")}
+              deck={ref}
+              pose={state}
+              active={drawn}
+              label={record.catalogue}
+              onReady={model.onReady}
+              onLost={model.fail}
+            />
+          </CanvasBoundary>
+        )}
+        {modelView && <span className={`${styles.smoke} ${styles.smokeOver}`} aria-hidden="true" />}
 
         <header className={styles.brand}>
           <p className={styles.maker}>Gen X Soft Club</p>

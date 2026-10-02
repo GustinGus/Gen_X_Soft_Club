@@ -18,6 +18,20 @@ import {
  * Rendered once into a PMREM cube; the source scene is disposed immediately.
  */
 export function createFluorescentEnvironment(renderer: WebGLRenderer) {
+  const room = createFluorescentRoom();
+  const pmrem = new PMREMGenerator(renderer);
+  const target = pmrem.fromScene(room.scene, ROOM_BLUR);
+  pmrem.dispose();
+  room.dispose();
+
+  return target;
+}
+
+/** Blur applied to the room before it is prefiltered. */
+export const ROOM_BLUR = 0.035;
+
+/** The room itself, before it is turned into a reflection map. */
+export function createFluorescentRoom() {
   const scene = new Scene();
   const disposables: { dispose(): void }[] = [];
 
@@ -47,10 +61,5 @@ export function createFluorescentEnvironment(renderer: WebGLRenderer) {
   box(3.4, 2.6, 0.05, new Color("#a8c9c1").multiplyScalar(1.6), -5.8, 0.4, -1.5);
   box(4, 0.02, 3, new Color("#c6d8a7").multiplyScalar(0.5), 1.5, -3.95, 1);
 
-  const pmrem = new PMREMGenerator(renderer);
-  const target = pmrem.fromScene(scene, 0.035);
-  pmrem.dispose();
-  disposables.forEach((d) => d.dispose());
-
-  return target;
+  return { scene, dispose: () => disposables.forEach((d) => d.dispose()) };
 }

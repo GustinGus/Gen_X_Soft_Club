@@ -1,57 +1,112 @@
 "use client";
 
-import { Canvas, useThree } from "@react-three/fiber";
-import { useEffect, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NeutralToneMapping } from "three";
 import { experience } from "../store";
 import { Disc } from "./Disc";
-import { createFluorescentEnvironment } from "./fluorescentEnvironment";
+import { createFluorescentEnvironmentAsync, type Environment as Room } from "./fluorescentEnvironmentAsync";
+import { linkInTurn } from "./linkInTurn";
 
-/** Installs the procedural fluorescent environment once per renderer. */
-function Environment() {
+/**
+ * Makes the scene drawable without stalling the page: the procedural
+ * fluorescent room (once per renderer), then the disc's programs, both
+ * compiled off the main thread. `onPrepared` once a frame costs no
+ * compilation; if it cannot be done (a lost context) it is never called.
+ */
+function Preparation({ onPrepared }: { onPrepared: () => void }) {
   const get = useThree((s) => s.get);
   useEffect(() => {
     // Read from the store inside the effect: three objects are mutated, not React state.
-    const { gl, scene, invalidate } = get();
-    const target = createFluorescentEnvironment(gl);
-    scene.environment = target.texture;
-    invalidate();
-    return () => {
-      scene.environment = null;
-      target.dispose();
+    const { gl, scene, camera } = get();
+    let room: Room | null = null;
+    let dropped = false;
+    const prepare = async () => {
+      const made = await createFluorescentEnvironmentAsync(gl, () => !dropped);
+      if (!made) return;
+      if (dropped) return made.dispose();
+      room = made;
+      scene.environment = made.texture;
+      // The label is printed once the fonts are in (DiscModel, which asked
+      // first): the programs are linked for the disc as it will be drawn.
+      await document.fonts.ready;
+      await linkInTurn(gl, scene, camera);
+      if (!dropped) onPrepared();
     };
-  }, [get]);
+    prepare().catch(() => {});
+    return () => {
+      dropped = true;
+      scene.environment = null;
+      room?.dispose();
+    };
+  }, [get, onPrepared]);
   return null;
 }
 
 /** Exposes R3F's invalidate to DOM code (scroll, resize, enter). */
-function Bridge({ onReady }: { onReady: () => void }) {
+function Bridge() {
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     experience.invalidate = () => invalidate();
-    onReady();
     return () => {
       experience.invalidate = () => {};
     };
-  }, [invalidate, onReady]);
+  }, [invalidate]);
+  return null;
+}
+
+/**
+ * What the page needs to know of the canvas: that the disc is on screen
+ * (`onReady`, on the frame after the first one drawn), and that its context
+ * was lost (`onLost`).
+ */
+function Presence({ onReady, onLost }: { onReady: () => void; onLost: () => void }) {
+  const frames = useRef(0);
+  const invalidate = useThree((s) => s.invalidate);
+  const canvas = useThree((s) => s.gl.domElement);
+
+  useEffect(() => {
+    canvas.addEventListener("webglcontextlost", onLost);
+    return () => canvas.removeEventListener("webglcontextlost", onLost);
+  }, [canvas, onLost]);
+
+  useFrame(() => {
+    if (frames.current > 1) return;
+    if (++frames.current === 2) onReady();
+    else invalidate(); // on demand (reduced motion), the second frame is asked for
+  });
   return null;
 }
 
 type Props = {
   reducedMotion: boolean;
   coarse: boolean;
+  /** The disc has been drawn. */
   onReady: () => void;
+  /** The context was lost: the canvas will draw nothing more. */
+  onLost: () => void;
 };
 
 /**
  * The WebGL layer. Loaded lazily (see DiscLayer) so three.js never blocks
- * first paint — the CSS poster disc holds the composition until this mounts.
+ * first paint — the CSS poster disc holds the composition until this mounts,
+ * and until the scene is prepared: no frame runs before that, so the disc
+ * starts from its first pose when it is first drawn.
  */
-export default function DiscCanvas({ reducedMotion, coarse, onReady }: Props) {
+export default function DiscCanvas({ reducedMotion, coarse, onReady, onLost }: Props) {
   const [monoFamily] = useState(
     () => getComputedStyle(document.documentElement).getPropertyValue("--font-plex-mono").trim() || "monospace",
   );
   const [awake, setAwake] = useState(true);
+  const [prepared, setPrepared] = useState(false);
+  const onPrepared = useCallback(() => {
+    // A drag made on the poster turned nothing on screen: the first frame
+    // starts from the pose the poster shows, and a hand still on the disc
+    // carries on from there.
+    experience.drag.delta = 0;
+    experience.drag.velocity = 0;
+    setPrepared(true);
+  }, []);
 
   // Sleep once the reader has scrolled past the disc's last station; wake on return.
   useEffect(() => {
@@ -69,7 +124,12 @@ export default function DiscCanvas({ reducedMotion, coarse, onReady }: Props) {
     };
   }, []);
 
-  const frameloop = !awake ? "never" : reducedMotion ? "demand" : "always";
+  // Prepared: the first frame (on demand, nothing else would ask for it).
+  useEffect(() => {
+    if (prepared) experience.invalidate();
+  }, [prepared]);
+
+  const frameloop = !prepared || !awake ? "never" : reducedMotion ? "demand" : "always";
 
   return (
     <Canvas
@@ -80,8 +140,9 @@ export default function DiscCanvas({ reducedMotion, coarse, onReady }: Props) {
       style={{ pointerEvents: "none" }}
       aria-hidden="true"
     >
-      <Environment />
-      <Bridge onReady={onReady} />
+      <Preparation onPrepared={onPrepared} />
+      <Bridge />
+      <Presence onReady={onReady} onLost={onLost} />
       <Disc monoFamily={monoFamily} />
     </Canvas>
   );

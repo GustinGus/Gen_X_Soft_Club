@@ -197,6 +197,62 @@
   box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.55);
 }
 
+/* ================================================================ the disc as one model */
+/*
+ * Inspection (?disc=webgl): one canvas, one disc, over the plate — from
+ * above the plate's edge down to the seat. It is cut to the two places a
+ * disc can be seen: above the edge (to --lip under the slot's mouth, like
+ * .protrude) and through the window. A plain rectangle is enough for the
+ * window: the disc never reaches its rounded corners.
+ */
+.stage {
+  --overhang: calc(var(--disc) * 0.04);
+  --stage-x: calc(var(--disc-x) - var(--disc) / 2 - var(--overhang));
+  --stage-above: calc(var(--disc) + var(--overhang));
+
+  position: absolute;
+  left: var(--stage-x);
+  top: calc(var(--stage-above) * -1);
+  width: calc(var(--disc) + var(--overhang) * 2);
+  height: calc(var(--stage-above) + var(--seat-y) + var(--disc) / 2 + var(--overhang));
+  pointer-events: none;
+  /* the disc's own drop onto the tray below it (as the poster's) */
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.35));
+  mask:
+    linear-gradient(#000 0 0) 0 0 / 100% calc(var(--stage-above) + var(--lip)) no-repeat,
+    linear-gradient(#000 0 0) calc(var(--win-x) - var(--stage-x)) calc(var(--win-y) + var(--stage-above)) /
+      var(--win-w) var(--win-h) no-repeat;
+}
+
+/* Mounted but not the disc yet (still loading, or no media). */
+.stageOff {
+  visibility: hidden;
+}
+
+/* Above the model: the slot-side shade, then the polycarbonate. */
+.over {
+  z-index: 1;
+}
+
+/* A poster while the model is drawn: its box, its motion and (at the slot)
+   the lip's shade stay; its face and print are not shown. */
+.ghost > * {
+  visibility: hidden;
+}
+
+.plate .ghost {
+  filter: none;
+}
+
+.smokeOver {
+  inset: auto;
+  left: var(--win-x);
+  top: var(--win-y);
+  width: var(--win-w);
+  height: var(--win-h);
+  border-radius: 1.6cqi;
+}
+
 /* ================================================================ right column */
 .brand {
   position: absolute;

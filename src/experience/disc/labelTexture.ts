@@ -1,13 +1,27 @@
 import { CanvasTexture, SRGBColorSpace } from "three";
 import { DISC } from "./discGeometry";
 
+/** The Home disc's catalogue number — what is printed when no label is given. */
+export const DEFAULT_LABEL = "SC—001";
+/** The Home disc's issue line — what is printed when no issue is given. */
+export const DEFAULT_ISSUE = "ISSUE 001";
+
 /**
  * Printed label for the procedural disc — drawn once to a canvas.
  * Identity text only (issue / catalogue number); no invented release data.
  * Uses the same mono face as the DOM metadata so the object and the page
  * read as one printed system.
+ *
+ * `label` is the catalogue number, printed on the rim and above the hub.
+ * `issue` is the issue line on the rim; `null` prints none (a record's disc
+ * belongs to no issue).
  */
-export function createLabelTexture(monoFamily: string, size = 1024) {
+export function createLabelTexture(
+  monoFamily: string,
+  label: string = DEFAULT_LABEL,
+  issue: string | null = DEFAULT_ISSUE,
+  size = 1024,
+) {
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
@@ -20,7 +34,10 @@ export function createLabelTexture(monoFamily: string, size = 1024) {
   ctx.textBaseline = "middle";
 
   // Ring text around the outer edge, like a matrix / rim print.
-  const ring = "SOFT CLUB ARCHIVE   ·   ISSUE 001   ·   SOUND / FASHION / IMAGE   ·   SC—001   ·   ";
+  const ring = ["SOFT CLUB ARCHIVE", issue, "SOUND / FASHION / IMAGE", label]
+    .filter((part) => part !== null)
+    .map((part) => `${part}   ·   `)
+    .join("");
   const ringRadius = (DISC.dataOuter - 0.045) * unit;
   ctx.font = `500 ${Math.round(size * 0.0165)}px ${monoFamily}`;
   const chars = [...ring];
@@ -38,7 +55,7 @@ export function createLabelTexture(monoFamily: string, size = 1024) {
   // Hub print: catalogue number + a thin registration rule.
   ctx.textAlign = "center";
   ctx.font = `500 ${Math.round(size * 0.02)}px ${monoFamily}`;
-  ctx.fillText("SC—001", c, c - DISC.stackOuter * unit - size * 0.028);
+  ctx.fillText(label, c, c - DISC.stackOuter * unit - size * 0.028);
   ctx.font = `400 ${Math.round(size * 0.013)}px ${monoFamily}`;
   ctx.fillText("GEN X SOFT CLUB", c, c + DISC.stackOuter * unit + size * 0.026);
 

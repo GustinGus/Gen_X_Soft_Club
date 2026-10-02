@@ -18,8 +18,20 @@ import { createLabelTexture } from "./labelTexture";
  * Renders its four meshes straight into the parent group (no wrapper node),
  * so whoever holds it owns pose, tilt, yaw, spin and light. The Home's
  * `Disc` is that holder today.
+ *
+ * `label` is the catalogue number printed on it and `issue` the issue line
+ * on its rim; left out, they are the Home disc's own. `issue={null}` prints
+ * no issue line.
  */
-export function DiscModel({ monoFamily }: { monoFamily: string }) {
+export function DiscModel({
+  monoFamily,
+  label,
+  issue,
+}: {
+  monoFamily: string;
+  label?: string;
+  issue?: string | null;
+}) {
   // ---------------------------------------------------------------- geometry
   const geo = useMemo(
     () => ({
@@ -93,7 +105,7 @@ export function DiscModel({ monoFamily }: { monoFamily: string }) {
     let cancelled = false;
     document.fonts.ready.then(() => {
       if (cancelled) return;
-      texture = createLabelTexture(monoFamily);
+      texture = createLabelTexture(monoFamily, label, issue);
       mat.print.map = texture;
       mat.print.needsUpdate = true;
       experience.invalidate();
@@ -102,7 +114,7 @@ export function DiscModel({ monoFamily }: { monoFamily: string }) {
       cancelled = true;
       texture?.dispose();
     };
-  }, [mat, monoFamily]);
+  }, [mat, monoFamily, label, issue]);
 
   useEffect(
     () => () => {

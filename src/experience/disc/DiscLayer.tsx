@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supportsWebGL } from "@/lib/webgl";
 import { useMediaQuery, useReducedMotion } from "@/motion/useMediaQuery";
 import { experience, measureAnchor } from "../store";
+import { CanvasBoundary } from "./CanvasBoundary";
 import styles from "./disc.module.css";
 
 const DiscCanvas = dynamic(() => import("./DiscCanvas"), { ssr: false });
@@ -73,8 +74,18 @@ export function DiscLayer() {
     return () => clearTimeout(id);
   }, []);
 
+  // The disc is drawn: the posters hand over, and the layer fades in with it.
+  const [shown, setShown] = useState(false);
   const onReady = useCallback(() => {
     document.documentElement.dataset.disc = "webgl";
+    setShown(true);
+  }, []);
+
+  // WebGL gone (no context made, or a lost one): the posters are the disc
+  // again, for the rest of the visit.
+  const onLost = useCallback(() => {
+    delete document.documentElement.dataset.disc;
+    setMount(false);
   }, []);
 
   useEffect(() => () => void delete document.documentElement.dataset.disc, []);
@@ -82,8 +93,10 @@ export function DiscLayer() {
   if (!mount) return null;
 
   return (
-    <div className={styles.layer} aria-hidden="true">
-      <DiscCanvas reducedMotion={reducedMotion} coarse={coarse} onReady={onReady} />
+    <div className={styles.layer} style={shown ? undefined : { animationPlayState: "paused" }} aria-hidden="true">
+      <CanvasBoundary onFail={onLost}>
+        <DiscCanvas reducedMotion={reducedMotion} coarse={coarse} onReady={onReady} onLost={onLost} />
+      </CanvasBoundary>
     </div>
   );
 }
