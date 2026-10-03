@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { deckEasing as ease, deckTimeline as t } from "@/motion/tokens";
 import { hasMedia, type DeckEvent, type DeckState } from "./deckMachine";
+import { caseInView, flyFromCase, flyToCase, mouthOf, type Flight } from "./discFlight";
 
 type Options = {
   deck: RefObject<HTMLElement | null>;
@@ -11,6 +12,12 @@ type Options = {
   reduced: boolean;
   /** Inspection (?deck=): the state is shown still, nothing runs. */
   still: boolean;
+  /** The disc may be carried between its case and the slot (else it appears / is lifted away at the slot). */
+  fly: boolean;
+  /** This cycle's disc in the deck is the model: the flying poster hands over to it (and takes it back) with a cross-fade. */
+  model: boolean;
+  /** The class the deck's views wear when the model is drawn (only their motion and shade shown). */
+  ghost?: string;
 };
 
 type Snapshot = { disc: number | null };
@@ -54,10 +61,11 @@ const cqiOf = (el: Element, name: string) => parseFloat(getComputedStyle(el).get
  *
  * Only transform (translate / rotate) and opacity are animated.
  */
-export function useDeckSequence({ deck, state, dispatch, reduced, still }: Options) {
+export function useDeckSequence({ deck, state, dispatch, reduced, still, fly, model, ghost }: Options) {
   const generation = useRef(0);
   const previous = useRef(state);
   const snapshot = useRef<Snapshot | null>(null);
+  const flying = useRef<Flight | null>(null);
 
   /** The only way events reach the machine: measure first, then dispatch. */
   const send = (event: DeckEvent) => {
@@ -78,8 +86,10 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
   useEffect(() => {
     const el = deck.current;
     const sequence = generation;
+    const flight = flying;
     return () => {
       sequence.current++;
+      flight.current?.cancel();
       el?.closest("article")?.removeAttribute("data-deck");
     };
   }, [deck]);
@@ -149,6 +159,11 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
     const lcd = (name: string) => el.querySelector<HTMLElement>(`[data-lcd="${name}"]`);
 
     discs.forEach((d) => cancel(d, MOVE));
+    // A disc still in flight is overtaken with the rest — except by an EJECT,
+    // which turns it back to its case from wherever it is (below).
+    const inFlight = flying.current;
+    flying.current = null;
+    if (inFlight && (state !== "ejecting" || reduced)) inFlight.cancel();
     // The previous state's LCD cues end with it.
     el.querySelectorAll("[data-lcd]").forEach((segment) => cancel(segment, CUE));
 
@@ -188,17 +203,26 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
 
     if (from === "empty" && state === "inserting") {
       prints().forEach((p) => (p.style.rotate = "0deg"));
-      const placed = reduced
-        ? move([{ opacity: 0 }, { opacity: 1 }], { duration: t.fade })
-        : move(
-            [
-              { translate: `0 ${-6 * cqi}px`, opacity: 0 },
-              { opacity: 1, offset: 0.3 },
-              { translate: "0 0", opacity: 1 },
-            ],
-            { duration: t.entry, delay: t.entryDelay, easing: ease.travel, fill: "both" },
-          );
-      then(placed, () => {
+      const standing = el.querySelector<HTMLElement>('[data-deck-disc="slot"]');
+      const flight =
+        !reduced && fly && standing ? flyFromCase(el, { disc: standing, ghost, clearance: model ? 0 : undefined }) : null;
+      flying.current = flight;
+      // Out of its case and over the table, or (case off screen, reduced
+      // motion, a layout without the flight) simply appearing at the slot's mouth.
+      const placed = flight
+        ? move([{ opacity: 0 }, { opacity: 0 }], { duration: t.flightDelay + t.flight, fill: "both" })
+        : reduced
+          ? move([{ opacity: 0 }, { opacity: 1 }], { duration: t.fade })
+          : move(
+              [
+                { translate: `0 ${-6 * cqi}px`, opacity: 0 },
+                { opacity: 1, offset: 0.3 },
+                { translate: "0 0", opacity: 1 },
+              ],
+              { duration: t.entry, delay: t.entryDelay, easing: ease.travel, fill: "both" },
+            );
+      // The pull onto the spindle, from the slot's mouth (as it always was).
+      const pull = () => {
         // read below the plate: the narrow plate redefines both there
         const probe = window_ ?? el;
         const seat = (cqiOf(probe, "--seat-y") - cqiOf(probe, "--disc-y")) * cqi;
@@ -214,6 +238,38 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
               { duration: t.pull, delay: t.pullPause },
             );
         then(pulled, () => report.current({ type: "SEATED" }));
+      };
+      // From rest above the slot, pushed into its mouth by the deck's views:
+      // it gets going, then stops there.
+      // (measured then: the layout may have changed under the flight)
+      const slide = (flown: Flight) => {
+        flown.land();
+        flying.current = null;
+        const push = { duration: t.slideIn, easing: ease.motor, fill: "forwards" as const };
+        const slid = move(
+          [
+            { translate: `0 ${-flown.mouth * (el.clientWidth / 100)}px`, opacity: 1 },
+            { translate: "0 0", opacity: 1 },
+          ],
+          push,
+        );
+        // the lip's shade stays on the plate's edge while the disc goes under it
+        discs.forEach((d) => d.animate([{ "--slide": flown.mouth }, { "--slide": 0 }], { id: MOVE, ...push }));
+        then(slid, pull);
+      };
+      if (!flight) {
+        then(placed, pull);
+        return;
+      }
+      // Set down above the slot: the deck's views take the disc over in the
+      // same frame — or, in the model's cycle, the model fades in over the
+      // flying poster there first.
+      then(flight.animation, () => {
+        if (!model) return slide(flight);
+        const held = { translate: `0 ${-flight.mouth * (el.clientWidth / 100)}px`, "--slide": flight.mouth };
+        flight.fadeOut(t.crossfade);
+        const shown = move([{ ...held, opacity: 0 }, { ...held, opacity: 1 }], { duration: t.crossfade });
+        then(shown, () => slide(flight));
       });
       return;
     }
@@ -265,16 +321,78 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
     }
 
     if (state === "ejecting") {
+      // EJECT while the disc is still on its way from the case: it turns back
+      // from wherever it is, and the deck's own views never show it.
+      if (inFlight) {
+        flying.current = inFlight;
+        const back = inFlight.turnBack();
+        move([{ opacity: 0 }, { opacity: 0 }], { duration: Number(back.effect?.getTiming().duration) || 0, fill: "both" });
+        then(back, () => {
+          inFlight.land();
+          flying.current = null;
+          report.current({ type: "OUT" });
+        });
+        return;
+      }
+
       // A disc still turning is braked before it is pushed out.
       if (from === "reading") stop(t.brake);
       else {
         const at = angleOf(window_?.querySelector("[data-disc-print]") ?? null);
         prints().forEach((p) => (p.style.rotate = `${at}deg`));
       }
+      const standing = el.querySelector<HTMLElement>('[data-deck-disc="slot"]');
+      const flyBack = !reduced && fly && !!standing && caseInView(el);
       const out = reduced
         ? move([{ opacity: 0 }, { opacity: 1 }], { duration: t.fade })
         : move([{ translate: `0 ${delta}px` }, { translate: "0 0" }], { duration: t.eject, easing: ease.eject });
       then(out, () => {
+        if (flyBack && standing) {
+          // After a shorter stand (shorter again by the model's cross-fade, so
+          // the whole EJECT keeps its length), taken up out of the slot to just above it…
+          const mouth = mouthOf(el, standing, model ? 0 : undefined);
+          const fade = model ? t.crossfade : 0;
+          const rise = {
+            duration: t.slideOut,
+            delay: t.ejectHoldFlight - fade,
+            easing: ease.motor,
+            fill: "forwards" as const,
+          };
+          const raised = move([{ translate: "0 0" }, { translate: `0 ${-mouth * cqi}px` }], rise);
+          discs.forEach((d) => d.animate([{ "--slide": 0 }, { "--slide": mouth }], { id: MOVE, ...rise }));
+          // …where a flight takes it over (in the same frame, or fading in over
+          // the model fading out) and carries it back to its case.
+          then(raised, () => {
+            const back = flyToCase(el, { disc: standing, ghost, clearance: model ? 0 : undefined }, mouth, fade);
+            if (!back) {
+              // the case has left the screen meanwhile: lifted away, as without a flight
+              const away = move(
+                [
+                  { translate: `0 ${-mouth * cqi}px`, opacity: 1 },
+                  { translate: `0 ${-(mouth + 5) * cqi}px`, opacity: 0 },
+                ],
+                { duration: t.lift, easing: "cubic-bezier(0.55, 0, 0.9, 0.3)" },
+              );
+              then(away, () => report.current({ type: "OUT" }));
+              return;
+            }
+            flying.current = back;
+            const up = `0 ${-mouth * cqi}px`;
+            move(
+              [
+                { translate: up, opacity: fade ? 1 : 0 },
+                { translate: up, opacity: 0 },
+              ],
+              { duration: fade || t.flight, fill: "both" },
+            );
+            then(back.animation, () => {
+              back.land();
+              flying.current = null;
+              report.current({ type: "OUT" });
+            });
+          });
+          return;
+        }
         const lifted = move(
           reduced
             ? [{ opacity: 1 }, { opacity: 0 }]
@@ -287,7 +405,7 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still }: Optio
         then(lifted, () => report.current({ type: "OUT" }));
       });
     }
-  }, [deck, state, still, reduced]);
+  }, [deck, state, still, reduced, fly, model, ghost]);
 
   return send;
 }

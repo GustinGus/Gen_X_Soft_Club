@@ -36,7 +36,7 @@ type Owed = { picture?: boolean; labelled?: boolean };
  * its ceiling is in front of the lens: the deck lies on the table and is
  * seen from above, so the disc faces the tubes, not a wall.
  */
-function Environment() {
+function Environment({ quiet }: { quiet: () => Promise<void> }) {
   const get = useThree((s) => s.get);
   useEffect(() => {
     const { gl, scene, invalidate } = get();
@@ -44,7 +44,7 @@ function Environment() {
     let dropped = false;
     // The room is made without stalling on its shaders, so it arrives later;
     // a canvas dropped meanwhile ends it with nothing.
-    createFluorescentEnvironmentAsync(gl, () => !dropped).then((made) => {
+    createFluorescentEnvironmentAsync(gl, () => !dropped, quiet).then((made) => {
       if (!made) return;
       if (dropped) return made.dispose();
       room = made;
@@ -59,7 +59,7 @@ function Environment() {
       scene.environment = null;
       room?.dispose();
     };
-  }, [get]);
+  }, [get, quiet]);
   return null;
 }
 
@@ -90,6 +90,7 @@ type RigProps = {
   active: boolean;
   onReady: () => void;
   onLost: () => void;
+  quiet: () => Promise<void>;
   children: React.ReactNode;
 };
 
@@ -110,7 +111,7 @@ type RigProps = {
  * but a picture is only drawn when something in it changed — a disc at rest,
  * or waiting out a pause in the sequence, costs no GL work.
  */
-function Rig({ deck, pose, active, onReady, onLost, children }: RigProps) {
+function Rig({ deck, pose, active, onReady, onLost, quiet, children }: RigProps) {
   const group = useRef<Group>(null);
   const drawn = useRef("");
   const reported = useRef(false);
@@ -215,7 +216,7 @@ function Rig({ deck, pose, active, onReady, onLost, children }: RigProps) {
     if (compiled.current !== "done") {
       if (!compiled.current && owed.labelled && scene.environment) {
         compiled.current = "pending";
-        linkInTurn(gl, scene, camera).then(() => {
+        linkInTurn(gl, scene, camera, quiet).then(() => {
           compiled.current = "done";
           owed.picture = true;
           invalidate();
@@ -253,6 +254,8 @@ type Props = {
   onReady: () => void;
   /** The context was lost: this canvas will draw nothing more. */
   onLost: () => void;
+  /** Resolves when the deck is still: each heavy step of the preparation waits on it. */
+  quiet: () => Promise<void>;
   /** Placement: the area of the deck the disc can be seen in. */
   className?: string;
 };
@@ -266,7 +269,7 @@ type Props = {
  * moves and what covers it stay DOM. It draws on demand: a disc at rest
  * costs no frames.
  */
-export default function DeckCanvas({ label, deck, pose, active, onReady, onLost, className }: Props) {
+export default function DeckCanvas({ label, deck, pose, active, onReady, onLost, quiet, className }: Props) {
   const [monoFamily] = useState(
     () => getComputedStyle(document.documentElement).getPropertyValue("--font-plex-mono").trim() || "monospace",
   );
@@ -287,11 +290,11 @@ export default function DeckCanvas({ label, deck, pose, active, onReady, onLost,
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance", toneMapping: NeutralToneMapping }}
         style={{ pointerEvents: "none" }}
       >
-        <Environment />
+        <Environment quiet={quiet} />
         <Bridge />
         {/* The Home disc's key light, from its resting place. */}
         <directionalLight position={[2.5, 3, 6]} intensity={KEY_LIGHT} color="#f1f4ee" />
-        <Rig deck={deck} pose={pose} active={active} onReady={onReady} onLost={onLost}>
+        <Rig deck={deck} pose={pose} active={active} onReady={onReady} onLost={onLost} quiet={quiet}>
           {/* A record's disc carries its catalogue number and no issue line. */}
           <DiscModel monoFamily={monoFamily} label={label} issue={null} />
         </Rig>

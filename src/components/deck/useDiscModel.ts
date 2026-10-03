@@ -25,12 +25,16 @@ const frugal = () => {
   return !!connection && (connection.saveData === true || /(^|-)2g$/.test(connection.effectiveType ?? ""));
 };
 
-/** Something of the deck's sequence is still moving (disc, print or card). */
+/** Something of the deck's sequence is still moving (disc, print, card, or the disc in flight to or from its case). */
 const moving = (deck: HTMLElement) =>
+  !!deck.closest("article")?.querySelector("[data-deck-flight]") ||
   [
     ...deck.querySelectorAll("[data-deck-disc], [data-disc-print]"),
     ...(deck.closest("article")?.querySelectorAll('[data-vt="catalogue-card"]') ?? []),
   ].some((el) => el.getAnimations().some((a) => a.playState === "running"));
+
+/** How often a step of the preparation waiting for the deck to be still looks again. */
+const QUIET_POLL = 120;
 
 /**
  * THE DISC MODEL'S PREPARATION — when the physical disc is fetched and made
@@ -92,6 +96,29 @@ export function useDiscModel({ enabled, deck, state, load, immediate }: Options)
     };
   }, [stage, atRest, deck]);
 
+  // The canvas is only *made* with the deck at rest — a key pressed between
+  // the idle moment and the render must not have it built under its
+  // sequence. Once made, it stays through whatever the deck does.
+  const [made, setMade] = useState(false);
+  const mount = stage === "mounted" && (made || atRest);
+  if (mount && !made) setMade(true);
+
+  // The heavy steps of the preparation (the room's prefilter, linking the
+  // disc's programs) wait for the deck to be still: nothing of them may land
+  // on a sequence or a disc in flight. Fetching is not held back.
+  const quiet = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        const look = () => {
+          const el = deck.current;
+          if (el && moving(el)) setTimeout(look, QUIET_POLL);
+          else resolve();
+        };
+        look();
+      }),
+    [deck],
+  );
+
   const onReady = useCallback(() => setReady(true), []);
 
   // The canvas could not be made, or lost its context (no context, a broken
@@ -105,7 +132,9 @@ export function useDiscModel({ enabled, deck, state, load, immediate }: Options)
     /** Call if the canvas throws or loses its context. */
     fail,
     /** Render the canvas (hidden until a cycle uses it). */
-    mount: stage === "mounted",
+    mount,
+    /** Resolves when the deck is still: the canvas waits on it before each heavy step. */
+    quiet,
     /** The labelled disc has been drawn, by a canvas that is still there. */
     ready: enabled && ready && stage === "mounted",
     onReady,

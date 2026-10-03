@@ -102,6 +102,18 @@
   text-shadow: 0 1px 0 rgb(255 255 255 / 0.45);
 }
 
+/*
+ * --slide: how far above its pose for the state the disc still is, in cqi,
+ * while it is pushed into the slot from where the flight from the case set
+ * it down (discFlight.ts). The disc itself moves by `translate`; only the
+ * lip's shade on it reads this. 0 everywhere else.
+ */
+@property --slide {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 /* The disc outside the plate, above its top edge (inserting / ejecting). */
 .protrude {
   position: absolute;
@@ -114,6 +126,15 @@
   pointer-events: none;
 }
 
+/* Inserting / ejecting: room for the disc clear of the slot, where the
+   flight from (and back to) its case hands it over (discFlight.ts CLEARANCE).
+   Only the clip reaches up: the box keeps its size, so nothing shifts. */
+.deck[data-state="inserting"] .protrude,
+.deck[data-state="ejecting"] .protrude {
+  overflow: visible;
+  clip-path: inset(-6cqi 0 0 0);
+}
+
 .protrude .disc {
   left: calc(var(--disc-x) - var(--disc) / 2);
   top: calc(var(--disc-y) - var(--disc) / 2 + var(--disc));
@@ -123,18 +144,23 @@
 }
 
 /* The disc darkens as it passes under the lip into the mechanism
-   (the plate's edge sits --disc / 2 - --disc-y down the disc). */
+   (the plate's edge sits --disc / 2 - --disc-y down the disc, and --slide
+   further while it is still above its pose). */
 .protrude .disc::after {
+  --edge: calc(var(--disc) / 2 - var(--disc-y) + var(--slide) * 1cqi);
+
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  /* its own layer: following the lip as the disc goes in repaints the shade only */
+  will-change: transform;
   background: linear-gradient(
     180deg,
-    transparent calc(var(--disc) / 2 - var(--disc-y) - 6cqi),
-    rgb(8 10 9 / 0.08) calc(var(--disc) / 2 - var(--disc-y) - 3.5cqi),
-    rgb(8 10 9 / 0.3) calc(var(--disc) / 2 - var(--disc-y) - 1.2cqi),
-    rgb(8 10 9 / 0.75) calc(var(--disc) / 2 - var(--disc-y) + var(--lip))
+    transparent calc(var(--edge) - 6cqi),
+    rgb(8 10 9 / 0.08) calc(var(--edge) - 3.5cqi),
+    rgb(8 10 9 / 0.3) calc(var(--edge) - 1.2cqi),
+    rgb(8 10 9 / 0.75) calc(var(--edge) + var(--lip))
   );
 }
 

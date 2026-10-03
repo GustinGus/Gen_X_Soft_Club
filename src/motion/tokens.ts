@@ -73,6 +73,20 @@ export const deckTimeline = {
   entryDelay: 260,
   /** Placed at the slot's mouth. */
   entry: 520,
+  /** Carried from the case to just above the slot, over the card being set aside. */
+  flightDelay: 20,
+  flight: 540,
+  /** Pushed from there into the slot's mouth — where `entry` would have left it. */
+  slideIn: 220,
+  /** Taken back out of the mouth to just above the slot, before the flight back to the case. */
+  slideOut: 220,
+  /** The ejected disc's stand when it flies back: `ejectHold` less the time the
+   *  flight back adds over `lift`, so the whole EJECT keeps its length. */
+  ejectHoldFlight: 420,
+  /** An EJECT during the flight to the deck: the shortest way back to the case. */
+  turnBack: 180,
+  /** The model's cycle: the flying poster and the deck's model cross-fade over each other, above the slot. */
+  crossfade: 160,
   /** The mechanism takes it: a beat, then the pull onto the spindle. */
   pullPause: 140,
   pull: 720,

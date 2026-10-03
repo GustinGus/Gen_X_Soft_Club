@@ -20,6 +20,8 @@ type Props = {
  *
  * Artwork: placeholder → Phase 2A JewelCase (empty tray) + scan-pending marks
  * on the file. Licensed → the scan inside the same case, never cropped.
+ * Either way the tray is `data-disc-home`: where the record's disc lies, and
+ * where it leaves from for the deck.
  */
 export function ArchiveSleeve({ record, variant = "index", className }: Props) {
   const { artwork } = record;
@@ -30,7 +32,7 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
         {artwork.status === "licensed" ? (
           <figure className={styles.licensed}>
             <span className={styles.hinge} aria-hidden="true" />
-            <span className={styles.tray}>
+            <span className={styles.tray} data-disc-home="">
               <Image
                 src={artwork.src}
                 alt={`Cover of ${record.album} by ${record.artist}`}

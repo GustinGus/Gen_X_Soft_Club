@@ -1,0 +1,27 @@
+/*
+ * The disc in flight between its case and the deck: a layer of the file,
+ * scrolling with it. Sized like the deck (its cqi are the deck's), so the
+ * disc carried in it is drawn exactly as in the slot.
+ *
+ * Above the catalogue card and the deck, under the case (RecordSheet: case 3,
+ * card 2, deck 1) — the disc leaves from behind the case.
+ */
+.flight {
+  position: absolute;
+  z-index: 2;
+  height: 0;
+  container-type: inline-size;
+  pointer-events: none;
+}
+
+/* The disc lifted off the table: a soft shadow under it, gone when it is set down. */
+.air {
+  position: absolute;
+  inset: 4%;
+  z-index: -1;
+  border-radius: 50%;
+  translate: 0 6%;
+  /* a gradient, not a blur: nothing to re-rasterise as the disc scales */
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.26), rgb(0 0 0 / 0.14) 55%, rgb(0 0 0 / 0.04) 85%, transparent);
+  opacity: 0;
+}

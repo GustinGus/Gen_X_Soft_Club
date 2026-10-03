@@ -50,6 +50,8 @@ const loadDeckCanvas = () => import("./DeckCanvas");
 const readPosterOnly = () => INSPECT && new URLSearchParams(window.location.search).get("disc") === "poster";
 /** The deck's horizontal plate (ArchiveDeck.module.css): the only layout the model is placed in. */
 const DESKTOP = "(min-width: 700px)";
+/** The file's wide layout (RecordSheet.module.css), case and deck side by side: where the disc is carried between them. */
+const WIDE = "(min-width: 1024px)";
 
 /**
  * THE ARCHIVE DECK — SC-AU/02, the archive's own audio unit.
@@ -74,6 +76,7 @@ export function ArchiveDeck({ record, file, className }: Props) {
   const reduced = useReducedMotion();
   const fine = useFinePointer();
   const desktop = useMediaQuery(DESKTOP);
+  const wide = useMediaQuery(WIDE);
   const posterOnly = useSyncExternalStore(subscribe, readPosterOnly, () => false);
   const allowed = fine && desktop && !posterOnly;
   const model = useDiscModel({ enabled: allowed, deck: ref, state, load: loadDeckCanvas, immediate: forced !== null });
@@ -84,7 +87,18 @@ export function ArchiveDeck({ record, file, className }: Props) {
   const modelView = drawn && hasMedia(state);
   // With the model drawn, the posters stay as its motion and its shade only.
   const disc = [styles.disc, modelView && styles.ghost].filter(Boolean).join(" ");
-  const send = useDeckSequence({ deck: ref, state, dispatch, reduced, still: forced !== null });
+  // The disc is carried between its case and the slot as a poster; in the
+  // model's cycle the model takes it over (and gives it back) above the slot.
+  const send = useDeckSequence({
+    deck: ref,
+    state,
+    dispatch,
+    reduced,
+    still: forced !== null,
+    fly: wide,
+    model: drawn,
+    ghost: styles.ghost,
+  });
 
   // Announce only what the user set going — never the state at first paint.
   const [touched, setTouched] = useState(false);
@@ -152,6 +166,7 @@ export function ArchiveDeck({ record, file, className }: Props) {
               label={record.catalogue}
               onReady={model.onReady}
               onLost={model.fail}
+              quiet={model.quiet}
             />
           </CanvasBoundary>
         )}

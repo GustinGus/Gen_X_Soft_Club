@@ -69,7 +69,7 @@ export function JewelCase({ artist, album, catalogue, className }: CaseProps) {
       data-placeholder="artwork"
     >
       <span className={styles.hinge} aria-hidden="true" />
-      <span className={styles.tray} aria-hidden="true">
+      <span className={styles.tray} aria-hidden="true" data-disc-home="">
         <span className={styles.trayLabel}>
           {catalogue}
           <br />
