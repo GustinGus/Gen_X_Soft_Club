@@ -526,20 +526,32 @@
     min-height: 37rem;
   }
 
+  /* Media in the deck: the disc stands up to 53% of the deck's width out of
+     the slot (ejecting), so the deck sits just low enough to keep it clear of
+     the case above. That place is held in every state, so the layout never
+     moves under an INSERT or an EJECT. Empty, the plate is drawn back up by
+     the drop — a transform, in the deck's own cqi (1cqi = 1% of its width,
+     the margins' 1%) — to where the card covers it, and the drop is given
+     back below. */
   .deck {
     --card-rest-bottom: calc(37rem - var(--space-7));
     --deck-scale: 1;
 
     grid-column: 1 / -1;
-    margin-top: calc(var(--card-rest-bottom) - 140%);
+    margin-top: max(calc(var(--card-rest-bottom) - 140%), calc(53% + var(--space-4)));
+    margin-bottom: calc(max(0px, 193% + var(--space-4) - var(--card-rest-bottom)) * -1);
   }
 
-  /* Media in the deck: the disc stands up to 53% of the deck's width out of
-     the slot (ejecting), so the deck drops just enough to keep it clear of
-     the case above. Held for the whole cycle so the deck never moves while
-     the disc is in it. */
+  .deck > :first-child {
+    translate: 0 calc(max(0px, 193cqi + var(--space-4) - var(--card-rest-bottom)) * -1);
+  }
+
   .sheet[data-deck]:not([data-deck="empty"]) .deck {
-    margin-top: max(calc(var(--card-rest-bottom) - 140%), calc(53% + var(--space-4)));
+    margin-bottom: 0;
+  }
+
+  .sheet[data-deck]:not([data-deck="empty"]) .deck > :first-child {
+    translate: none;
   }
 
   .sheet[data-deck]:not([data-deck="empty"]) .card {

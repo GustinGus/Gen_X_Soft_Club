@@ -96,12 +96,28 @@ export function useDiscModel({ enabled, deck, state, load, immediate }: Options)
     };
   }, [stage, atRest, deck]);
 
-  // The canvas is only *made* with the deck at rest — a key pressed between
-  // the idle moment and the render must not have it built under its
-  // sequence. Once made, it stays through whatever the deck does.
+  // The canvas is only *made* with the deck at rest. R3F builds its root and
+  // WebGL context only after its element is in the page and measured — in
+  // one task that also sizes the drawing buffer away from the element's
+  // default 300 × 150 — and that comes a few hundred ms after the mount is
+  // asked for. A key pressed before then drops the attempt (nothing built,
+  // nothing to lose) and the cycle stays with the posters; the next rest
+  // tries again. Once built, the canvas stays through whatever the deck does.
   const [made, setMade] = useState(false);
+  useEffect(() => {
+    const el = deck.current;
+    if (stage !== "mounted" || made || !el) return;
+    const look = () => {
+      const canvas = el.querySelector("canvas");
+      if (canvas && (canvas.width !== 300 || canvas.height !== 150)) setMade(true);
+    };
+    const observer = new MutationObserver(look);
+    observer.observe(el, { childList: true, subtree: true, attributes: true, attributeFilter: ["width", "height"] });
+    queueMicrotask(look);
+    return () => observer.disconnect();
+  }, [stage, made, deck]);
+  if (stage === "mounted" && !made && !atRest) setStage("loaded");
   const mount = stage === "mounted" && (made || atRest);
-  if (mount && !made) setMade(true);
 
   // The heavy steps of the preparation (the room's prefilter, linking the
   // disc's programs) wait for the deck to be still: nothing of them may land

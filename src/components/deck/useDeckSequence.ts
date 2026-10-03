@@ -122,14 +122,16 @@ export function useDeckSequence({ deck, state, dispatch, reduced, still, fly, mo
     const card = article.querySelector<HTMLElement>('[data-vt="catalogue-card"]');
     const moveCard = animate && card && hasMedia(from) !== hasMedia(state);
     const cardFirst = moveCard && card ? { box: card.getBoundingClientRect(), angle: angleOf(card) } : null;
-    const deckTop = el.getBoundingClientRect().top;
+    // the plate: where the deck is drawn (the layout may move it by a transform)
+    const face = el.firstElementChild ?? el;
+    const deckTop = face.getBoundingClientRect().top;
 
     article.setAttribute("data-deck", state);
 
     // The page may grow or shrink around the deck (mobile): hold the deck
     // still on screen, so the machine never jumps under the user's hand.
     if (animate) {
-      const shift = el.getBoundingClientRect().top - deckTop;
+      const shift = face.getBoundingClientRect().top - deckTop;
       if (Math.abs(shift) > 0.5) window.scrollBy({ top: shift, behavior: "instant" });
     }
 
