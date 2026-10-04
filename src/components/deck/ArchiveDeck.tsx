@@ -115,7 +115,8 @@ export function ArchiveDeck({ record, file, className }: Props) {
 
   const announcement: Record<DeckState, string> = {
     empty: "Disc returned to its case.",
-    inserting: "Disc inserting.",
+    // Silent: the pressed key is its own feedback; two announcements per insert.
+    inserting: "",
     reading: "Reading disc.",
     ready: `Disc ready: ${record.artist}, ${record.album}, ${record.year}. No listening copy is held.`,
     ejecting: "Ejecting disc.",
