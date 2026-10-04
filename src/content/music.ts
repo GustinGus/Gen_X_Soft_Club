@@ -203,6 +203,7 @@ export const recordFileCopy = {
   documented: "Documented history",
   tracklist: "Tracklist",
   linerNotes: "Liner notes",
+  credits: "Credits",
   notes: "Notes & sources",
   prev: "Previous file",
   next: "Next file",

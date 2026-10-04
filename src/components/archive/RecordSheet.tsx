@@ -14,6 +14,8 @@ import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CardStock } from "./CardStock";
 import { CatalogueCard } from "./CatalogueCard";
+import { ContextText } from "./ContextText";
+import { Credits } from "./Credits";
 import { FileTabs } from "./FileTabs";
 import { PendingMark } from "./PendingMark";
 import { SheetFocus } from "./SheetFocus";
@@ -28,7 +30,8 @@ import styles from "./RecordSheet.module.css";
  *   case (shared element, carried over from the drawer)
  *   display title
  *   catalogue card (slides out from under the case on open)
- *   01 curatorial note · 02 context · 03 liner notes · 04 notes & sources
+ *   01 curatorial note · 02 context · 03 liner notes · 04 credits ·
+ *   05 notes & sources
  *   file tabs (previous / next)
  *
  * Each file is lit by its frequency's room. Documented fields are sourced
@@ -110,7 +113,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
         <div className={styles.sectionBody}>
           <p className={styles.interpretation}>{copy.documented}</p>
           {file.context.status === "sourced" ? (
-            <p className={styles.contextText}>{file.context.value}</p>
+            <ContextText text={file.context.value} sources={file.context.sources} slug={record.slug} className={styles.contextText} />
           ) : (
             <PendingMark size="block" />
           )}
@@ -127,9 +130,18 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
         </div>
       </section>
 
+      <section className={styles.section} aria-labelledby={`credits-${record.slug}`}>
+        <h2 id={`credits-${record.slug}`} className={styles.sectionHead}>
+          <span className={styles.sectionNo}>04</span> {copy.credits}
+        </h2>
+        <div className={styles.sectionBody}>
+          <Credits file={file} slug={record.slug} />
+        </div>
+      </section>
+
       <section className={styles.section} aria-labelledby={`sources-${record.slug}`}>
         <h2 id={`sources-${record.slug}`} className={styles.sectionHead}>
-          <span className={styles.sectionNo}>04</span> {copy.notes}
+          <span className={styles.sectionNo}>05</span> {copy.notes}
         </h2>
         <div className={styles.sectionBody}>
           <ol className={styles.sources}>
@@ -152,7 +164,9 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
           </ol>
           <ul className={styles.research}>
             <li>Values are taken from the listed sources only. Fields without a confirmable source stay pending.</li>
-            <li>Official artist and label sources are still to be consulted for this file.</li>
+            {file.sources.every((s) => s.kind === "editorial-reference") && (
+              <li>Official artist and label sources are still to be consulted for this file.</li>
+            )}
             {file.researchNotes?.map((n) => <li key={n}>{n}</li>)}
             <li>
               {file.audio.availability === "not-held"

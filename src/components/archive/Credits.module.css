@@ -1,0 +1,85 @@
+/* Credits, set like the catalogue card's fields. Colours inherit from the file's room (--sh-*). */
+.credits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-self: stretch;
+}
+
+.rows {
+  margin: 0;
+  border-top: 1px solid var(--sh-rule);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: var(--space-4);
+  align-items: baseline;
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--sh-rule);
+}
+
+.row dt {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+
+.row dd {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 0;
+  font-size: clamp(1rem, 0.85rem + 0.45vw, 1.25rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: pretty;
+}
+
+.note {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.06em;
+  color: var(--sh-muted);
+}
+
+.sources {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+
+/* Footnote numeral. The hit area outgrows the glyph. */
+.ref {
+  position: relative;
+  top: -0.5em;
+  margin-left: 0.4em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ref::after {
+  content: "";
+  position: absolute;
+  inset: -10px -8px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ref:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 699px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}
