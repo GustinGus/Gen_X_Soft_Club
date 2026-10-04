@@ -532,9 +532,11 @@
      moves under an INSERT or an EJECT. Empty, the plate is drawn back up by
      the drop — a transform, in the deck's own cqi (1cqi = 1% of its width,
      the margins' 1%) — to where the card covers it, and the drop is given
-     back below. */
+     back below. The card's bottom edge is taken from the stock reserved
+     here or, should the card outgrow it, from its measured height
+     (--card-stock, CardStock.tsx): the card never comes down over the keys. */
   .deck {
-    --card-rest-bottom: calc(37rem - var(--space-7));
+    --card-rest-bottom: calc(max(37rem, var(--card-stock, 0px)) - var(--space-7));
     --deck-scale: 1;
 
     grid-column: 1 / -1;
@@ -582,5 +584,18 @@
 @media (max-width: 359px) {
   .sheet[data-deck]:not([data-deck="empty"]) .card {
     margin-top: calc(var(--space-7) * -1);
+  }
+}
+
+/* Narrower still: the card's rows wrap and its content outgrows the 37rem
+   stock, so the card would come down over the keys. A taller stock for all
+   twelve files, and the deck placed from it. */
+@media (max-width: 339px) {
+  .card {
+    min-height: 42rem;
+  }
+
+  .deck {
+    --card-rest-bottom: calc(max(42rem, var(--card-stock, 0px)) - var(--space-7));
   }
 }

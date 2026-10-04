@@ -12,6 +12,7 @@ import {
 import type { RecordFile } from "@/content/records";
 import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
+import { CardStock } from "./CardStock";
 import { CatalogueCard } from "./CatalogueCard";
 import { FileTabs } from "./FileTabs";
 import { PendingMark } from "./PendingMark";
@@ -168,6 +169,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
       </div>
 
       <SheetFocus targetId={titleId} />
+      <CardStock cardId={`card-${record.slug}`} />
     </article>
   );
 }
