@@ -6,3 +6,6 @@ next-env.d.ts
 .env*.local
 .DS_Store
 npm-debug.log*
+
+# Reference copies of cover artwork: private study only, never versioned.
+public/covers/reference/

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import {
   archiveIndex,
+  coverOf,
   frequencyOf,
   neighboursOf,
   pad2,
@@ -41,6 +42,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
   const frequency = frequencyOf(record.frequency);
   const { prev, next } = neighboursOf(record);
   const titleId = `record-title-${record.slug}`;
+  const cover = coverOf(record);
 
   return (
     <article
@@ -173,7 +175,13 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
                 ? "No listening copy is held: the archive hosts no recordings."
                 : `Listening copy: ${file.audio.provider ?? "attached"}.`}
             </li>
-            {record.artwork.status === "placeholder" && <li>{copy.artworkNote}</li>}
+            {cover?.status === "reference" ? (
+              <li>
+                {copy.artworkReferenceNote} Source: {cover.source.publisher}, {cover.edition}; retrieved {cover.retrieved}.
+              </li>
+            ) : (
+              !cover && <li>{copy.artworkNote}</li>
+            )}
           </ul>
         </div>
       </section>

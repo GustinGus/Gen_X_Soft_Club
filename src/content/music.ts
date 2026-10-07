@@ -20,7 +20,29 @@ export type Verification = "pending" | "sourced";
 export type Artwork =
   /** Art-directed empty frame. Never presented as the real cover. */
   | { status: "placeholder" }
-  /** Future: licensed / sourced cover. */
+  /**
+   * A reference copy of the cover, kept on this machine for private study.
+   * NOT licensed: it grants no right to redistribute. The file is never
+   * versioned (public/covers/reference/ is ignored), and the record must be
+   * audited, replaced or returned to a placeholder before any public release
+   * — next.config.ts refuses a public build while one remains.
+   */
+  | {
+      status: "reference";
+      src: string;
+      /** Where the copy was taken from. */
+      source: { publisher: string; url: string };
+      /** Which edition the image belongs to. */
+      edition: string;
+      /** ISO date the copy was retrieved. */
+      retrieved: string;
+      /**
+       * The colour of the cover's own border, for a copy that is not quite
+       * square: the tray shows it beside the image, which is left as it came.
+       */
+      edge?: string;
+    }
+  /** Future: a cover used with documented permission. */
   | { status: "licensed"; src: string; credit: string; source: string };
 
 export type MusicRecord = {
@@ -103,7 +125,15 @@ export const frequencies: readonly Frequency[] = [
 const placeholder: Artwork = { status: "placeholder" };
 
 export const records: readonly MusicRecord[] = [
-  { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: placeholder, verification: "sourced" },
+  { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: {
+      status: "reference",
+      src: "/covers/reference/portishead-dummy.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dummy/1440653096" },
+      edition: "Go! Discs, 1994 — catalogue edition",
+      retrieved: "2026-10-04",
+      // 1445 × 1465: the border's blue, read from the file's left and right edges
+      edge: "#012666",
+    }, verification: "sourced" },
   { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: placeholder, verification: "sourced" },
   { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: placeholder, verification: "sourced" },
 
@@ -132,6 +162,21 @@ export function spanOf(id: FrequencyId) {
   const min = Math.min(...years);
   const max = Math.max(...years);
   return min === max ? String(min) : `${min}—${max}`;
+}
+
+/** Reference copies present on this machine (file names), listed by next.config.ts when it starts. */
+const referenceCovers = (process.env.NEXT_PUBLIC_REFERENCE_COVERS ?? "").split(",").filter(Boolean);
+
+/**
+ * The cover that can be drawn for a record: a licensed one, or a reference
+ * copy whose file is here. Anything else — and a reference whose file is
+ * missing, as in a fresh clone — is the placeholder (`null`).
+ */
+export function coverOf(record: MusicRecord) {
+  const { artwork } = record;
+  if (artwork.status === "licensed") return artwork;
+  if (artwork.status === "reference" && referenceCovers.includes(artwork.src.split("/").pop() ?? "")) return artwork;
+  return null;
 }
 
 export const pad2 = (n: number) => String(n).padStart(2, "0");
@@ -212,6 +257,8 @@ export const recordFileCopy = {
   backToIndex: "Return to the index",
   artworkPending: "Scan pending",
   artworkNote: "Artwork not digitised — awaiting a licensed scan.",
+  artworkReference: "Reference copy — not licensed.",
+  artworkReferenceNote: "Cover shown as a reference copy kept for private study: it is not licensed for redistribution.",
 } as const;
 
 export const afterHours = {

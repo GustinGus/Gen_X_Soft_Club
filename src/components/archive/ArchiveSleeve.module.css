@@ -67,13 +67,17 @@
   rotate: -3deg;
 }
 
-/* ---------------------------------------------------------------- licensed */
-/* Future: the scan inside the same case proportions (142 × 125, square tray). */
+/* ---------------------------------------------------------------- a cover */
+/* The cover inside the same case as the placeholder's (142 × 125, square
+   tray): the same plastic, hinge and lid, so a drawer of cases reads as one
+   set whether or not each holds its cover. */
 .licensed {
   position: relative;
   aspect-ratio: 142 / 125;
   width: 100%;
-  background: #151b18;
+  background:
+    linear-gradient(90deg, rgb(231 229 219 / 0.1), rgb(231 229 219 / 0.03) 30%, rgb(231 229 219 / 0.06)),
+    #151b18;
   box-shadow:
     inset 0 0 0 1px rgb(231 229 219 / 0.16),
     0 24px 40px -28px rgb(0 0 0 / 0.9);
@@ -84,6 +88,7 @@
   inset: 0 auto 0 0;
   width: 8.5%;
   border-right: 1px solid rgb(231 229 219 / 0.14);
+  background: repeating-linear-gradient(180deg, rgb(231 229 219 / 0.07) 0 1px, transparent 1px 5px);
 }
 
 .tray {
@@ -93,13 +98,27 @@
   right: 4%;
   aspect-ratio: 1;
   overflow: hidden;
+  /* shows beside a cover that is not quite square */
+  background: #171d1a;
+}
+
+/* Polycarbonate lid catching one tube of light, over the cover. */
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(118deg, transparent 38%, rgb(255 255 255 / 0.07) 44%, transparent 52%);
 }
 
 .tray img {
   object-fit: contain;
 }
 
+/* Under the case, on one line — only where the table is clear there. On
+   narrower layouts the catalogue card lies under the case's lower edge, so
+   the caption is left out and the file's notes say the same in full. */
 .credit {
+  display: none;
   position: absolute;
   top: calc(100% + var(--space-3));
   left: 0;
@@ -107,5 +126,12 @@
   font-size: var(--type-meta);
   letter-spacing: var(--tracking-meta);
   text-transform: uppercase;
+  white-space: nowrap;
   opacity: 0.7;
+}
+
+@media (min-width: 1280px) {
+  .credit {
+    display: block;
+  }
 }

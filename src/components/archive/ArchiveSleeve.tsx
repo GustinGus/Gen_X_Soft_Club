@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ViewTransition } from "react";
 import { JewelCase } from "@/components/editorial/Placeholders";
-import { recordFileCopy as copy, type MusicRecord } from "@/content/music";
+import { coverOf, recordFileCopy as copy, type MusicRecord } from "@/content/music";
 import styles from "./ArchiveSleeve.module.css";
 
 type Props = {
@@ -19,30 +19,45 @@ type Props = {
  * file carries the object from the drawer to the table (and back).
  *
  * Artwork: placeholder → Phase 2A JewelCase (empty tray) + scan-pending marks
- * on the file. Licensed → the scan inside the same case, never cropped.
- * Either way the tray is `data-disc-home`: where the record's disc lies, and
- * where it leaves from for the deck.
+ * on the file. A cover → the image inside the same case, never cropped: a
+ * licensed one, or a reference copy held on this machine (said to be one, and
+ * not licensed, under the case on the file). A reference whose file is not
+ * here is the placeholder. Either way the tray is `data-disc-home`: where the
+ * record's disc lies, and where it leaves from for the deck.
  */
 export function ArchiveSleeve({ record, variant = "index", className }: Props) {
-  const { artwork } = record;
+  const cover = coverOf(record);
 
   return (
     <ViewTransition name={`sleeve-${record.slug}`} share="sleeve-morph" default="none">
       <div className={[styles.sleeve, className].filter(Boolean).join(" ")} data-variant={variant}>
-        {artwork.status === "licensed" ? (
+        {cover ? (
           <figure className={styles.licensed}>
             <span className={styles.hinge} aria-hidden="true" />
-            <span className={styles.tray} data-disc-home="">
+            <span
+              className={styles.tray}
+              data-disc-home=""
+              style={cover.status === "reference" && cover.edge ? { background: cover.edge } : undefined}
+            >
               <Image
-                src={artwork.src}
+                src={cover.src}
                 alt={`Cover of ${record.album} by ${record.artist}`}
                 fill
-                sizes={variant === "file" ? "(max-width: 699px) 80vw, 40vw" : "(max-width: 699px) 80vw, 25vw"}
+                sizes={
+                  variant === "file"
+                    ? "(max-width: 699px) 67vw, (max-width: 1023px) 43vw, 32vw"
+                    : "(max-width: 699px) 61vw, 25vw"
+                }
+                loading={variant === "file" ? "eager" : "lazy"}
+                fetchPriority={variant === "file" ? "high" : "auto"}
               />
             </span>
+            <span className={styles.sheen} aria-hidden="true" />
             {variant === "file" && (
               <figcaption className={styles.credit}>
-                {artwork.credit} — {artwork.source}
+                {cover.status === "reference"
+                  ? `${copy.artworkReference} Source: ${cover.source.publisher}`
+                  : `${cover.credit} — ${cover.source}`}
               </figcaption>
             )}
           </figure>
