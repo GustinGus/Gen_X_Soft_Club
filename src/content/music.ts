@@ -157,7 +157,13 @@ export const records: readonly MusicRecord[] = [
       edition: "Mute, 1999 — catalogue edition",
       retrieved: "2026-10-06",
     }, verification: "sourced" },
-  { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: placeholder, verification: "sourced" },
+  { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: {
+      status: "reference",
+      src: "/covers/reference/zero-7-simple-things.jpg",
+      source: { publisher: "Bandcamp", url: "https://zero7.bandcamp.com/album/simple-things" },
+      edition: "Standard edition — artwork of the 2001 release",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
 
   { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: placeholder, verification: "sourced" },
   { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: {
@@ -169,8 +175,20 @@ export const records: readonly MusicRecord[] = [
     }, verification: "sourced" },
   { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: placeholder, verification: "sourced" },
 
-  { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: placeholder, verification: "sourced" },
-  { number: 11, slug: "stereolab-dots-and-loops", artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: placeholder, verification: "sourced" },
+  { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: {
+      status: "reference",
+      src: "/covers/reference/radiohead-ok-computer.jpg",
+      source: { publisher: "Bandcamp", url: "https://radiohead.bandcamp.com/album/ok-computer" },
+      edition: "Standard edition, 1997 — 12 tracks",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
+  { number: 11, slug: "stereolab-dots-and-loops", artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: {
+      status: "reference",
+      src: "/covers/reference/stereolab-dots-and-loops.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dots-and-loops/1230517312" },
+      edition: "Duophonic, 1997 — catalogue edition",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
   { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: placeholder, verification: "sourced" },
 ];
 
