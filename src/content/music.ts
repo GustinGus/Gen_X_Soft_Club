@@ -135,14 +135,38 @@ export const records: readonly MusicRecord[] = [
       edge: "#012666",
     }, verification: "sourced" },
   { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: placeholder, verification: "sourced" },
-  { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: placeholder, verification: "sourced" },
+  { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: {
+      status: "reference",
+      src: "/covers/reference/massive-attack-mezzanine.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/mezzanine/724466069" },
+      edition: "Virgin, 1998 — catalogue edition",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
 
-  { number: 4, slug: "air-moon-safari", artist: "Air", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: placeholder, verification: "sourced" },
-  { number: 5, slug: "moby-play", artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: placeholder, verification: "sourced" },
+  { number: 4, slug: "air-moon-safari", artist: "Air", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: {
+      status: "reference",
+      src: "/covers/reference/air-moon-safari.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/moon-safari/697240234" },
+      edition: "Source, 1998 — catalogue edition",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
+  { number: 5, slug: "moby-play", artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: {
+      status: "reference",
+      src: "/covers/reference/moby-play.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/play/1436695379" },
+      edition: "Mute, 1999 — catalogue edition",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
   { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: placeholder, verification: "sourced" },
 
   { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: placeholder, verification: "sourced" },
-  { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: placeholder, verification: "sourced" },
+  { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: {
+      status: "reference",
+      src: "/covers/reference/the-chemical-brothers-dig-your-own-hole.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dig-your-own-hole/714366008" },
+      edition: "Virgin, 1997 — catalogue edition",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
   { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: placeholder, verification: "sourced" },
 
   { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: placeholder, verification: "sourced" },
