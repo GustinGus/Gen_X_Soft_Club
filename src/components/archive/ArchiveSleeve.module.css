@@ -130,7 +130,7 @@
   opacity: 0.7;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1344px) {
   .credit {
     display: block;
   }

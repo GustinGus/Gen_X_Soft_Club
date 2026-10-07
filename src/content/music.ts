@@ -134,7 +134,14 @@ export const records: readonly MusicRecord[] = [
       // 1445 × 1465: the border's blue, read from the file's left and right edges
       edge: "#012666",
     }, verification: "sourced" },
-  { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: placeholder, verification: "sourced" },
+  { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: {
+      status: "reference",
+      src: "/covers/reference/sneaker-pimps-becoming-x.jpg",
+      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/78f73c8a-ffab-4bb1-8aba-c83454c99fe1" },
+      edition: "Clean Up CUP020CD, UK, 19 August 1996 — release identified on MusicBrainz",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
   { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: {
       status: "reference",
       src: "/covers/reference/massive-attack-mezzanine.jpg",
@@ -165,7 +172,16 @@ export const records: readonly MusicRecord[] = [
       retrieved: "2026-10-06",
     }, verification: "sourced" },
 
-  { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: placeholder, verification: "sourced" },
+  { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: {
+      status: "reference",
+      src: "/covers/reference/dj-shadow-endtroducing.jpg",
+      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/eedf81f7-50ba-414d-82b7-03b4c9eefce9" },
+      edition: "Mo' Wax MW059CD, UK, 16 September 1996 — release identified on MusicBrainz",
+      retrieved: "2026-10-06",
+      // 1133 × 1200, a photograph to the edge: the mean of its left and right edges
+      edge: "#504b47",
+    }, verification: "sourced" },
   { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: {
       status: "reference",
       src: "/covers/reference/the-chemical-brothers-dig-your-own-hole.jpg",
@@ -173,7 +189,14 @@ export const records: readonly MusicRecord[] = [
       edition: "Virgin, 1997 — catalogue edition",
       retrieved: "2026-10-06",
     }, verification: "sourced" },
-  { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: placeholder, verification: "sourced" },
+  { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: {
+      status: "reference",
+      src: "/covers/reference/fatboy-slim-youve-come-a-long-way-baby.jpg",
+      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/e096184f-65a2-30d1-9f3d-fc4ad5e44a14" },
+      edition: "Skint BRASSIC 11CD, UK, 19 October 1998 — release identified on MusicBrainz",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
 
   { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: {
       status: "reference",
@@ -189,7 +212,13 @@ export const records: readonly MusicRecord[] = [
       edition: "Duophonic, 1997 — catalogue edition",
       retrieved: "2026-10-06",
     }, verification: "sourced" },
-  { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: placeholder, verification: "sourced" },
+  { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: {
+      status: "reference",
+      src: "/covers/reference/unkle-psyence-fiction.jpg",
+      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/psyence-fiction/1667639546" },
+      edition: "Mo' Wax, 1998 — catalogue edition (digital, 13 tracks)",
+      retrieved: "2026-10-06",
+    }, verification: "sourced" },
 ];
 
 // ---------------------------------------------------------------- queries
