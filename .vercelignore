@@ -1,0 +1,11 @@
+# Never sent to Vercel as source when deploying from this machine (CLI).
+# A second line of defence, not the first: a public build also stops if any of
+# this is in the tree it builds (next.config.ts), and Git never holds it.
+
+# Reference copies of cover artwork: private, not licensed.
+public/covers/
+
+# Local builds. The private one refers to the reference copies and its image
+# cache holds reduced copies of them; neither is ever uploaded.
+.next/
+.next-public/

@@ -23,9 +23,9 @@ export type Artwork =
   /**
    * A reference copy of the cover, kept on this machine for private study.
    * NOT licensed: it grants no right to redistribute. The file is never
-   * versioned (public/covers/reference/ is ignored), and the record must be
-   * audited, replaced or returned to a placeholder before any public release
-   * — next.config.ts refuses a public build while one remains.
+   * versioned (public/covers/reference/ is ignored) and never published: a
+   * public build draws the archive's own sleeve instead, leaves this data
+   * out, and fails if the files are anywhere it could ship them from.
    */
   | {
       status: "reference";
@@ -120,103 +120,147 @@ export const frequencies: readonly Frequency[] = [
   },
 ];
 
+// ---------------------------------------------------------------- editions
+
+/**
+ * PUBLIC EDITION. A public build (PUBLIC_BUILD=1, see next.config.ts) sets
+ * NEXT_PUBLIC_EDITION to "public", and nothing else does. In it the archive
+ * draws only its own sleeves (content/sleeves.ts): no cover is selected,
+ * whatever a record's artwork state and whatever files are on the machine,
+ * and what is private in this file is not part of what is built.
+ */
+export const publicEdition = process.env.NEXT_PUBLIC_EDITION === "public";
+
+/**
+ * REFERENCE ARTWORK — private. Where each reference copy came from, which
+ * edition it is and when it was retrieved: kept here, versioned, as the
+ * record of those copies. It is written inside the comparison itself so that
+ * a public build, where the comparison is already decided, carries none of
+ * it: there every record's artwork reads as the placeholder state.
+ *
+ * Everything between the two marks below is private. The check that follows
+ * a public build (scripts/verify-public-build.mjs) reads this block and
+ * refuses a build in which any of it can still be found.
+ */
+// <private:reference-artwork>
+const referenceArtwork: Readonly<Record<string, Artwork>> =
+  process.env.NEXT_PUBLIC_EDITION === "public"
+    ? {}
+    : {
+        "portishead-dummy": {
+          status: "reference",
+          src: "/covers/reference/portishead-dummy.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dummy/1440653096" },
+          edition: "Go! Discs, 1994 — catalogue edition",
+          retrieved: "2026-10-04",
+          // 1445 × 1465: the border's blue, read from the file's left and right edges
+          edge: "#012666",
+        },
+        "sneaker-pimps-becoming-x": {
+          status: "reference",
+          src: "/covers/reference/sneaker-pimps-becoming-x.jpg",
+          // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+          source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/78f73c8a-ffab-4bb1-8aba-c83454c99fe1" },
+          edition: "Clean Up CUP020CD, UK, 19 August 1996 — release identified on MusicBrainz",
+          retrieved: "2026-10-06",
+        },
+        "massive-attack-mezzanine": {
+          status: "reference",
+          src: "/covers/reference/massive-attack-mezzanine.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/mezzanine/724466069" },
+          edition: "Virgin, 1998 — catalogue edition",
+          retrieved: "2026-10-06",
+        },
+        "air-moon-safari": {
+          status: "reference",
+          src: "/covers/reference/air-moon-safari.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/moon-safari/697240234" },
+          edition: "Source, 1998 — catalogue edition",
+          retrieved: "2026-10-06",
+        },
+        "moby-play": {
+          status: "reference",
+          src: "/covers/reference/moby-play.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/play/1436695379" },
+          edition: "Mute, 1999 — catalogue edition",
+          retrieved: "2026-10-06",
+        },
+        "zero-7-simple-things": {
+          status: "reference",
+          src: "/covers/reference/zero-7-simple-things.jpg",
+          source: { publisher: "Bandcamp", url: "https://zero7.bandcamp.com/album/simple-things" },
+          edition: "Standard edition — artwork of the 2001 release",
+          retrieved: "2026-10-06",
+        },
+        "dj-shadow-endtroducing": {
+          status: "reference",
+          src: "/covers/reference/dj-shadow-endtroducing.jpg",
+          // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+          source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/eedf81f7-50ba-414d-82b7-03b4c9eefce9" },
+          edition: "Mo' Wax MW059CD, UK, 16 September 1996 — release identified on MusicBrainz",
+          retrieved: "2026-10-06",
+          // 1133 × 1200, a photograph to the edge: the mean of its left and right edges
+          edge: "#504b47",
+        },
+        "the-chemical-brothers-dig-your-own-hole": {
+          status: "reference",
+          src: "/covers/reference/the-chemical-brothers-dig-your-own-hole.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dig-your-own-hole/714366008" },
+          edition: "Virgin, 1997 — catalogue edition",
+          retrieved: "2026-10-06",
+        },
+        "fatboy-slim-youve-come-a-long-way-baby": {
+          status: "reference",
+          src: "/covers/reference/fatboy-slim-youve-come-a-long-way-baby.jpg",
+          // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
+          source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/e096184f-65a2-30d1-9f3d-fc4ad5e44a14" },
+          edition: "Skint BRASSIC 11CD, UK, 19 October 1998 — release identified on MusicBrainz",
+          retrieved: "2026-10-06",
+        },
+        "radiohead-ok-computer": {
+          status: "reference",
+          src: "/covers/reference/radiohead-ok-computer.jpg",
+          source: { publisher: "Bandcamp", url: "https://radiohead.bandcamp.com/album/ok-computer" },
+          edition: "Standard edition, 1997 — 12 tracks",
+          retrieved: "2026-10-06",
+        },
+        "stereolab-dots-and-loops": {
+          status: "reference",
+          src: "/covers/reference/stereolab-dots-and-loops.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dots-and-loops/1230517312" },
+          edition: "Duophonic, 1997 — catalogue edition",
+          retrieved: "2026-10-06",
+        },
+        "unkle-psyence-fiction": {
+          status: "reference",
+          src: "/covers/reference/unkle-psyence-fiction.jpg",
+          source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/psyence-fiction/1667639546" },
+          edition: "Mo' Wax, 1998 — catalogue edition (digital, 13 tracks)",
+          retrieved: "2026-10-06",
+        },
+      };
+// </private:reference-artwork>
+
+const artworkOf = (slug: string): Artwork => referenceArtwork[slug] ?? { status: "placeholder" };
+
 // ---------------------------------------------------------------- records
 
 export const records: readonly MusicRecord[] = [
-  { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: {
-      status: "reference",
-      src: "/covers/reference/portishead-dummy.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dummy/1440653096" },
-      edition: "Go! Discs, 1994 — catalogue edition",
-      retrieved: "2026-10-04",
-      // 1445 × 1465: the border's blue, read from the file's left and right edges
-      edge: "#012666",
-    }, verification: "sourced" },
-  { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: {
-      status: "reference",
-      src: "/covers/reference/sneaker-pimps-becoming-x.jpg",
-      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
-      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/78f73c8a-ffab-4bb1-8aba-c83454c99fe1" },
-      edition: "Clean Up CUP020CD, UK, 19 August 1996 — release identified on MusicBrainz",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: {
-      status: "reference",
-      src: "/covers/reference/massive-attack-mezzanine.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/mezzanine/724466069" },
-      edition: "Virgin, 1998 — catalogue edition",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
+  { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: artworkOf("portishead-dummy"), verification: "sourced" },
+  { number: 2, slug: "sneaker-pimps-becoming-x", artist: "Sneaker Pimps", album: "Becoming X", year: 1996, frequency: "after-hours", hero: false, catalogue: "SC—AH—02", artwork: artworkOf("sneaker-pimps-becoming-x"), verification: "sourced" },
+  { number: 3, slug: "massive-attack-mezzanine", artist: "Massive Attack", album: "Mezzanine", year: 1998, frequency: "after-hours", hero: true, catalogue: "SC—AH—03", artwork: artworkOf("massive-attack-mezzanine"), verification: "sourced" },
 
-  { number: 4, slug: "air-moon-safari", artist: "Air", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: {
-      status: "reference",
-      src: "/covers/reference/air-moon-safari.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/moon-safari/697240234" },
-      edition: "Source, 1998 — catalogue edition",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 5, slug: "moby-play", artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: {
-      status: "reference",
-      src: "/covers/reference/moby-play.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/play/1436695379" },
-      edition: "Mute, 1999 — catalogue edition",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: {
-      status: "reference",
-      src: "/covers/reference/zero-7-simple-things.jpg",
-      source: { publisher: "Bandcamp", url: "https://zero7.bandcamp.com/album/simple-things" },
-      edition: "Standard edition — artwork of the 2001 release",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
+  { number: 4, slug: "air-moon-safari", artist: "Air", album: "Moon Safari", year: 1998, frequency: "soft-future", hero: true, catalogue: "SC—SF—04", artwork: artworkOf("air-moon-safari"), verification: "sourced" },
+  { number: 5, slug: "moby-play", artist: "Moby", album: "Play", year: 1999, frequency: "soft-future", hero: false, catalogue: "SC—SF—05", artwork: artworkOf("moby-play"), verification: "sourced" },
+  { number: 6, slug: "zero-7-simple-things", artist: "Zero 7", album: "Simple Things", year: 2001, frequency: "soft-future", hero: false, catalogue: "SC—SF—06", artwork: artworkOf("zero-7-simple-things"), verification: "sourced" },
 
-  { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: {
-      status: "reference",
-      src: "/covers/reference/dj-shadow-endtroducing.jpg",
-      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
-      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/eedf81f7-50ba-414d-82b7-03b4c9eefce9" },
-      edition: "Mo' Wax MW059CD, UK, 16 September 1996 — release identified on MusicBrainz",
-      retrieved: "2026-10-06",
-      // 1133 × 1200, a photograph to the edge: the mean of its left and right edges
-      edge: "#504b47",
-    }, verification: "sourced" },
-  { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: {
-      status: "reference",
-      src: "/covers/reference/the-chemical-brothers-dig-your-own-hole.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dig-your-own-hole/714366008" },
-      edition: "Virgin, 1997 — catalogue edition",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: {
-      status: "reference",
-      src: "/covers/reference/fatboy-slim-youve-come-a-long-way-baby.jpg",
-      // file from the Cover Art Archive; the URL is the MusicBrainz page that identifies the release
-      source: { publisher: "Cover Art Archive", url: "https://musicbrainz.org/release/e096184f-65a2-30d1-9f3d-fc4ad5e44a14" },
-      edition: "Skint BRASSIC 11CD, UK, 19 October 1998 — release identified on MusicBrainz",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
+  { number: 7, slug: "dj-shadow-endtroducing", artist: "DJ Shadow", album: "Endtroducing.....", year: 1996, frequency: "city-frequency", hero: true, catalogue: "SC—CF—07", artwork: artworkOf("dj-shadow-endtroducing"), verification: "sourced" },
+  { number: 8, slug: "the-chemical-brothers-dig-your-own-hole", artist: "The Chemical Brothers", album: "Dig Your Own Hole", year: 1997, frequency: "city-frequency", hero: false, catalogue: "SC—CF—08", artwork: artworkOf("the-chemical-brothers-dig-your-own-hole"), verification: "sourced" },
+  { number: 9, slug: "fatboy-slim-youve-come-a-long-way-baby", artist: "Fatboy Slim", album: "You've Come a Long Way, Baby", year: 1998, frequency: "city-frequency", hero: false, catalogue: "SC—CF—09", artwork: artworkOf("fatboy-slim-youve-come-a-long-way-baby"), verification: "sourced" },
 
-  { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: {
-      status: "reference",
-      src: "/covers/reference/radiohead-ok-computer.jpg",
-      source: { publisher: "Bandcamp", url: "https://radiohead.bandcamp.com/album/ok-computer" },
-      edition: "Standard edition, 1997 — 12 tracks",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 11, slug: "stereolab-dots-and-loops", artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: {
-      status: "reference",
-      src: "/covers/reference/stereolab-dots-and-loops.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/dots-and-loops/1230517312" },
-      edition: "Duophonic, 1997 — catalogue edition",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
-  { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: {
-      status: "reference",
-      src: "/covers/reference/unkle-psyence-fiction.jpg",
-      source: { publisher: "Apple Music", url: "https://music.apple.com/gb/album/psyence-fiction/1667639546" },
-      edition: "Mo' Wax, 1998 — catalogue edition (digital, 13 tracks)",
-      retrieved: "2026-10-06",
-    }, verification: "sourced" },
+  { number: 10, slug: "radiohead-ok-computer", artist: "Radiohead", album: "OK Computer", year: 1997, frequency: "alternative-signal", hero: true, catalogue: "SC—AS—10", artwork: artworkOf("radiohead-ok-computer"), verification: "sourced" },
+  { number: 11, slug: "stereolab-dots-and-loops", artist: "Stereolab", album: "Dots and Loops", year: 1997, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—11", artwork: artworkOf("stereolab-dots-and-loops"), verification: "sourced" },
+  { number: 12, slug: "unkle-psyence-fiction", artist: "UNKLE", album: "Psyence Fiction", year: 1998, frequency: "alternative-signal", hero: false, catalogue: "SC—AS—12", artwork: artworkOf("unkle-psyence-fiction"), verification: "sourced" },
 ];
 
 // ---------------------------------------------------------------- queries
@@ -232,13 +276,6 @@ export function spanOf(id: FrequencyId) {
   const max = Math.max(...years);
   return min === max ? String(min) : `${min}—${max}`;
 }
-
-/**
- * PUBLIC EDITION. Built with NEXT_PUBLIC_EDITION=public, the archive draws
- * only its own sleeves (content/sleeves.ts): no cover is selected, whatever a
- * record's artwork state and whatever files are on the machine.
- */
-export const publicEdition = process.env.NEXT_PUBLIC_EDITION === "public";
 
 /** Reference copies present on this machine (file names), listed by next.config.ts when it starts. */
 const referenceCovers = (process.env.NEXT_PUBLIC_REFERENCE_COVERS ?? "").split(",").filter(Boolean);
@@ -336,8 +373,11 @@ export const recordFileCopy = {
   artworkPending: "Scan pending",
   artworkNote: "Artwork not digitised — awaiting a licensed scan.",
   sleeveNote: "Sleeve shown: original artwork of the Soft Club Archive, drawn from this file's track lengths. The record's own cover is not reproduced.",
-  artworkReference: "Reference copy — not licensed.",
-  artworkReferenceNote: "Cover shown as a reference copy kept for private study: it is not licensed for redistribution.",
+  // <private:reference-captions>
+  artworkReference: process.env.NEXT_PUBLIC_EDITION === "public" ? "" : "Reference copy — not licensed.",
+  artworkReferenceNote:
+    process.env.NEXT_PUBLIC_EDITION === "public" ? "" : "Cover shown as a reference copy kept for private study: it is not licensed for redistribution.",
+  // </private:reference-captions>
 } as const;
 
 export const afterHours = {

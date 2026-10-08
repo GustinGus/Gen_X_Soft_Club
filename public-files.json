@@ -1,0 +1,4 @@
+{
+  "about": "The only files under public/ that are meant to be published, as paths relative to public/. Everything in public/ ships with the site, so anything else found there stops a public build (next.config.ts) and fails its inspection (scripts/verify-public-build.mjs). Both read this list, each on its own.",
+  "files": []
+}
