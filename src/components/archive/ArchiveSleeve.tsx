@@ -2,6 +2,8 @@ import Image from "next/image";
 import { ViewTransition } from "react";
 import { JewelCase } from "@/components/editorial/Placeholders";
 import { coverOf, recordFileCopy as copy, type MusicRecord } from "@/content/music";
+import { sleeveOf } from "@/content/sleeves";
+import { PublicSleeve } from "./PublicSleeve";
 import styles from "./ArchiveSleeve.module.css";
 
 type Props = {
@@ -21,12 +23,14 @@ type Props = {
  * Artwork: placeholder → Phase 2A JewelCase (empty tray) + scan-pending marks
  * on the file. A cover → the image inside the same case, never cropped: a
  * licensed one, or a reference copy held on this machine (said to be one, and
- * not licensed, under the case on the file). A reference whose file is not
- * here is the placeholder. Either way the tray is `data-disc-home`: where the
+ * not licensed, under the case on the file). No cover to draw → the archive's
+ * own sleeve in the same case; the placeholder is only what is left when a
+ * record has neither. Every way the tray is `data-disc-home`: where the
  * record's disc lies, and where it leaves from for the deck.
  */
 export function ArchiveSleeve({ record, variant = "index", className }: Props) {
   const cover = coverOf(record);
+  const sleeve = cover ? null : sleeveOf(record);
 
   return (
     <ViewTransition name={`sleeve-${record.slug}`} share="sleeve-morph" default="none">
@@ -60,6 +64,14 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
                   : `${cover.credit} — ${cover.source}`}
               </figcaption>
             )}
+          </figure>
+        ) : sleeve ? (
+          <figure className={styles.licensed}>
+            <span className={styles.hinge} aria-hidden="true" />
+            <span className={styles.tray} data-disc-home="">
+              <PublicSleeve record={record} sleeve={sleeve} />
+            </span>
+            <span className={styles.sheen} aria-hidden="true" />
           </figure>
         ) : (
           <>

@@ -1,0 +1,151 @@
+/*
+ * PUBLIC SLEEVE — the print. Fills the case's tray; every measure is a share
+ * of the tray's own width (cqi), so the drawer and the table show one sheet
+ * at two sizes.
+ */
+.sleeve {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  container-type: size;
+  background: var(--sleeve-paper);
+  color: var(--sleeve-ink);
+}
+
+/* Paper, ink and the second colour: the room's own materials. */
+.sleeve[data-family="after-hours"] {
+  --sleeve-paper: var(--palette-deep-green);
+  --sleeve-ink: var(--palette-off-white);
+  --sleeve-second: var(--palette-phosphor);
+}
+
+.sleeve[data-family="soft-future"] {
+  --sleeve-paper: var(--palette-off-white);
+  --sleeve-ink: var(--palette-ink);
+  --sleeve-second: var(--palette-transit-green);
+}
+
+.sleeve[data-family="city-frequency"] {
+  --sleeve-paper: var(--palette-transit-green);
+  --sleeve-ink: var(--palette-ink);
+  --sleeve-second: var(--palette-off-white);
+}
+
+.sleeve[data-family="alternative-signal"] {
+  --sleeve-paper: var(--palette-concrete);
+  --sleeve-ink: var(--palette-ink);
+  --sleeve-second: var(--palette-dark-steel);
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------------------------------------------------------------- the figure */
+.band {
+  fill: color-mix(in srgb, var(--sleeve-second) 24%, var(--sleeve-paper));
+}
+
+.mark {
+  fill: none;
+  stroke: var(--sleeve-ink);
+  stroke-width: 2;
+  opacity: 0.6;
+}
+
+.numeral {
+  font-family: var(--font-grotesk);
+  font-size: 330px;
+  font-weight: var(--weight-black);
+  font-variation-settings: "wdth" var(--width-condensed);
+  letter-spacing: -0.04em;
+  fill: color-mix(in srgb, var(--sleeve-ink) 9%, transparent);
+  stroke: color-mix(in srgb, var(--sleeve-ink) 50%, transparent);
+  stroke-width: 3;
+}
+
+.ghost {
+  fill: var(--sleeve-second);
+  opacity: 0.55;
+}
+
+.solid {
+  fill: var(--sleeve-ink);
+}
+
+.accent {
+  fill: var(--sleeve-second);
+}
+
+.void {
+  fill: var(--sleeve-paper);
+  stroke: var(--sleeve-ink);
+  stroke-width: 4;
+}
+
+.dot {
+  fill: var(--sleeve-ink);
+}
+
+/* ---------------------------------------------------------------- the lines */
+.head,
+.foot {
+  position: absolute;
+  left: 6cqi;
+  right: 6cqi;
+  display: flex;
+  justify-content: space-between;
+  gap: 2cqi;
+  font-family: var(--font-mono);
+  font-size: 2.5cqi;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.head {
+  top: 4.6cqi;
+}
+
+.foot {
+  bottom: 4.6cqi;
+  padding-top: 1.6cqi;
+  border-top: 0.3cqi solid currentColor;
+}
+
+.names {
+  position: absolute;
+  top: 60cqi;
+  left: 6cqi;
+  right: 6cqi;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8cqi;
+}
+
+.artist {
+  font-family: var(--font-grotesk);
+  font-size: calc(var(--artist) * 1cqi);
+  font-weight: var(--weight-black);
+  font-variation-settings: "wdth" var(--width-condensed);
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+
+.album {
+  font-family: var(--font-grotesk);
+  font-size: 4.4cqi;
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}

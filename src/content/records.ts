@@ -29,6 +29,7 @@
 
 import type { RecordAudio } from "@/audio/types";
 import type { MusicRecord } from "./music";
+import { tracklists } from "./tracklists";
 
 export type SourceRef = {
   title: string;
@@ -165,19 +166,7 @@ export const recordFiles: readonly RecordFile[] = [
     ],
     tracklist: sourced({
       edition: "Standard edition, as listed by the source",
-      tracks: tracks([
-        ["Mysterons", "5:02"],
-        ["Sour Times", "4:14"],
-        ["Strangers", "3:55"],
-        ["It Could Be Sweet", "4:16"],
-        ["Wandering Star", "4:51"],
-        ["It's a Fire", "3:48", "Not on vinyl LP or original UK and Europe versions"],
-        ["Numb", "3:54"],
-        ["Roads", "5:02"],
-        ["Pedestal", "3:39"],
-        ["Biscuit", "5:01"],
-        ["Glory Box", "5:06"],
-      ]),
+      tracks: tracks(tracklists["SC—AH—01"]),
     }),
     context: sourced(
       "Portishead took shape around Bristol's Coach House Studios. Geoff Barrow was working there as a studio junior while Massive Attack recorded Blue Lines in 1991, and was given studio time for his own material; he met singer Beth Gibbons the same year. Guitarist Adrian Utley and engineer Dave McDonald completed the working group." +
@@ -218,19 +207,7 @@ export const recordFiles: readonly RecordFile[] = [
     ],
     tracklist: sourced({
       edition: "Original version, as listed by the source",
-      tracks: tracks([
-        ["Low Place Like Home", "4:37"],
-        ["Tesko Suicide", "3:44"],
-        ["6 Underground", "4:05"],
-        ["Becoming X", "4:14"],
-        ["Spin Spin Sugar", "4:20"],
-        ["Post-Modern Sleaze", "5:11"],
-        ["Waterbaby", "4:10"],
-        ["Roll On", "4:27"],
-        ["Wasted Early Sunday Morning", "4:27"],
-        ["Walking Zero", "4:31"],
-        ["How Do", "5:01"],
-      ]),
+      tracks: tracks(tracklists["SC—AH—02"]),
     }),
     context: sourced(
       "Sneaker Pimps began in Hartlepool with Chris Corner and Liam Howe, who had been recording on an eight-track machine in Howe's bedroom since 1992 and released an EP as Line of Flight on the Clean Up label in 1993. Wanting a voice for what had been instrumental music, they recruited Kelli Dayton after hearing her sing in a pub; the songs had first been written with Corner singing, with lyrics by Ian Pickering." +
@@ -267,19 +244,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("63:29"),
     tracklist: sourced({
       edition: "Standard edition, as listed by the source",
-      tracks: tracks([
-        ["Angel", "6:18"],
-        ["Risingson", "4:58"],
-        ["Teardrop", "5:29"],
-        ["Inertia Creeps", "5:56"],
-        ["Exchange", "4:11"],
-        ["Dissolved Girl", "6:07"],
-        ["Man Next Door", "5:55"],
-        ["Black Milk", "6:20"],
-        ["Mezzanine", "5:54"],
-        ["Group Four", "8:13"],
-        ["(Exchange)", "4:08"],
-      ]),
+      tracks: tracks(tracklists["SC—AH—03"]),
     }),
     context: sourced(
       "Mezzanine was made by a group pulling apart. Neil Davidge, producing with Massive Attack, worked with the three members largely one at a time, and has described sessions in which one would leave the room as another arrived. Mark “Spike” Stent mixed the record, and has recalled finished mixes being taken away and reworked into parts of other tracks. Elizabeth Fraser of Cocteau Twins sings “Teardrop”; Horace Andy is the other guest voice. The working title was Damaged Goods." +
@@ -321,18 +286,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("43:35"),
     tracklist: sourced({
       edition: "Standard edition, as listed by the source",
-      tracks: tracks([
-        ["La Femme d'argent", "7:08"],
-        ["Sexy Boy", "4:57"],
-        ["All I Need", "4:28"],
-        ["Kelly Watch the Stars", "3:44"],
-        ["Talisman", "4:16"],
-        ["Remember", "2:34"],
-        ["You Make It Easy", "4:00"],
-        ["Ce matin là", "3:38"],
-        ["New Star in the Sky (Chanson pour Solal)", "5:38"],
-        ["Le Voyage de Pénélope", "3:10"],
-      ]),
+      tracks: tracks(tracklists["SC—SF—04"]),
     }),
     context: sourced(
       "Jean-Benoît Dunckel and Nicolas Godin recorded Moon Safari on an eight-track machine with analogue instruments from the 1970s — Godin has said they bought them because they were the most affordable instruments available. The string parts were recorded at Abbey Road Studios in London with the arranger David Whitaker, and the American singer Beth Hirsch sings “All I Need” and “You Make It Easy”. Stéphane Briat engineered." +
@@ -380,26 +334,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("63:18"),
     tracklist: sourced({
       edition: "Standard edition, as listed by the source",
-      tracks: tracks([
-        ["Honey", "3:28"],
-        ["Find My Baby", "4:00"],
-        ["Porcelain", "4:01"],
-        ["Why Does My Heart Feel So Bad?", "4:24"],
-        ["South Side", "3:50"],
-        ["Rushing", "3:01"],
-        ["Bodyrock", "3:36"],
-        ["Natural Blues", "4:14"],
-        ["Machete", "3:38"],
-        ["7", "1:02"],
-        ["Run On", "3:45"],
-        ["Down Slow", "1:35"],
-        ["If Things Were Perfect", "4:18"],
-        ["Everloving", "3:26"],
-        ["Inside", "4:49"],
-        ["Guitar Flute & String", "2:09"],
-        ["The Sky Is Broken", "4:20"],
-        ["My Weakness", "3:42"],
-      ]),
+      tracks: tracks(tracklists["SC—SF—05"]),
     }),
     context: sourced(
       "Moby made Play alone in his home studio on Mott Street in Manhattan, on mostly second-hand equipment. Several of its tracks are built around voices sampled from Sounds of the South, a box set of field recordings made by Alan Lomax. Warner Bros., Sony and RCA turned the record down before V2 took it for North America; Mute released it elsewhere on 17 May 1999." +
@@ -440,20 +375,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("61:14"),
     tracklist: sourced({
       edition: "Standard edition, as listed by the source",
-      tracks: tracks([
-        ["I Have Seen", "5:07"],
-        ["Polaris", "4:48"],
-        ["Destiny", "5:38"],
-        ["Give It Away", "5:17"],
-        ["Simple Things", "4:24"],
-        ["Red Dust", "5:40"],
-        ["Distractions", "5:16"],
-        ["In the Waiting Line", "4:35"],
-        ["Out of Town", "4:48"],
-        ["This World", "5:37"],
-        ["Likufanele", "6:24"],
-        ["End Theme", "3:38"],
-      ]),
+      tracks: tracks(tracklists["SC—SF—06"]),
     }),
     context: sourced(
       "Henry Binns and Sam Hardaker learned their trade as tape operators at RAK Studios in London, working on their own material in a small programming room during downtime. Their first public work as Zero 7 was a 1997 remix of Radiohead's “Climbing Up the Walls”, followed by two limited EPs." +
@@ -498,21 +420,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("63:23"),
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Best Foot Forward", "0:49"],
-        ["Building Steam with a Grain of Salt", "6:40"],
-        ["The Number Song", "4:40"],
-        ["Changeling / Transmission 1", "7:51"],
-        ["What Does Your Soul Look Like (Part 4)", "5:08"],
-        [null, "0:24"],
-        ["Stem/Long Stem / Transmission 2", "9:21"],
-        ["Mutual Slump", "4:02"],
-        ["Organ Donor", "1:57"],
-        ["Why Hip Hop Sucks in '96", "0:43"],
-        ["Midnight in a Perfect World", "4:57"],
-        ["Napalm Brain/Scatter Brain", "9:23"],
-        ["What Does Your Soul Look Like (Part 1 – Blue Sky Revisit) / Transmission 3", "7:28"],
-      ]),
+      tracks: tracks(tracklists["SC—CF—07"]),
     }),
     context: sourced(
       "Josh Davis built Endtroducing..... from records. He worked on an Akai MPC60 sampler bought in October 1992, a turntable and an Alesis ADAT recorder, drawing on vinyl found in the basement of Rare Records in Sacramento, where he had spent years earning the owner's trust. The album was mixed at the Glue Factory, Dan “the Automator” Nakamura's studio in San Francisco. The cover photograph was taken in the same record shop." +
@@ -557,19 +465,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("63:27"),
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Block Rockin' Beats", "5:14"],
-        ["Dig Your Own Hole", "5:27"],
-        ["Elektrobank", "8:18"],
-        ["Piku", "4:54"],
-        ["Setting Sun", "5:29"],
-        ["It Doesn't Matter", "6:14"],
-        ["Don't Stop the Rock", "4:50"],
-        ["Get Up on It Like This", "2:47"],
-        ["Lost in the K-Hole", "3:52"],
-        ["Where Do I Begin", "6:56"],
-        ["The Private Psychedelic Reel", "9:22"],
-      ]),
+      tracks: tracks(tracklists["SC—CF—08"]),
     }),
     context: sourced(
       "Dig Your Own Hole was released on 7 April 1997 and went to number one in the United Kingdom. It carried two UK number-one singles: “Setting Sun”, sung by Noel Gallagher of Oasis, which reached the top in late 1996, and “Block Rockin' Beats”." +
@@ -608,19 +504,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("62:00"),
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Right Here, Right Now", "6:27"],
-        ["The Rockafeller Skank", "6:53"],
-        ["Fucking in Heaven", "3:55", "Retitled on the North American version"],
-        ["Gangster Tripping", "5:20"],
-        ["Build It Up – Tear It Down", "5:05"],
-        ["Kalifornia", "5:53"],
-        ["Soul Surfing", "4:56"],
-        ["You're Not from Brighton", "5:20"],
-        ["Praise You", "5:23"],
-        ["Love Island", "5:18"],
-        ["Acid 8000", "7:28"],
-      ]),
+      tracks: tracks(tracklists["SC—CF—09"]),
     }),
     context: sourced(
       "Norman Cook made his second Fatboy Slim album at home in Brighton, on an Atari ST computer and two Akai S950 samplers, with engineer Simon Thornton. “Praise You” is built on the voice of Camille Yarbrough, from her 1975 recording “Take Yo' Praise”." +
@@ -659,20 +543,7 @@ export const recordFiles: readonly RecordFile[] = [
     researchNotes: ["Released first in Japan on 21 May 1997; the card prints the United Kingdom date."],
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Airbag", "4:44"],
-        ["Paranoid Android", "6:23"],
-        ["Subterranean Homesick Alien", "4:27"],
-        ["Exit Music (For a Film)", "4:24"],
-        ["Let Down", "4:59"],
-        ["Karma Police", "4:21"],
-        ["Fitter Happier", "1:57"],
-        ["Electioneering", "3:50"],
-        ["Climbing Up the Walls", "4:45"],
-        ["No Surprises", "3:48"],
-        ["Lucky", "4:19"],
-        ["The Tourist", "5:24"],
-      ]),
+      tracks: tracks(tracklists["SC—AS—10"]),
     }),
     context: sourced(
       "Radiohead recorded at St Catherine's Court, a mansion near Bath owned by the actress Jane Seymour. The band produced the record themselves with Nigel Godrich. The artwork was made by Stanley Donwood and Thom Yorke on a computer, under a rule that nothing could be erased." +
@@ -707,18 +578,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("65:52"),
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Brakhage", "5:30"],
-        ["Miss Modular", "4:29"],
-        ["The Flower Called Nowhere", "4:55"],
-        ["Diagonals", "5:15"],
-        ["Prisoner of Mars", "4:03"],
-        ["Rainbo Conversation", "4:46"],
-        ["Refractions in the Plastic Pulse", "17:32"],
-        ["Parsec", "5:34"],
-        ["Ticker-Tape of the Unconscious", "4:45"],
-        ["Contronatura", "9:03"],
-      ]),
+      tracks: tracks(tracklists["SC—AS—11"]),
     }),
     context: pending,
     credits: pending,
@@ -746,20 +606,7 @@ export const recordFiles: readonly RecordFile[] = [
     runtime: sourced("54:59"),
     tracklist: sourced({
       edition: "As listed by the source",
-      tracks: tracks([
-        ["Guns Blazing (Drums of Death Part 1)", "5:01"],
-        ["Unkle Main Title Theme", "3:24"],
-        ["Bloodstain", "5:57"],
-        ["Unreal", "5:10"],
-        ["Lonely Soul", "8:56"],
-        ["Getting Ahead in the Lucrative Field of Artist Management", "0:56"],
-        ["Nursery Rhyme / Breather", "4:45"],
-        ["Celestial Annihilation", "4:44"],
-        ["The Knock (Drums of Death Part 2)", "3:58"],
-        ["Chaos", "4:42"],
-        ["Rabbit in Your Headlights", "6:20"],
-        ["Outro (Mandatory)", "1:06"],
-      ]),
+      tracks: tracks(tracklists["SC—AS—12"]),
     }),
     context: sourced(
       "Psyence Fiction was three years in the making. James Lavelle, who ran Mo' Wax, conceived the record and recruited its guests; DJ Shadow built the music, largely from samples, on an Akai MPC3000 at home. Jim Abbiss then spent the best part of a year mixing it." +

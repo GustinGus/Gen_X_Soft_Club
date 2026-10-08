@@ -11,6 +11,7 @@ import {
   type MusicRecord,
 } from "@/content/music";
 import type { RecordFile } from "@/content/records";
+import { sleeveOf } from "@/content/sleeves";
 import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CardStock } from "./CardStock";
@@ -180,7 +181,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
                 {copy.artworkReferenceNote} Source: {cover.source.publisher}, {cover.edition}; retrieved {cover.retrieved}.
               </li>
             ) : (
-              !cover && <li>{copy.artworkNote}</li>
+              !cover && <li>{sleeveOf(record) ? copy.sleeveNote : copy.artworkNote}</li>
             )}
           </ul>
         </div>

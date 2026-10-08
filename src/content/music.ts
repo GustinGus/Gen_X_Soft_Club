@@ -122,8 +122,6 @@ export const frequencies: readonly Frequency[] = [
 
 // ---------------------------------------------------------------- records
 
-const placeholder: Artwork = { status: "placeholder" };
-
 export const records: readonly MusicRecord[] = [
   { number: 1, slug: "portishead-dummy", artist: "Portishead", album: "Dummy", year: 1994, frequency: "after-hours", hero: false, catalogue: "SC—AH—01", artwork: {
       status: "reference",
@@ -235,15 +233,24 @@ export function spanOf(id: FrequencyId) {
   return min === max ? String(min) : `${min}—${max}`;
 }
 
+/**
+ * PUBLIC EDITION. Built with NEXT_PUBLIC_EDITION=public, the archive draws
+ * only its own sleeves (content/sleeves.ts): no cover is selected, whatever a
+ * record's artwork state and whatever files are on the machine.
+ */
+export const publicEdition = process.env.NEXT_PUBLIC_EDITION === "public";
+
 /** Reference copies present on this machine (file names), listed by next.config.ts when it starts. */
 const referenceCovers = (process.env.NEXT_PUBLIC_REFERENCE_COVERS ?? "").split(",").filter(Boolean);
 
 /**
  * The cover that can be drawn for a record: a licensed one, or a reference
- * copy whose file is here. Anything else — and a reference whose file is
- * missing, as in a fresh clone — is the placeholder (`null`).
+ * copy whose file is here. Anything else — a reference whose file is
+ * missing, as in a fresh clone, and every record in the public edition — has
+ * none (`null`): the case then holds the archive's own sleeve.
  */
 export function coverOf(record: MusicRecord) {
+  if (publicEdition) return null;
   const { artwork } = record;
   if (artwork.status === "licensed") return artwork;
   if (artwork.status === "reference" && referenceCovers.includes(artwork.src.split("/").pop() ?? "")) return artwork;
@@ -328,6 +335,7 @@ export const recordFileCopy = {
   backToIndex: "Return to the index",
   artworkPending: "Scan pending",
   artworkNote: "Artwork not digitised — awaiting a licensed scan.",
+  sleeveNote: "Sleeve shown: original artwork of the Soft Club Archive, drawn from this file's track lengths. The record's own cover is not reproduced.",
   artworkReference: "Reference copy — not licensed.",
   artworkReferenceNote: "Cover shown as a reference copy kept for private study: it is not licensed for redistribution.",
 } as const;
