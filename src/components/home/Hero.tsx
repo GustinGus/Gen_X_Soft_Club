@@ -3,6 +3,7 @@
 import type { CSSProperties, MouseEvent, Ref } from "react";
 import { archive, axes, hero } from "@/content/home";
 import { useCopy } from "@/i18n/I18nProvider";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import { DiscAnchor } from "@/experience/disc/DiscAnchor";
 import { EnterButton } from "./EnterButton";
 import { MiniDisc, PaperSlip } from "./HeroObjects";
@@ -62,6 +63,9 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
           </button>
         )}
       </header>
+
+      {/* The page's top right corner. Part of the chrome: it leaves with the rail when ENTER is pressed. */}
+      <LanguageSwitch className={styles.language} data-shot="chrome" />
 
       <h1 id="hero-title" className={styles.title} translate="no">
         <span className={styles.titleBack} data-shot="title-back" data-parallax style={{ "--depth": 0.6 } as CSSProperties}>

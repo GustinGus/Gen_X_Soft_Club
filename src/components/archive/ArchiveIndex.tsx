@@ -14,6 +14,7 @@ import { href } from "@/i18n/href";
 import type { Locale } from "@/i18n/locales";
 import { countWord, fill } from "@/i18n/format";
 import { IndexEntry } from "./IndexEntry";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import atmosphere from "./Atmosphere.module.css";
 import styles from "./ArchiveIndex.module.css";
 
@@ -51,6 +52,7 @@ export function ArchiveIndex({ locale, copy: dictionary }: { locale: Locale; cop
             {pad2(frequencies.length)}
             {` ${copy.frequencies}`}
           </p>
+          <LanguageSwitch className={styles.language} />
         </div>
 
         <h1 className={styles.title}>

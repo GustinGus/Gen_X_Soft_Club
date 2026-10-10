@@ -16,6 +16,7 @@ import type { Dictionary } from "@/i18n/dictionary";
 import { fill } from "@/i18n/format";
 import { href } from "@/i18n/href";
 import type { Locale } from "@/i18n/locales";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CardStock } from "./CardStock";
@@ -76,6 +77,7 @@ export function RecordSheet({ record, file, locale, copy: dictionary }: Props) {
           {`${copy.file} `}
           {pad2(record.number)} / {pad2(records.length)}
         </p>
+        <LanguageSwitch className={styles.language} />
       </header>
 
       <ArchiveSleeve record={record} variant="file" className={styles.sleeve} copy={dictionary.sleeve} />

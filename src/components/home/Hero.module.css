@@ -68,6 +68,15 @@
   text-transform: uppercase;
 }
 
+/* The language switch: the rail's line, in the corner the rail leaves free —
+   set in from the registration mark that stands there. */
+.language {
+  position: absolute;
+  top: var(--margin);
+  right: calc(var(--margin) + var(--space-3));
+  z-index: var(--z-ui);
+}
+
 .masthead {
   grid-column: 1 / span 3;
   display: flex;

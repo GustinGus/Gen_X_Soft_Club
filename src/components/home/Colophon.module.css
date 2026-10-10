@@ -200,6 +200,16 @@
   padding-top: var(--space-8);
 }
 
+/* "Return to the entrance" and, beside it, the language switch — which takes
+   a line of its own where the two do not fit on one, far enough below for
+   the two targets not to meet. */
+.ways {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-5) var(--space-6);
+}
+
 .back {
   display: inline-flex;
   align-items: center;

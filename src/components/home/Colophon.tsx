@@ -6,6 +6,7 @@ import { pad2 } from "@/content/music";
 import { countWord, fill } from "@/i18n/format";
 import { href } from "@/i18n/href";
 import { useCopy, useLocale } from "@/i18n/I18nProvider";
+import { LanguageSwitch } from "@/components/i18n/LanguageSwitch";
 import styles from "./Colophon.module.css";
 
 /* The site's palette (tokens.css), as values: SVG paint attributes take no custom properties. */
@@ -106,9 +107,13 @@ export function Colophon() {
 
       <div className={styles.foot}>
         <p className={styles.muted}>{copy.artwork}</p>
-        <a className={styles.back} href="#lobby">
-          {copy.back} <span aria-hidden="true">↑</span>
-        </a>
+        {/* The ways out of the last page: back up, or the same page in the other language. */}
+        <div className={styles.ways}>
+          <a className={styles.back} href="#lobby">
+            {copy.back} <span aria-hidden="true">↑</span>
+          </a>
+          <LanguageSwitch />
+        </div>
       </div>
     </footer>
   );

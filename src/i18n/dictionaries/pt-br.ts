@@ -45,6 +45,16 @@ export const ptBr: Dictionary = {
   /** Counted in the feminine: "duas frequências". Only one and two differ. */
   countWordsFeminine: COUNT_WORDS.map((word, n) => (n === 1 ? "Uma" : n === 2 ? "Duas" : word)) as unknown as Dictionary["countWordsFeminine"],
 
+  // each language keeps its own name, in every language
+  language: {
+    label: "Idioma",
+    names: {
+      en: "English",
+      "pt-br": "Português (Brasil)",
+    },
+    current: "atual",
+  },
+
   home: {
     skipToManifesto: "Pular para o manifesto",
   },

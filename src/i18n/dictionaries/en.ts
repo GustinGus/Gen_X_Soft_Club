@@ -48,6 +48,16 @@ export const en = {
    */
   countWordsFeminine: COUNT_WORDS,
 
+  /** The language switch: how it is named, each language in its own name, and how the page's own is told apart. */
+  language: {
+    label: "Language",
+    names: {
+      en: "English",
+      "pt-br": "Português (Brasil)",
+    },
+    current: "current",
+  },
+
   home: {
     skipToManifesto: "Skip to manifesto",
   },

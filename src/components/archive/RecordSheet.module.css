@@ -599,3 +599,25 @@
     --card-rest-bottom: calc(max(42rem, var(--card-stock, 0px)) - var(--space-7));
   }
 }
+
+/* ================================================================ language switch */
+/* In the corner of the folio: on its first line, at the page's right margin —
+   the room the folio keeps clear on that side — so that nothing on the line
+   moves to make way for it. On a phone the line runs the full width, and the
+   switch stands just above it. */
+.folio {
+  position: relative;
+}
+
+.language {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+@media (max-width: 699px) {
+  .language {
+    top: auto;
+    bottom: calc(100% + var(--space-4));
+  }
+}

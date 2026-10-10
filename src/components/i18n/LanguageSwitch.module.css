@@ -1,0 +1,54 @@
+/*
+ * EN / PT-BR — set like the editorial captions: mono, small, tracked.
+ * The page's language in full ink; the other set back and underlined, as a
+ * link. No motion of its own. Where it sits is each page's business.
+ */
+.switch {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55em;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-regular, 400);
+  letter-spacing: var(--tracking-meta);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.separator {
+  opacity: 0.45;
+}
+
+/* Set back, but never below 4.5:1 against the lightest paper it stands on
+   (the day-toned record sheets): 0.69 is the least that clears it there. */
+.link {
+  position: relative;
+  color: inherit;
+  opacity: 0.72;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+/* A 44px target around an 11px word: the type keeps its size and the line its height. */
+.link::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: 44px;
+  translate: -50% -50%;
+}
+
+.link:focus-visible {
+  opacity: 1;
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    opacity: 1;
+  }
+}
