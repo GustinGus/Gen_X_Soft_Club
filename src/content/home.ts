@@ -1,10 +1,11 @@
 /**
- * Home copy — PHASE 1 PROTOTYPE COPY.
+ * Home copy.
  *
- * Deliberately short. No historical claims live here: dated/sourced cultural
- * history arrives in a later phase with research and citations.
- * Everything below is either identity copy or editorial framing.
+ * Deliberately short. No historical claims live here: dated, sourced history
+ * is in the record files. Everything below is identity copy or editorial
+ * framing, and says only what the archive holds today.
  */
+import { records } from "./music";
 
 export const archive = {
   name: "Soft Club Archive",
@@ -12,16 +13,20 @@ export const archive = {
   span: "199X—200X",
 } as const;
 
-/** Editorial axes, in order of importance (music first). Not links yet. */
+/**
+ * Editorial axes, in order of importance (music first). The archive comes out
+ * an issue at a time: Sound is this issue; Fashion and Image are issues to
+ * come and hold nothing yet. They are named, not offered — none is a link.
+ */
 export const axes = [
-  { code: "01", label: "Sound" },
-  { code: "02", label: "Fashion" },
-  { code: "03", label: "Image" },
+  { code: "01", label: "Sound", issue: "Open", open: true },
+  { code: "02", label: "Fashion", issue: "To come", open: false },
+  { code: "03", label: "Image", issue: "To come", open: false },
 ] as const;
 
 export const hero = {
   titleLines: ["Gen X", "Soft Club"],
-  intro: ["A digital archive of", "sound, fashion & image"],
+  intro: ["A digital archive of sound.", "Fashion & image to follow."],
   cta: "Enter the club",
   /** Caption for the procedural disc. 120 mm is the Red Book CD diameter. */
   objectCaption: ["OBJ_001", "Compact disc", "Ø 120 mm", "Procedural model"],
@@ -31,11 +36,8 @@ export const manifesto = {
   id: "CULTURE_001",
   range: "Archive / 1990—2005",
   lines: ["The future", "used to look", "like this."],
-  /**
-   * PLACEHOLDER — prototype intro. Framed as the archive's intent,
-   * not as history. Replace with sourced editorial copy in a later phase.
-   */
+  /** The archive's intent, not history: what it is after, and what this issue holds of it. */
   intro:
-    "An archive of a future imagined at the turn of the millennium — calm, cool and slightly strange — kept here as sound, clothing and photographs.",
-  status: "Index in preparation",
+    "An archive of a future imagined at the turn of the millennium — calm, cool and slightly strange. First, its sound; clothing and photographs to follow.",
+  status: `Listening index open — ${records.length} records`,
 } as const;

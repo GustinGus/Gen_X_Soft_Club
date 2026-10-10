@@ -40,11 +40,17 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
         </p>
         <ul className={styles.axes} aria-label="Editorial axes">
           {axes.map((axis) => (
-            <li key={axis.code}>
+            <li key={axis.code} data-open={axis.open || undefined}>
               <span className={styles.muted} aria-hidden="true">
                 {axis.code}
               </span>
-              {axis.label}
+              <span className={styles.axis}>
+                {axis.label}
+                <span className={styles.axisIssue}>
+                  <span className="visually-hidden"> — </span>
+                  {axis.issue}
+                </span>
+              </span>
             </li>
           ))}
         </ul>

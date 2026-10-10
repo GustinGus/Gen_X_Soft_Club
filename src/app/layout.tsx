@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { SoundProvider } from "@/audio/SoundProvider";
-import { SoundStatus } from "@/components/chrome/SoundStatus";
 import { Cursor } from "@/components/cursor/Cursor";
 import "@/styles/tokens.css";
 import "@/styles/base.css";
@@ -39,7 +38,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${archivo.variable} ${plexMono.variable}`}>
       <body>
         <SoundProvider>
-          <SoundStatus />
           {children}
         </SoundProvider>
         <Cursor />

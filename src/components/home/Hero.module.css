@@ -85,6 +85,23 @@
   gap: var(--space-2);
 }
 
+/* An axis and, under it, where its issue stands: the second line of the rail. */
+.axis {
+  display: flex;
+  flex-direction: column;
+}
+
+.axisIssue {
+  color: var(--ink-day-muted);
+  /* kept whole, so the rail stays two lines deep at every width */
+  white-space: nowrap;
+}
+
+/* An issue to come is set back: named, not offered. */
+.axes li:not([data-open]) .axis {
+  color: var(--ink-day-muted);
+}
+
 /* Pause ambient motion — a system switch, not a feature. */
 .motion {
   grid-column: 11 / span 2;
