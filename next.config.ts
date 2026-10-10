@@ -111,7 +111,13 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // The public edition is built apart, and without server source maps: a map carries the source it was made from,
   // private blocks included.
-  ...(publicBuild ? { distDir: ".next-public", experimental: { serverSourceMaps: false } } : {}),
+  ...(publicBuild ? { distDir: ".next-public" } : {}),
+  experimental: {
+    // One 404 for the whole site (app/global-not-found.tsx). Each language has a root layout of its own, so there is
+    // no single layout to make an unmatched address's page from: without this, that page has no language and no styles.
+    globalNotFound: true,
+    ...(publicBuild ? { serverSourceMaps: false } : {}),
+  },
   env: { NEXT_PUBLIC_EDITION: edition, NEXT_PUBLIC_REFERENCE_COVERS: referenceCovers },
   images: { formats: ["image/avif", "image/webp"] },
 };

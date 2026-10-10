@@ -10,15 +10,12 @@ export type RecordTexts = Loosen<typeof en>;
   interface dictionary, and loaded only by a record's page (content/records.ts,
   fileFor): the home and the index never carry it.
 
-  pt-br joins this table with its routes; until then asking for it is a
-  mistake worth hearing about.
+  A language that is not written yet has a stand-in here (records/pt-br) and
+  says so in locales.ts: it can be built and worked on, not published.
 */
-const loaders: { readonly [L in Locale]?: () => Promise<RecordTexts> } = {
+const loaders: { readonly [L in Locale]: () => Promise<RecordTexts> } = {
   en: () => import("./records/en").then((module) => module.en),
+  "pt-br": () => import("./records/pt-br").then((module) => module.ptBr),
 };
 
-export async function getRecordTexts(locale: Locale): Promise<RecordTexts> {
-  const load = loaders[locale];
-  if (!load) throw new Error(`No record texts for "${locale}" yet.`);
-  return load();
-}
+export const getRecordTexts = (locale: Locale): Promise<RecordTexts> => loaders[locale]();

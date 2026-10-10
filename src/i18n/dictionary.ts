@@ -12,15 +12,12 @@ export type Dictionary = Loosen<typeof en>;
   when its language is asked for: the server reads one, and hands that one to
   the browser (I18nProvider). The other never leaves the server.
 
-  pt-br joins this table with its routes; until then asking for it is a mistake
-  worth hearing about, not something to paper over with English.
+  A language that is not written yet has a stand-in here (dictionaries/pt-br)
+  and says so in locales.ts: it can be built and worked on, not published.
 */
-const loaders: { readonly [L in Locale]?: () => Promise<Dictionary> } = {
+const loaders: { readonly [L in Locale]: () => Promise<Dictionary> } = {
   en: () => import("./dictionaries/en").then((module) => module.en),
+  "pt-br": () => import("./dictionaries/pt-br").then((module) => module.ptBr),
 };
 
-export async function getDictionary(locale: Locale): Promise<Dictionary> {
-  const load = loaders[locale];
-  if (!load) throw new Error(`No dictionary for "${locale}" yet.`);
-  return load();
-}
+export const getDictionary = (locale: Locale): Promise<Dictionary> => loaders[locale]();
