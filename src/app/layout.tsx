@@ -25,10 +25,10 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Gen X Soft Club — Soft Club Archive",
-  description: "A digital archive of sound, fashion & image. Issue 001 / Online.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = await getDictionary(defaultLocale);
+  return { title: meta.site.title, description: meta.site.description };
+}
 
 export const viewport: Viewport = {
   themeColor: "#d8d9d3",

@@ -8,6 +8,8 @@ type Props = {
   state: DeckState;
   onInsert?: () => void;
   onEject?: () => void;
+  /** The keys' group name, in the page's language. */
+  label: string;
   className?: string;
 };
 
@@ -20,7 +22,7 @@ type Props = {
  * or holds on the panel while neither is live — instead of dropping to the
  * page. Only while the user is working the keys.
  */
-export function DeckControls({ state, onInsert, onEject, className }: Props) {
+export function DeckControls({ state, onInsert, onEject, label, className }: Props) {
   const group = useRef<HTMLDivElement>(null);
   const insert = useRef<HTMLButtonElement>(null);
   const eject = useRef<HTMLButtonElement>(null);
@@ -55,7 +57,7 @@ export function DeckControls({ state, onInsert, onEject, className }: Props) {
       ref={group}
       className={[styles.controls, className].filter(Boolean).join(" ")}
       role="group"
-      aria-label="Deck controls"
+      aria-label={label}
       tabIndex={-1}
       onFocus={() => (inUse.current = true)}
       onBlur={(event) => {

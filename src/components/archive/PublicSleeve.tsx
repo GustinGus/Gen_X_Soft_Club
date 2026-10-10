@@ -167,7 +167,7 @@ function artistSize(artist: string) {
   return r2(Math.min(20, 150 / longest, oneLine >= 10 ? oneLine : 280 / artist.length));
 }
 
-export function PublicSleeve({ record, sleeve }: { record: MusicRecord; sleeve: Sleeve }) {
+export function PublicSleeve({ record, sleeve, label }: { record: MusicRecord; sleeve: Sleeve; /** What the sleeve is, for those who cannot see it. */ label: string }) {
   const family = families[record.frequency];
   const frequency = frequencyOf(record.frequency);
   const total = sleeve.tracks.reduce((a, b) => a + b, 0);
@@ -182,7 +182,7 @@ export function PublicSleeve({ record, sleeve }: { record: MusicRecord; sleeve: 
     <span
       className={styles.sleeve}
       role="img"
-      aria-label={`Catalogue sleeve for ${record.album} by ${record.artist}: original artwork of the Soft Club Archive.`}
+      aria-label={label}
       data-sleeve="public"
       data-family={record.frequency}
       style={{ "--artist": artistSize(record.artist) } as CSSProperties}

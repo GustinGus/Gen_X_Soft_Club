@@ -5,6 +5,8 @@ import { useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { catalogueSpan, type MusicRecord } from "@/content/music";
 import type { RecordFile } from "@/content/records";
 import { CanvasBoundary } from "@/experience/disc/CanvasBoundary";
+import { fill } from "@/i18n/format";
+import { useCopy } from "@/i18n/I18nProvider";
 import { DeckControls } from "./DeckControls";
 import { DeckDiscPoster } from "./DeckDiscPoster";
 import { DeckDisplay } from "./DeckDisplay";
@@ -113,13 +115,15 @@ export function ArchiveDeck({ record, file, className }: Props) {
     send({ type: "EJECT" });
   };
 
+  // How the deck is named and what it says to a screen reader: the page's language. Its lettering is the unit's own.
+  const copy = useCopy().deck;
   const announcement: Record<DeckState, string> = {
-    empty: "Disc returned to its case.",
+    empty: copy.announce.empty,
     // Silent: the pressed key is its own feedback; two announcements per insert.
     inserting: "",
-    reading: "Reading disc.",
-    ready: `Disc ready: ${record.artist}, ${record.album}, ${record.year}. No listening copy is held.`,
-    ejecting: "Ejecting disc.",
+    reading: copy.announce.reading,
+    ready: fill(copy.announce.ready, { artist: record.artist, album: record.album, year: record.year }),
+    ejecting: copy.announce.ejecting,
   };
 
   return (
@@ -127,7 +131,7 @@ export function ArchiveDeck({ record, file, className }: Props) {
       ref={ref}
       className={[styles.deck, className].filter(Boolean).join(" ")}
       data-state={state}
-      aria-label="Archive deck SC-AU/02"
+      aria-label={copy.region}
       onPointerEnter={model.arm}
       onFocus={model.arm}
     >
@@ -179,9 +183,10 @@ export function ArchiveDeck({ record, file, className }: Props) {
           <p className={styles.code}>SC-AU/02</p>
         </header>
 
-        <DeckDisplay className={styles.lcd} state={state} record={record} file={file} />
+        <DeckDisplay className={styles.lcd} label={copy.display} state={state} record={record} file={file} />
         <DeckControls
           className={styles.controls}
+          label={copy.controls}
           state={state}
           onInsert={forced ? undefined : insert}
           onEject={forced ? undefined : eject}

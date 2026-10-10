@@ -332,40 +332,17 @@ export const soundOfTheClub = {
   format: ["DISC 01", "44.1 kHz", "16-BIT", "STEREO"],
 } as const;
 
-/** /music — the complete ARCHIVE_002 index. */
+/** /music — the complete ARCHIVE_002 index: its code. Its wording is in the dictionaries (src/i18n). */
 export const archiveIndex = {
   archive: "ARCHIVE_002",
-  label: "Listening index",
-  titleLines: ["Listening", "index"],
-  deck: "Twelve records, filed under four frequencies. Each one can be drawn from its drawer and read as a file.",
-  note: "Editorial curation — atmospheres, not genres.",
-  entrance: "Entrance",
-  drawer: "Drawer",
-  open: "Open file",
 } as const;
 
-/** /music/[slug] — the record file. */
-export const recordFileCopy = {
-  index: "Index",
-  card: "Catalogue card",
-  pending: "Pending",
-  sourceRequired: "Source required",
-  curatorialNote: "Curatorial note",
-  interpretation: "Editorial interpretation — Gen X Soft Club",
-  context: "Context",
-  documented: "Documented history",
-  tracklist: "Tracklist",
-  linerNotes: "Liner notes",
-  credits: "Credits",
-  notes: "Notes & sources",
-  prev: "Previous file",
-  next: "Next file",
-  startOfIndex: "Start of index",
-  endOfIndex: "End of index",
-  backToIndex: "Return to the index",
-  artworkPending: "Scan pending",
-  artworkNote: "Artwork not digitised — awaiting a licensed scan.",
-  sleeveNote: "Sleeve shown: original artwork of the Soft Club Archive, drawn from this file's track lengths. The record's own cover is not reproduced.",
+/**
+ * What the private edition prints under a reference copy. Private, and in
+ * English only: these never reach a dictionary, a public build or a
+ * translation. The wording of the record file itself is in the dictionaries.
+ */
+export const referenceCaptions = {
   // <private:reference-captions>
   artworkReference: process.env.NEXT_PUBLIC_EDITION === "public" ? "" : "Reference copy — not licensed.",
   artworkReferenceNote:

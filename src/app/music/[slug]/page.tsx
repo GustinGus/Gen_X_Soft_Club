@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 import { RecordSheet } from "@/components/archive/RecordSheet";
-import { frequencyOf, recordBySlug, records } from "@/content/music";
+import { archiveIndex, frequencyOf, recordBySlug, records } from "@/content/music";
 import { fileFor } from "@/content/records";
+import { getDictionary } from "@/i18n/dictionary";
+import { fill } from "@/i18n/format";
+import { defaultLocale } from "@/i18n/locales";
 
 /** The archive is closed: twelve files, nothing generated on demand. */
 export const dynamicParams = false;
@@ -16,9 +19,17 @@ export async function generateMetadata({ params }: PageProps<"/music/[slug]">): 
   const record = recordBySlug((await params).slug);
   if (!record) return {};
   const frequency = frequencyOf(record.frequency);
+  const { meta } = await getDictionary(defaultLocale);
   return {
-    title: `${record.artist} — ${record.album} · ${record.catalogue} — Soft Club Archive`,
-    description: `ARCHIVE_002 / ${frequency.code} ${frequency.name}. Record file: ${record.artist}, ${record.album} (${record.year}).`,
+    title: fill(meta.record.title, { artist: record.artist, album: record.album, catalogue: record.catalogue }),
+    description: fill(meta.record.description, {
+      archive: archiveIndex.archive,
+      code: frequency.code,
+      frequency: frequency.name,
+      artist: record.artist,
+      album: record.album,
+      year: record.year,
+    }),
   };
 }
 
@@ -43,7 +54,7 @@ export default async function RecordPage({ params }: PageProps<"/music/[slug]">)
       default="none"
     >
       <main>
-        <RecordSheet record={record} file={file} />
+        <RecordSheet record={record} file={file} copy={await getDictionary(defaultLocale)} />
       </main>
     </ViewTransition>
   );

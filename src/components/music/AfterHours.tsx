@@ -24,7 +24,8 @@ const shelfOf = (catalogue: string) => catalogue.split("—").slice(0, 2).join("
  * the records themselves. The curatorial note is labelled as interpretation.
  */
 export function AfterHours() {
-  const copy = useCopy().afterHours;
+  const dictionary = useCopy();
+  const copy = dictionary.afterHours;
   const ref = useRef<HTMLElement>(null);
   const recordsRef = useRef<HTMLOListElement>(null);
   useReveal(ref, 0.1);
@@ -112,7 +113,7 @@ export function AfterHours() {
               style={{ "--i": i } as CSSProperties}
             >
               <article className={styles.object} aria-labelledby={`record-${record.number}`}>
-                <ArchiveSleeve record={record} className={styles.sleeve} />
+                <ArchiveSleeve record={record} className={styles.sleeve} copy={dictionary.sleeve} />
                 <div className={styles.label}>
                   <p className={styles.recordNo} aria-hidden="true">
                     {pad2(record.number)}

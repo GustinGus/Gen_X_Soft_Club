@@ -1,4 +1,6 @@
 import type { Sourced } from "@/content/records";
+import type { Dictionary } from "@/i18n/dictionary";
+import { fill } from "@/i18n/format";
 import { PendingMark } from "./PendingMark";
 import styles from "./SourcedValue.module.css";
 
@@ -9,15 +11,15 @@ export const sourceId = (slug: string, index: number) => `source-${slug}-${index
  * A documented value with its footnotes — or the PENDING stamp.
  * There is no third state: a value without a source cannot render.
  */
-export function SourcedValue({ field, slug }: { field: Sourced<string>; slug: string }) {
-  if (field.status === "pending") return <PendingMark />;
+export function SourcedValue({ field, slug, copy }: { field: Sourced<string>; slug: string; copy: Dictionary["record"] }) {
+  if (field.status === "pending") return <PendingMark copy={copy} />;
 
   return (
     <>
       {field.value}
       {field.note && <span className={styles.qualifier}> ({field.note})</span>}
       {field.sources.map((i) => (
-        <a key={i} className={styles.ref} href={`#${sourceId(slug, i)}`} aria-label={`Source ${i + 1}`}>
+        <a key={i} className={styles.ref} href={`#${sourceId(slug, i)}`} aria-label={fill(copy.source, { n: i + 1 })}>
           {i + 1}
         </a>
       ))}

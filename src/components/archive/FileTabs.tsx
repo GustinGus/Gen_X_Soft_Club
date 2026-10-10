@@ -1,17 +1,18 @@
 import Link from "next/link";
-import { recordFileCopy as copy, type MusicRecord } from "@/content/music";
+import type { MusicRecord } from "@/content/music";
+import type { Dictionary } from "@/i18n/dictionary";
 import styles from "./FileTabs.module.css";
 
-type Props = { prev: MusicRecord | null; next: MusicRecord | null };
+type Props = { prev: MusicRecord | null; next: MusicRecord | null; copy: Dictionary["record"]["tabs"] };
 
 /**
  * FILE TABS — the neighbouring cards in the drawer, their tabs showing.
  * Direction is a transition type, so the file slides the way you leafed.
  * The index has ends: no wrap-around; the last tab returns to the index.
  */
-export function FileTabs({ prev, next }: Props) {
+export function FileTabs({ prev, next, copy }: Props) {
   return (
-    <nav className={styles.tabs} aria-label="Archive files">
+    <nav className={styles.tabs} aria-label={copy.label}>
       {prev ? (
         <Link className={styles.tab} data-side="prev" href={`/music/${prev.slug}`} transitionTypes={["file-prev"]} rel="prev">
           <span className={styles.dir}>

@@ -7,6 +7,8 @@ type Props = {
   state: DeckState;
   record: MusicRecord;
   file: RecordFile;
+  /** The display's accessible name, in the page's language. */
+  label: string;
   className?: string;
 };
 
@@ -21,14 +23,14 @@ const pad3 = (n: number) => String(n).padStart(3, "0");
  * `data-lcd` / `data-lcd-print` mark the segments the deck's sequence
  * drives (the READ flag, the cursor, READY's lines printing in).
  */
-export function DeckDisplay({ state, record, file, className }: Props) {
+export function DeckDisplay({ state, record, file, label, className }: Props) {
   const media = state !== "empty";
   const tracks = file.tracklist.status === "sourced" ? file.tracklist.value.tracks : null;
   const first = tracks?.[0];
   const runtime = file.runtime.status === "sourced" ? file.runtime.value : null;
 
   return (
-    <div className={[styles.lcd, className].filter(Boolean).join(" ")} role="group" aria-label="Deck display">
+    <div className={[styles.lcd, className].filter(Boolean).join(" ")} role="group" aria-label={label}>
       <div className={styles.screen}>
         {/* Segment flags mirror the state printed below; unlit ones would read as lit to a screen reader. */}
         <p className={styles.flags} aria-hidden="true">

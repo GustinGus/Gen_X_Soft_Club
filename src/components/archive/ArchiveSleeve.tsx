@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { ViewTransition } from "react";
 import { JewelCase } from "@/components/editorial/Placeholders";
-import { coverOf, recordFileCopy as copy, type MusicRecord } from "@/content/music";
+import { coverOf, referenceCaptions, type MusicRecord } from "@/content/music";
 import { sleeveOf } from "@/content/sleeves";
+import type { Dictionary } from "@/i18n/dictionary";
+import { fill } from "@/i18n/format";
 import { PublicSleeve } from "./PublicSleeve";
 import styles from "./ArchiveSleeve.module.css";
 
@@ -10,6 +12,8 @@ type Props = {
   record: MusicRecord;
   /** "index": the object in its drawer. "file": the same object, out on the table. */
   variant?: "index" | "file";
+  /** How the case and its contents are named, in the page's language. */
+  copy: Dictionary["sleeve"];
   className?: string;
 };
 
@@ -28,7 +32,8 @@ type Props = {
  * record has neither. Every way the tray is `data-disc-home`: where the
  * record's disc lies, and where it leaves from for the deck.
  */
-export function ArchiveSleeve({ record, variant = "index", className }: Props) {
+export function ArchiveSleeve({ record, variant = "index", copy, className }: Props) {
+  const named = { album: record.album, artist: record.artist };
   const cover = coverOf(record);
   const sleeve = cover ? null : sleeveOf(record);
 
@@ -45,7 +50,7 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
             >
               <Image
                 src={cover.src}
-                alt={`Cover of ${record.album} by ${record.artist}`}
+                alt={fill(copy.coverAlt, named)}
                 fill
                 sizes={
                   variant === "file"
@@ -60,7 +65,7 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
             {variant === "file" && (
               <figcaption className={styles.credit}>
                 {cover.status === "reference"
-                  ? `${copy.artworkReference} Source: ${cover.source.publisher}`
+                  ? `${referenceCaptions.artworkReference} Source: ${cover.source.publisher}`
                   : `${cover.credit} — ${cover.source}`}
               </figcaption>
             )}
@@ -69,13 +74,13 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
           <figure className={styles.licensed}>
             <span className={styles.hinge} aria-hidden="true" />
             <span className={styles.tray} data-disc-home="">
-              <PublicSleeve record={record} sleeve={sleeve} />
+              <PublicSleeve record={record} sleeve={sleeve} label={fill(copy.publicSleeve, named)} />
             </span>
             <span className={styles.sheen} aria-hidden="true" />
           </figure>
         ) : (
           <>
-            <JewelCase artist={record.artist} album={record.album} catalogue={record.catalogue} />
+            <JewelCase catalogue={record.catalogue} label={fill(copy.emptyCase, named)} toCome={copy.artworkToCome} />
             {variant === "file" && (
               /* Scanner-bed marks laid over the empty tray: material awaiting digitisation. */
               <span className={styles.scan} aria-hidden="true">
@@ -83,7 +88,7 @@ export function ArchiveSleeve({ record, variant = "index", className }: Props) {
                 <span className={styles.reg} data-corner="tr" />
                 <span className={styles.reg} data-corner="bl" />
                 <span className={styles.reg} data-corner="br" />
-                <span className={styles.stamp}>{copy.artworkPending}</span>
+                <span className={styles.stamp}>{copy.scanPending}</span>
               </span>
             )}
           </>

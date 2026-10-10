@@ -6,12 +6,14 @@ import {
   frequencyOf,
   neighboursOf,
   pad2,
-  recordFileCopy as copy,
   records,
+  referenceCaptions,
   type MusicRecord,
 } from "@/content/music";
 import type { RecordFile } from "@/content/records";
 import { sleeveOf } from "@/content/sleeves";
+import type { Dictionary } from "@/i18n/dictionary";
+import { fill } from "@/i18n/format";
 import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CardStock } from "./CardStock";
@@ -39,7 +41,8 @@ import styles from "./RecordSheet.module.css";
  * Each file is lit by its frequency's room. Documented fields are sourced
  * or PENDING; the curatorial note is labelled as interpretation.
  */
-export function RecordSheet({ record, file }: { record: MusicRecord; file: RecordFile }) {
+export function RecordSheet({ record, file, copy: dictionary }: { record: MusicRecord; file: RecordFile; copy: Dictionary }) {
+  const copy = dictionary.record;
   const frequency = frequencyOf(record.frequency);
   const { prev, next } = neighboursOf(record);
   const titleId = `record-title-${record.slug}`;
@@ -66,14 +69,15 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
           {frequency.code} — {frequency.name}
         </p>
         <p className={styles.count}>
-          File {pad2(record.number)} / {pad2(records.length)}
+          {`${copy.file} `}
+          {pad2(record.number)} / {pad2(records.length)}
         </p>
       </header>
 
-      <ArchiveSleeve record={record} variant="file" className={styles.sleeve} />
+      <ArchiveSleeve record={record} variant="file" className={styles.sleeve} copy={dictionary.sleeve} />
       {/* Shown while the disc is out of its case (deck has media). */}
       <p className={styles.inDeck} aria-hidden="true">
-        Disc out — in deck SC-AU/02
+        {copy.inDeck}
       </p>
 
       <div className={styles.heading}>
@@ -90,11 +94,11 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
         </h1>
 
         <p className={styles.year}>
-          <span className={styles.yearKey}>Year</span> {record.year}
+          <span className={styles.yearKey}>{copy.year}</span> {record.year}
         </p>
       </div>
 
-      <CatalogueCard className={styles.card} record={record} file={file} frequency={frequency} />
+      <CatalogueCard className={styles.card} record={record} file={file} frequency={frequency} copy={copy} />
 
       {/* The archive's audio unit, lying on the table under the card. New record, empty deck. */}
       <ArchiveDeck key={record.slug} className={styles.deck} record={record} file={file} />
@@ -116,9 +120,15 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
         <div className={styles.sectionBody}>
           <p className={styles.interpretation}>{copy.documented}</p>
           {file.context.status === "sourced" ? (
-            <ContextText text={file.context.value} sources={file.context.sources} slug={record.slug} className={styles.contextText} />
+            <ContextText
+              text={file.context.value}
+              sources={file.context.sources}
+              slug={record.slug}
+              sourceLabel={copy.source}
+              className={styles.contextText}
+            />
           ) : (
-            <PendingMark size="block" />
+            <PendingMark size="block" copy={copy} />
           )}
         </div>
       </section>
@@ -129,7 +139,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
           <span className={styles.sectionAside}>{copy.linerNotes}</span>
         </h2>
         <div className={styles.sectionBody} data-wide>
-          <Tracklist file={file} slug={record.slug} />
+          <Tracklist file={file} slug={record.slug} copy={copy} />
         </div>
       </section>
 
@@ -138,7 +148,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
           <span className={styles.sectionNo}>04</span> {copy.credits}
         </h2>
         <div className={styles.sectionBody}>
-          <Credits file={file} slug={record.slug} />
+          <Credits file={file} slug={record.slug} copy={copy} />
         </div>
       </section>
 
@@ -154,31 +164,32 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
                 <span>
                   {s.publisher} — <cite>{s.title}</cite>.{" "}
                   <span className={styles.muted}>
-                    {s.kind === "editorial-reference" ? "Editorial reference" : s.kind === "label" ? "Label" : "Official"}. Read{" "}
+                    {copy.sourceKinds[s.kind]}
+                    {`. ${copy.read}`}{" "}
                     {s.accessed}.
                   </span>{" "}
                   <a className={styles.sourceLink} href={s.url} rel="noreferrer" target="_blank">
                     {s.url.replace(/^https:\/\//, "")}
-                    <span className="visually-hidden"> (opens in a new tab)</span>
+                    <span className="visually-hidden">{` ${copy.newTab}`}</span>
                   </a>
                 </span>
               </li>
             ))}
           </ol>
           <ul className={styles.research}>
-            <li>Values are taken from the listed sources only. Fields without a confirmable source stay pending.</li>
+            <li>{copy.research.sourcesOnly}</li>
             {file.sources.every((s) => s.kind === "editorial-reference") && (
-              <li>Official artist and label sources are still to be consulted for this file.</li>
+              <li>{copy.research.officialToCome}</li>
             )}
             {file.researchNotes?.map((n) => <li key={n}>{n}</li>)}
             <li>
               {file.audio.availability === "not-held"
-                ? "No listening copy is held: the archive hosts no recordings."
-                : `Listening copy: ${file.audio.provider ?? "attached"}.`}
+                ? copy.research.noListeningCopy
+                : fill(copy.research.listeningCopy, { provider: file.audio.provider ?? copy.research.attached })}
             </li>
             {cover?.status === "reference" ? (
               <li>
-                {copy.artworkReferenceNote} Source: {cover.source.publisher}, {cover.edition}; retrieved {cover.retrieved}.
+                {referenceCaptions.artworkReferenceNote} Source: {cover.source.publisher}, {cover.edition}; retrieved {cover.retrieved}.
               </li>
             ) : (
               !cover && <li>{sleeveOf(record) ? copy.sleeveNote : copy.artworkNote}</li>
@@ -188,7 +199,7 @@ export function RecordSheet({ record, file }: { record: MusicRecord; file: Recor
       </section>
 
       <div className={styles.tabs}>
-        <FileTabs prev={prev} next={next} />
+        <FileTabs prev={prev} next={next} copy={copy.tabs} />
       </div>
 
       <SheetFocus targetId={titleId} />

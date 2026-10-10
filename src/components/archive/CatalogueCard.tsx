@@ -1,5 +1,6 @@
-import { archiveIndex, pad2, recordFileCopy as copy, records, type Frequency, type MusicRecord } from "@/content/music";
+import { archiveIndex, pad2, records, type Frequency, type MusicRecord } from "@/content/music";
 import type { RecordFile } from "@/content/records";
+import type { Dictionary } from "@/i18n/dictionary";
 import { SourcedValue } from "./SourcedValue";
 import styles from "./CatalogueCard.module.css";
 
@@ -7,6 +8,7 @@ type Props = {
   record: MusicRecord;
   file: RecordFile;
   frequency: Frequency;
+  copy: Dictionary["record"];
   className?: string;
 };
 
@@ -20,21 +22,22 @@ type Props = {
  * `data-vt="catalogue-card"` is the hook for the pull-out motion
  * (styles/view-transitions.css), played only when a file is opened.
  */
-export function CatalogueCard({ record, file, frequency, className }: Props) {
+export function CatalogueCard({ record, file, frequency, copy, className }: Props) {
   const slug = record.slug;
+  const { fields } = copy.card;
   const identity: [string, string][] = [
-    ["Artist", record.artist],
-    ["Album", record.album],
-    ["Year", String(record.year)],
-    ["Archive no.", record.catalogue],
-    ["Frequency", `${frequency.code} — ${frequency.name}`],
+    [fields.artist, record.artist],
+    [fields.album, record.album],
+    [fields.year, String(record.year)],
+    [fields.archiveNo, record.catalogue],
+    [fields.frequency, `${frequency.code} — ${frequency.name}`],
   ];
   const documented = [
-    ["Released", file.released],
-    ["Origin", file.origin],
-    ["Label", file.label],
-    ["Format", file.format],
-    ["Runtime", file.runtime],
+    [fields.released, file.released],
+    [fields.origin, file.origin],
+    [fields.label, file.label],
+    [fields.format, file.format],
+    [fields.runtime, file.runtime],
   ] as const;
 
   return (
@@ -43,10 +46,11 @@ export function CatalogueCard({ record, file, frequency, className }: Props) {
         <span className={styles.punch} aria-hidden="true" />
         <p className={styles.issuer}>Soft Club Archive — {archiveIndex.archive}</p>
         <h2 id={`card-${slug}`} className={styles.kind}>
-          {copy.card}
+          {copy.card.title}
         </h2>
         <p className={styles.number}>
-          Card {pad2(record.number)} / {pad2(records.length)}
+          {`${copy.card.number} `}
+          {pad2(record.number)} / {pad2(records.length)}
         </p>
       </header>
 
@@ -62,7 +66,7 @@ export function CatalogueCard({ record, file, frequency, className }: Props) {
           <div key={term} className={styles.row} data-pending={field.status === "pending" || undefined}>
             <dt>{term}</dt>
             <dd>
-              <SourcedValue field={field} slug={slug} />
+              <SourcedValue field={field} slug={slug} copy={copy} />
             </dd>
           </div>
         ))}

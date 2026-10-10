@@ -49,9 +49,11 @@ export function PhotoPlate({ number, subject, ratio = "4 / 5", tone = "night", c
 }
 
 type CaseProps = {
-  artist: string;
-  album: string;
   catalogue: string;
+  /** What the empty case stands for, in the page's language. */
+  label: string;
+  /** The line printed in the empty tray. */
+  toCome: string;
   className?: string;
 };
 
@@ -60,12 +62,12 @@ type CaseProps = {
  * a real booklet); the hinge and spine are the case, not the art.
  * PLACEHOLDER until licensed artwork exists (see MusicRecord.artwork).
  */
-export function JewelCase({ artist, album, catalogue, className }: CaseProps) {
+export function JewelCase({ catalogue, label, toCome, className }: CaseProps) {
   return (
     <div
       className={[styles.case, className].filter(Boolean).join(" ")}
       role="img"
-      aria-label={`Placeholder for the cover of ${album} by ${artist}. Artwork to come.`}
+      aria-label={label}
       data-placeholder="artwork"
     >
       <span className={styles.hinge} aria-hidden="true" />
@@ -73,7 +75,7 @@ export function JewelCase({ artist, album, catalogue, className }: CaseProps) {
         <span className={styles.trayLabel}>
           {catalogue}
           <br />
-          Artwork to come
+          {toCome}
         </span>
       </span>
       <span className={styles.sheen} aria-hidden="true" />

@@ -1,3 +1,4 @@
+import { fill } from "@/i18n/format";
 import { sourceId } from "./SourcedValue";
 import refs from "./SourcedValue.module.css";
 
@@ -7,6 +8,8 @@ type Props = {
   /** Indexes into the record's `sources`. */
   sources: readonly number[];
   slug: string;
+  /** A footnote's name, with {n} for its number. */
+  sourceLabel: string;
   className?: string;
 };
 
@@ -14,7 +17,7 @@ type Props = {
  * DOCUMENTED HISTORY — the context set as paragraphs, its footnotes after
  * the last one. The sources answer for the whole text, not for each claim.
  */
-export function ContextText({ text, sources, slug, className }: Props) {
+export function ContextText({ text, sources, slug, sourceLabel, className }: Props) {
   const paragraphs = text.split("\n\n");
 
   return (
@@ -24,7 +27,7 @@ export function ContextText({ text, sources, slug, className }: Props) {
           {paragraph}
           {i === paragraphs.length - 1 &&
             sources.map((s) => (
-              <a key={s} className={refs.ref} href={`#${sourceId(slug, s)}`} aria-label={`Source ${s + 1}`}>
+              <a key={s} className={refs.ref} href={`#${sourceId(slug, s)}`} aria-label={fill(sourceLabel, { n: s + 1 })}>
                 {s + 1}
               </a>
             ))}

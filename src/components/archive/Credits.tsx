@@ -1,4 +1,6 @@
 import type { Credit, RecordFile } from "@/content/records";
+import type { Dictionary } from "@/i18n/dictionary";
+import { fill } from "@/i18n/format";
 import { PendingMark } from "./PendingMark";
 import { sourceId } from "./SourcedValue";
 import styles from "./Credits.module.css";
@@ -8,9 +10,9 @@ import styles from "./Credits.module.css";
  * role, set like the catalogue card's fields. Only confirmed credits are
  * printed, so a list may be short; with none confirmed it is PENDING.
  */
-export function Credits({ file, slug }: { file: RecordFile; slug: string }) {
+export function Credits({ file, slug, copy }: { file: RecordFile; slug: string; copy: Dictionary["record"] }) {
   const { credits } = file;
-  if (credits.status === "pending") return <PendingMark size="block" />;
+  if (credits.status === "pending") return <PendingMark size="block" copy={copy} />;
 
   // one row per role, in the order the roles first appear
   const roles = new Map<string, Credit[]>();
@@ -34,9 +36,9 @@ export function Credits({ file, slug }: { file: RecordFile; slug: string }) {
         ))}
       </dl>
       <p className={styles.sources}>
-        As documented by the sources
+        {copy.creditsSources}
         {credits.sources.map((i) => (
-          <a key={i} className={styles.ref} href={`#${sourceId(slug, i)}`} aria-label={`Source ${i + 1}`}>
+          <a key={i} className={styles.ref} href={`#${sourceId(slug, i)}`} aria-label={fill(copy.source, { n: i + 1 })}>
             {i + 1}
           </a>
         ))}

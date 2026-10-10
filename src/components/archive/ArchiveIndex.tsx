@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import {
-  archiveIndex as copy,
+  archiveIndex,
   archiveSpan,
   frequencies,
   pad2,
@@ -9,6 +9,8 @@ import {
   recordsIn,
   spanOf,
 } from "@/content/music";
+import type { Dictionary } from "@/i18n/dictionary";
+import { countWord, fill } from "@/i18n/format";
 import { IndexEntry } from "./IndexEntry";
 import atmosphere from "./Atmosphere.module.css";
 import styles from "./ArchiveIndex.module.css";
@@ -20,11 +22,13 @@ import styles from "./ArchiveIndex.module.css";
  * (night / paper alternate as in the tuner). Every record is an object
  * that opens into its file at /music/[slug].
  */
-export function ArchiveIndex() {
+export function ArchiveIndex({ copy: dictionary }: { copy: Dictionary }) {
+  const copy = dictionary.index;
+
   return (
     <main className={styles.index}>
       <a className="skip-link" href="#after-hours">
-        Skip to the drawers
+        {copy.skip}
       </a>
 
       <header className={styles.head} data-theme="night">
@@ -33,11 +37,17 @@ export function ArchiveIndex() {
             <span aria-hidden="true">←</span> {copy.entrance}
           </Link>
           <p className={styles.fileCode}>
-            {copy.archive} / {copy.label}
+            {archiveIndex.archive} / {copy.label}
           </p>
-          <p className={styles.muted}>Audio material — {archiveSpan()}</p>
+          <p className={styles.muted}>
+            {`${copy.material} — `}
+            {archiveSpan()}
+          </p>
           <p className={styles.count}>
-            {pad2(records.length)} records · {pad2(frequencies.length)} frequencies
+            {pad2(records.length)}
+            {` ${copy.records} · `}
+            {pad2(frequencies.length)}
+            {` ${copy.frequencies}`}
           </p>
         </div>
 
@@ -50,18 +60,26 @@ export function ArchiveIndex() {
         </h1>
 
         <div className={styles.intro}>
-          <p className={styles.deck}>{copy.deck}</p>
+          <p className={styles.deck}>
+            {fill(copy.deck, {
+              records: countWord(dictionary, records.length),
+              frequencies: countWord(dictionary, frequencies.length).toLowerCase(),
+            })}
+          </p>
           <p className={styles.note}>{copy.note}</p>
         </div>
 
-        <nav className={styles.directory} aria-label="Drawers">
+        <nav className={styles.directory} aria-label={copy.drawers}>
           <ol>
             {frequencies.map((f) => (
               <li key={f.id}>
                 <a href={`#${f.id}`} className={styles.dirLink}>
                   <span className={styles.dirCode}>{f.code}</span>
                   <span className={styles.dirName}>{f.name}</span>
-                  <span className={styles.dirCount}>{pad2(recordsIn(f.id).length)} records</span>
+                  <span className={styles.dirCount}>
+                    {pad2(recordsIn(f.id).length)}
+                    {` ${copy.records}`}
+                  </span>
                 </a>
               </li>
             ))}
@@ -94,14 +112,15 @@ export function ArchiveIndex() {
               <p className={styles.drawerMeta}>
                 <span>{f.atmosphere.join(" · ")}</span>
                 <span>
-                  {spanOf(f.id)} <span aria-hidden="true">—</span> {pad2(filed.length)} records
+                  {spanOf(f.id)} <span aria-hidden="true">—</span> {pad2(filed.length)}
+                  {` ${copy.records}`}
                 </span>
               </p>
             </header>
 
             <ol className={styles.entries}>
               {filed.map((record, i) => (
-                <IndexEntry key={record.slug} record={record} index={i} />
+                <IndexEntry key={record.slug} record={record} index={i} copy={dictionary} />
               ))}
             </ol>
           </section>
@@ -109,9 +128,13 @@ export function ArchiveIndex() {
       })}
 
       <footer className={styles.end} data-theme="night">
-        <p>End of index — {copy.archive}</p>
+        <p>
+          {`${copy.end} — `}
+          {archiveIndex.archive}
+        </p>
         <Link className={styles.back} href="/">
-          Return to the entrance <span aria-hidden="true">↑</span>
+          {`${copy.back} `}
+          <span aria-hidden="true">↑</span>
         </Link>
       </footer>
     </main>

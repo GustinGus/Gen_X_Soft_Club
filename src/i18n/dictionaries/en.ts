@@ -139,4 +139,132 @@ export const en = {
       "Sleeves and plates: original artwork of the Soft Club Archive. The records and their music belong to their artists and labels.",
     back: "Return to the entrance",
   },
+
+  /** /music — the complete listening index. */
+  index: {
+    skip: "Skip to the drawers",
+    entrance: "Entrance",
+    label: "Listening index",
+    material: "Audio material",
+    records: "records",
+    frequencies: "frequencies",
+    titleLines: ["Listening", "index"],
+    /** {records} as a word, {frequencies} as a word in lower case: both counted from the catalogue. */
+    deck: "{records} records, filed under {frequencies} frequencies. Each one can be drawn from its drawer and read as a file.",
+    note: "Editorial curation — atmospheres, not genres.",
+    drawers: "Drawers",
+    drawer: "Drawer",
+    year: "Year",
+    archiveNo: "Archive no.",
+    open: "Open file",
+    end: "End of index",
+    back: "Return to the entrance",
+  },
+
+  /** /music/[slug] — the record file: its structure. What a file says of its record is the file's own text. */
+  record: {
+    index: "Index",
+    file: "File",
+    inDeck: "Disc out — in deck SC-AU/02",
+    year: "Year",
+    card: {
+      title: "Catalogue card",
+      number: "Card",
+      fields: {
+        artist: "Artist",
+        album: "Album",
+        year: "Year",
+        archiveNo: "Archive no.",
+        frequency: "Frequency",
+        released: "Released",
+        origin: "Origin",
+        label: "Label",
+        format: "Format",
+        runtime: "Runtime",
+      },
+    },
+    pending: "Pending",
+    sourceRequired: "Source required",
+    curatorialNote: "Curatorial note",
+    interpretation: "Editorial interpretation — Gen X Soft Club",
+    context: "Context",
+    documented: "Documented history",
+    tracklist: "Tracklist",
+    linerNotes: "Liner notes",
+    tracks: "tracks",
+    untitled: "Untitled in source listing",
+    length: "Length",
+    credits: "Credits",
+    creditsSources: "As documented by the sources",
+    notes: "Notes & sources",
+    /** A footnote's name: the number of the source it points to. */
+    source: "Source {n}",
+    sourceKinds: {
+      official: "Official",
+      label: "Label",
+      "editorial-reference": "Editorial reference",
+    },
+    read: "Read",
+    newTab: "(opens in a new tab)",
+    research: {
+      sourcesOnly: "Values are taken from the listed sources only. Fields without a confirmable source stay pending.",
+      officialToCome: "Official artist and label sources are still to be consulted for this file.",
+      noListeningCopy: "No listening copy is held: the archive hosts no recordings.",
+      listeningCopy: "Listening copy: {provider}.",
+      attached: "attached",
+    },
+    sleeveNote: "Sleeve shown: original artwork of the Soft Club Archive, drawn from this file's track lengths. The record's own cover is not reproduced.",
+    artworkNote: "Artwork not digitised — awaiting a licensed scan.",
+    tabs: {
+      label: "Archive files",
+      prev: "Previous file",
+      next: "Next file",
+      startOfIndex: "Start of index",
+      endOfIndex: "End of index",
+      backToIndex: "Return to the index",
+    },
+  },
+
+  /** The case and what lies in it, for those who cannot see it. The lettering drawn on a sleeve is the sleeve's own. */
+  sleeve: {
+    coverAlt: "Cover of {album} by {artist}",
+    publicSleeve: "Catalogue sleeve for {album} by {artist}: original artwork of the Soft Club Archive.",
+    emptyCase: "Placeholder for the cover of {album} by {artist}. Artwork to come.",
+    artworkToCome: "Artwork to come",
+    scanPending: "Scan pending",
+  },
+
+  /**
+   * The deck, as it is named and as it speaks to a screen reader. What is
+   * printed on the unit — its faceplate, its keys, its display — is the
+   * equipment's own lettering and is not here.
+   */
+  deck: {
+    region: "Archive deck SC-AU/02",
+    display: "Deck display",
+    controls: "Deck controls",
+    announce: {
+      empty: "Disc returned to its case.",
+      reading: "Reading disc.",
+      ready: "Disc ready: {artist}, {album}, {year}. No listening copy is held.",
+      ejecting: "Ejecting disc.",
+    },
+  },
+
+  /** What a page says of itself: its title and description. */
+  meta: {
+    site: {
+      title: "Gen X Soft Club — Soft Club Archive",
+      description: "A digital archive of sound, fashion & image. Issue 001 / Online.",
+    },
+    index: {
+      title: "{archive} — Listening index — Soft Club Archive",
+      /** {records} as a word, {frequencies} as a word in lower case, {names} the frequencies in order. */
+      description: "{records} records filed under {frequencies} frequencies: {names}.",
+    },
+    record: {
+      title: "{artist} — {album} · {catalogue} — Soft Club Archive",
+      description: "{archive} / {code} {frequency}. Record file: {artist}, {album} ({year}).",
+    },
+  },
 } as const;
