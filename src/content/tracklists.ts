@@ -8,9 +8,12 @@
  * carry the files' text with it.
  *
  * Rows are [title, length, note?], keyed by catalogue number. A `null` title
- * is a track the source lists without one.
+ * is a track the source lists without one. A note is a key, not a sentence.
  */
-export type TrackRow = readonly [title: string | null, length: string] | readonly [title: string | null, length: string, note: string];
+export type TrackRow = readonly [title: string | null, length: string] | readonly [title: string | null, length: string, note: TrackNote];
+
+/** What may be said of a track beside its title. A key: the sentence is in each language's record texts (src/i18n/records). */
+export type TrackNote = "notOnVinylOrOriginalUkEurope" | "retitledNorthAmerica";
 
 export const tracklists = {
   "SC—AH—01": [
@@ -19,7 +22,7 @@ export const tracklists = {
     ["Strangers", "3:55"],
     ["It Could Be Sweet", "4:16"],
     ["Wandering Star", "4:51"],
-    ["It's a Fire", "3:48", "Not on vinyl LP or original UK and Europe versions"],
+    ["It's a Fire", "3:48", "notOnVinylOrOriginalUkEurope"],
     ["Numb", "3:54"],
     ["Roads", "5:02"],
     ["Pedestal", "3:39"],
@@ -129,7 +132,7 @@ export const tracklists = {
   "SC—CF—09": [
     ["Right Here, Right Now", "6:27"],
     ["The Rockafeller Skank", "6:53"],
-    ["Fucking in Heaven", "3:55", "Retitled on the North American version"],
+    ["Fucking in Heaven", "3:55", "retitledNorthAmerica"],
     ["Gangster Tripping", "5:20"],
     ["Build It Up – Tear It Down", "5:05"],
     ["Kalifornia", "5:53"],

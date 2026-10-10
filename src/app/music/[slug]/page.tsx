@@ -7,6 +7,7 @@ import { fileFor } from "@/content/records";
 import { getDictionary } from "@/i18n/dictionary";
 import { fill } from "@/i18n/format";
 import { defaultLocale } from "@/i18n/locales";
+import { getRecordTexts } from "@/i18n/records";
 
 /** The archive is closed: twelve files, nothing generated on demand. */
 export const dynamicParams = false;
@@ -36,7 +37,8 @@ export async function generateMetadata({ params }: PageProps<"/music/[slug]">): 
 export default async function RecordPage({ params }: PageProps<"/music/[slug]">) {
   const { slug } = await params;
   const record = recordBySlug(slug);
-  const file = record && fileFor(record.catalogue);
+  // the record's data, given the page's language: only a record's page reads the record texts
+  const file = record && fileFor(record.catalogue, await getRecordTexts(defaultLocale), defaultLocale);
   if (!record || !file) notFound();
 
   /*

@@ -1,8 +1,8 @@
 import type { en } from "./dictionaries/en";
 import type { Locale } from "./locales";
 
-/** The English dictionary's shape with its texts set free: same keys, same lists, any wording. */
-type Loosen<T> = T extends string ? string : { readonly [K in keyof T]: Loosen<T[K]> };
+/** A dictionary's shape with its texts set free: same keys, same lists, any wording. */
+export type Loosen<T> = T extends string ? string : { readonly [K in keyof T]: Loosen<T[K]> };
 
 /** What every language's dictionary holds. A translation missing a key, or a line of a title, does not typecheck. */
 export type Dictionary = Loosen<typeof en>;
