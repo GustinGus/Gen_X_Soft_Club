@@ -9,6 +9,7 @@ import { getDictionary } from "@/i18n/dictionary";
 import { countWord, fill } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
 import { getRecordTexts } from "@/i18n/records";
+import { pageSeo } from "./seo";
 
 /*
   THE SITE'S PAGES, ONCE.
@@ -20,19 +21,28 @@ import { getRecordTexts } from "@/i18n/records";
   exactly what it rendered when it was written out in full.
 */
 
+// ---------------------------------------------------------------- /
+
+export async function homeMetadata(locale: Locale): Promise<Metadata> {
+  const { meta } = await getDictionary(locale);
+  return pageSeo(locale, "/", meta.site.title, meta.site.description);
+}
+
 // ---------------------------------------------------------------- /music
 
 export async function indexMetadata(locale: Locale): Promise<Metadata> {
   const copy = await getDictionary(locale);
-  return {
-    title: fill(copy.meta.index.title, { archive: archiveIndex.archive }),
+  return pageSeo(
+    locale,
+    "/music",
+    fill(copy.meta.index.title, { archive: archiveIndex.archive }),
     // counted and named from the catalogue, never typed
-    description: fill(copy.meta.index.description, {
+    fill(copy.meta.index.description, {
       records: countWord(copy, records.length),
       frequencies: countWord(copy, frequencies.length, "feminine").toLowerCase(),
       names: frequencies.map((f) => f.name).join(", "),
     }),
-  };
+  );
 }
 
 export async function indexPage(locale: Locale) {
@@ -51,9 +61,11 @@ export async function recordMetadata(locale: Locale, slug: string): Promise<Meta
   if (!record) return {};
   const frequency = frequencyOf(record.frequency);
   const { meta } = await getDictionary(locale);
-  return {
-    title: fill(meta.record.title, { artist: record.artist, album: record.album, catalogue: record.catalogue }),
-    description: fill(meta.record.description, {
+  return pageSeo(
+    locale,
+    `/music/${record.slug}`,
+    fill(meta.record.title, { artist: record.artist, album: record.album, catalogue: record.catalogue }),
+    fill(meta.record.description, {
       archive: archiveIndex.archive,
       code: frequency.code,
       frequency: frequency.name,
@@ -61,7 +73,7 @@ export async function recordMetadata(locale: Locale, slug: string): Promise<Meta
       album: record.album,
       year: record.year,
     }),
-  };
+  );
 }
 
 export async function recordPage(locale: Locale, slug: string) {

@@ -28,6 +28,19 @@
  *                     is a reader's work, done before a language is marked.
  *   H. links          every internal link stays in its page's language and
  *                     leads somewhere (scripts/check-links.mjs, run here).
+ *   I. search engines what the build tells them, against where it was built:
+ *                     only a production deployment may be indexed, and it
+ *                     must say where it lives (SITE_URL: a real public origin,
+ *                     never guessed — and, being one of Vercel's, the one
+ *                     Vercel itself names as the project's production
+ *                     address, never a deployment's). Every page names itself
+ *                     as canonical and the same page in each language, each
+ *                     naming it back; the root is written with its slash;
+ *                     the sitemap is exactly the pages built; robots.txt
+ *                     opens the site only where it is indexed. No image is
+ *                     offered to a search engine or a share card, anywhere.
+ *                     The rules are src/site/seo.ts's; they are worked out
+ *                     again here, from the environment, not taken from it.
  *
  * The build's own cache (<dist>/cache) is not part of what is published. It
  * is read all the same for the private texts, and no optimised image may be
@@ -467,6 +480,202 @@ if (links.status !== 0) {
   fail("links", `scripts/check-links.mjs failed${said.length ? ": " + said.slice(0, 4).join(" | ") + (said.length > 4 ? ` | … and ${said.length - 4} more` : "") : ` (exit ${links.status})`}`);
 }
 
+// ---------------------------------------------------------------- I. search engines
+/*
+  WHAT THE BUILD TELLS SEARCH ENGINES, AND WHETHER IT MAY. Worked out here from
+  the same environment the build had (this runs right after it), on its own:
+
+    production   VERCEL=1 and VERCEL_ENV=production. Indexed; SITE_URL must be
+                 the site's public origin; SITE_URL_TEST must not be set.
+    preview      any other public build. Never indexed.
+
+  WHERE THE SITE LIVES is never taken on its own word. It is published at the
+  address Vercel gives the project for production, a *.vercel.app name — and
+  every deployment, branch and other project has a *.vercel.app name too. So
+  SITE_URL must be the address Vercel states for this project
+  (VERCEL_PROJECT_PRODUCTION_URL), and never this deployment's or its branch's
+  (VERCEL_URL, VERCEL_BRANCH_URL). Where Vercel says nothing, a *.vercel.app
+  address is refused, and so is any production build.
+
+  Then every page is read for what it actually says.
+*/
+const seo = { stage: process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production" ? "production" : "preview", origin: null, canonicals: 0, alternates: 0, sitemap: 0 };
+{
+  const NOT_PUBLIC = /^(localhost|.*\.localhost|.*\.local|.*\.test|.*\.example|.*\.invalid|example\.(com|org|net)|.*\.example\.(com|org|net))$/i;
+  const VERCEL_APP = /\.vercel\.app$/i;
+  const production = seo.stage === "production";
+  /** A host as Vercel names it in its system variables, or null where Vercel says nothing. */
+  const hostOf = (value) => value?.trim().replace(/^https?:\/\//i, "").replace(/\/+$/, "").toLowerCase() || null;
+  const vercel = { production: hostOf(process.env.VERCEL_PROJECT_PRODUCTION_URL), deployment: hostOf(process.env.VERCEL_URL), branch: hostOf(process.env.VERCEL_BRANCH_URL) };
+  /** An origin and nothing more, or why not. `mustBePublic`: https, a real name, not a placeholder or a deployment's own address. */
+  const originOf = (value, name, mustBePublic) => {
+    let url;
+    try {
+      url = new URL(value);
+    } catch {
+      return { problem: `${name}="${value}" is not an address` };
+    }
+    if (url.pathname !== "/" || url.search || url.hash || url.username || url.password) return { problem: `${name}="${value}" is more than an origin` };
+    if (!mustBePublic) return /^https?:$/.test(url.protocol) ? { origin: url.origin } : { problem: `${name}="${value}" is neither http nor https` };
+    const host = url.hostname.toLowerCase();
+    if (url.protocol !== "https:") return { problem: `${name}="${value}" is not https` };
+    if (!host.includes(".") || /^[\d.]+$/.test(host) || host.includes(":") || NOT_PUBLIC.test(host)) return { problem: `${name}="${value}" is this machine or a placeholder, not the site's own address` };
+    if (host === vercel.deployment || host === vercel.branch) return { problem: `${name}="${value}" is the temporary address of this deployment or of its branch, not the project's production address` };
+    if (vercel.production) {
+      if (host !== vercel.production) return { problem: `${name}="${value}", but Vercel names "${vercel.production}" as this project's production address` };
+    } else if (VERCEL_APP.test(host)) {
+      return { problem: `${name}="${value}" is a *.vercel.app name that nothing here confirms as this project's (VERCEL_PROJECT_PRODUCTION_URL is not set)` };
+    } else if (production) {
+      return { problem: `${name}="${value}" is not confirmed: a production build needs Vercel to name the project's production address (VERCEL_PROJECT_PRODUCTION_URL is not set)` };
+    }
+    return { origin: url.origin };
+  };
+  const given = process.env.SITE_URL?.trim();
+  const test = process.env.SITE_URL_TEST?.trim();
+  if (production && test) fail("search engines", "SITE_URL_TEST is set in a production build: a test origin is never a production address");
+  if (production && !given) fail("search engines", "SITE_URL is not set: a production build must say where the site lives, and no address is assumed");
+  if (given) {
+    const found = originOf(given, "SITE_URL", true);
+    if (found.problem) fail("search engines", found.problem);
+    else seo.origin = found.origin;
+  } else if (test && !production) {
+    const found = originOf(test, "SITE_URL_TEST", false);
+    if (found.problem) fail("search engines", found.problem);
+    else seo.origin = found.origin;
+  }
+
+  /** The languages that are published; a build holding any other has already failed (G). */
+  const released = locales.filter((locale) => localization[locale] === "complete");
+  const unreleased = locales.filter((locale) => !released.includes(locale));
+  /** An address is compared as it is written. The site's root is written one way everywhere: with its slash. */
+  const same = (url) => url;
+  const urlOf = (path) => seo.origin + path;
+  /** A page's address as English names it: "/pt-br/music/x" → "/music/x". */
+  const english = (path, locale) => (path === address(locale, "/") ? "/" : path.slice(segment(locale).length));
+  const decode = (text) => text.replaceAll("&amp;", "&").replaceAll("&#x27;", "'").replaceAll("&quot;", '"');
+  const attrOf = (tag, name) => {
+    const found = tag.match(new RegExp(`\\s${name}="([^"]*)"`, "i"))?.[1];
+    return found === undefined ? undefined : decode(found);
+  };
+  const tagsOf = (html, name) => [...html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").matchAll(new RegExp(`<${name}\\b[^>]*>`, "g"))].map((match) => match[0]);
+  const RASTER = /\.(png|jpe?g|gif|webp|avif|heic|bmp|tiff?)(\?|#|$)/i;
+  const wantedRobots = production ? "index, follow" : "noindex, nofollow";
+  const asText = (list) => list.map(([lang, url]) => `${lang}=${url}`).sort().join(" ");
+
+  /** What a page says of itself. */
+  const said = new Map();
+  for (const [path, page] of expected) {
+    const html = pageText.get(path);
+    if (html === undefined) continue; // not built: reported under D
+    const metas = tagsOf(html, "meta");
+    const headLinks = tagsOf(html, "link");
+    const meta = (key) => metas.filter((tag) => attrOf(tag, "name") === key || attrOf(tag, "property") === key).map((tag) => attrOf(tag, "content") ?? "");
+    const canonical = headLinks.filter((tag) => attrOf(tag, "rel") === "canonical").map((tag) => same(attrOf(tag, "href")));
+    const versions = headLinks.filter((tag) => attrOf(tag, "rel") === "alternate" && attrOf(tag, "hreflang") !== undefined).map((tag) => [attrOf(tag, "hreflang"), same(attrOf(tag, "href"))]);
+    said.set(path, { page, canonical: canonical[0] ?? null, versions });
+
+    // 1. may it be indexed
+    const robots = meta("robots");
+    if (robots.length !== 1 || robots[0] !== wantedRobots) fail("search engines", `${path} says robots="${robots.join(" | ")}"; a ${seo.stage} build must say "${wantedRobots}"`);
+
+    // 2. its own address, absolute and right
+    const isReleased = released.includes(page.locale);
+    const wantedCanonical = seo.origin && isReleased ? urlOf(path) : null;
+    if (canonical.length > 1) fail("search engines", `${path} names ${canonical.length} canonical addresses`);
+    if ((canonical[0] ?? null) !== wantedCanonical) {
+      fail("search engines", `${path} names "${canonical[0] ?? "nothing"}" as its canonical address; expected ${wantedCanonical ? `"${wantedCanonical}"` : "none (the site's origin is not known, or its language is not released)"}`);
+    }
+    if (canonical[0]) seo.canonicals += 1;
+
+    // 3. the same page in each released language, and the one for everyone else
+    const to = english(path, page.locale);
+    const wantedVersions = seo.origin && isReleased && released.length > 1 ? [...released.map((locale) => [htmlLang[locale], urlOf(address(locale, to))]), ["x-default", urlOf(address(ORIGINAL, to))]] : [];
+    if (asText(versions) !== asText(wantedVersions)) fail("search engines", `${path} names these versions of itself: ${asText(versions) || "none"}; expected ${asText(wantedVersions) || "none"}`);
+    seo.alternates += versions.length;
+    for (const [lang, url] of versions) {
+      for (const locale of unreleased) {
+        if (lang === htmlLang[locale] || (seo.origin && (url === seo.origin + segment(locale) || url.startsWith(seo.origin + segment(locale) + "/")))) fail("search engines", `${path} names a version in ${locale}, which is not released`);
+      }
+    }
+
+    // 4. the card: text, the page's own address, its language — and no image
+    const og = (key) => meta(`og:${key}`);
+    if ((og("url")[0] ? same(og("url")[0]) : null) !== wantedCanonical) fail("search engines", `${path} gives og:url "${og("url")[0] ?? "nothing"}"; expected ${wantedCanonical ? `"${wantedCanonical}"` : "none"}`);
+    if (!og("title")[0] || !og("description")[0] || og("type")[0] !== "website") fail("search engines", `${path} has no whole Open Graph card (title, description, type)`);
+    if (meta("twitter:card")[0] !== "summary") fail("search engines", `${path} has no text-only Twitter card (twitter:card="${meta("twitter:card")[0] ?? ""}")`);
+    for (const tag of metas) {
+      const key = attrOf(tag, "property") ?? attrOf(tag, "name") ?? "";
+      const content = attrOf(tag, "content") ?? "";
+      if (/image/i.test(key) || RASTER.test(content) || content.includes("covers/")) fail("search engines", `${path} offers an image or a cover to whoever reads its head: ${tag.slice(0, 160)}`);
+    }
+    for (const tag of headLinks) {
+      const linked = attrOf(tag, "href") ?? "";
+      if (RASTER.test(linked) || linked.includes("covers/") || /image_src|apple-touch-icon/i.test(attrOf(tag, "rel") ?? "")) fail("search engines", `${path} links an image or a cover from its head: ${tag.slice(0, 160)}`);
+    }
+  }
+
+  // 5. each version names the page back
+  const byCanonical = new Map([...said].filter(([, page]) => page.canonical).map(([path, page]) => [page.canonical, path]));
+  for (const [path, { page, canonical, versions }] of said) {
+    for (const [lang, url] of versions) {
+      const other = byCanonical.get(url);
+      if (!other) {
+        fail("search engines", `${path} names ${url} (${lang}) as a version of itself, and no page built has that address as its own`);
+        continue;
+      }
+      if (lang === "x-default") continue;
+      const back = said.get(other).versions.find(([otherLang]) => otherLang === htmlLang[page.locale])?.[1];
+      if (back !== canonical) fail("search engines", `${path} names ${other} as its ${lang} version, but ${other} names "${back ?? "nothing"}" as its ${htmlLang[page.locale]} version, not ${canonical}`);
+    }
+  }
+
+  // 6. the 404 is never indexed
+  const notFoundRobots = tagsOf(read(join(dist, NOT_FOUND)) ?? "", "meta").filter((tag) => attrOf(tag, "name") === "robots").map((tag) => attrOf(tag, "content") ?? "");
+  if (!notFoundRobots.some((content) => /\bnoindex\b/.test(content))) fail("search engines", "the 404 does not say noindex");
+
+  // 7. the sitemap: exactly the pages of the released languages, at the site's origin
+  const sitemap = read(join(app, "sitemap.xml.body"));
+  if (sitemap === null) fail("search engines", `${rel(join(app, "sitemap.xml.body"))} was not built`);
+  else {
+    const listed = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => same(decode(match[1].trim())));
+    const wanted = seo.origin ? [...expected].filter(([, page]) => released.includes(page.locale)).map(([path]) => urlOf(path)) : [];
+    const extra = listed.filter((url) => !wanted.includes(url));
+    const missing = wanted.filter((url) => !listed.includes(url));
+    const twice = new Set(listed).size !== listed.length;
+    if (extra.length || missing.length || twice) {
+      fail("search engines", `the sitemap is not the ${wanted.length} page(s) of the released languages${extra.length ? `; not among them: ${extra.slice(0, 4).join(", ")}` : ""}${missing.length ? `; missing: ${missing.slice(0, 4).join(", ")}` : ""}${twice ? "; an address is listed twice" : ""}`);
+    }
+    const stray = [...sitemap.matchAll(/<xhtml:link\b[^>]*>/g)].map((match) => same(attrOf(match[0], "href"))).filter((url) => !wanted.includes(url));
+    if (stray.length) fail("search engines", `the sitemap names ${stray.length} version(s) that are not pages of the released languages: ${stray.slice(0, 4).join(", ")}`);
+    if (/<image:|covers\//.test(sitemap) || RASTER.test(sitemap.replace(/<[^>]+>/g, " "))) fail("search engines", "the sitemap lists an image or a cover");
+    // whole: as many entries opened as closed, each with its one address
+    const opened = (sitemap.match(/<url>/g) ?? []).length;
+    const closed = (sitemap.match(/<\/url>/g) ?? []).length;
+    if (opened !== closed || opened !== listed.length || !/<\/urlset>\s*$/.test(sitemap)) fail("search engines", `the sitemap is not whole: ${opened} entries opened, ${closed} closed, ${listed.length} address(es)`);
+    if (production && listed.length === 0) fail("search engines", "the sitemap of a production build is empty");
+    seo.sitemap = listed.length;
+  }
+
+  // 8. robots.txt: open, with the sitemap, only where the site is indexed
+  const robotsFile = read(join(app, "robots.txt.body"));
+  if (robotsFile === null) fail("search engines", `${rel(join(app, "robots.txt.body"))} was not built`);
+  else {
+    const lines = robotsFile.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const has = (pattern) => lines.some((line) => pattern.test(line));
+    const closed = has(/^disallow:\s*\/\s*$/i);
+    const open = has(/^allow:\s*\/\s*$/i);
+    const sitemapLine = lines.find((line) => /^sitemap:/i.test(line))?.replace(/^sitemap:\s*/i, "");
+    if (production) {
+      if (closed || !open) fail("search engines", "robots.txt of a production build does not open the site");
+      if (sitemapLine !== `${seo.origin}/sitemap.xml`) fail("search engines", `robots.txt names "${sitemapLine ?? "no sitemap"}"; expected "${seo.origin}/sitemap.xml"`);
+    } else {
+      if (!closed || open) fail("search engines", `robots.txt of a ${seo.stage} build does not close the site ("Disallow: /" and nothing allowed)`);
+      if (sitemapLine !== undefined) fail("search engines", `robots.txt of a ${seo.stage} build names a sitemap: nothing is offered where nothing is indexed`);
+    }
+    if (/covers/i.test(robotsFile)) fail("search engines", "robots.txt speaks of the covers folder");
+  }
+}
+
 // ---------------------------------------------------------------- report
 const mb = (bytes) => (bytes / 1e6).toFixed(1);
 console.log(`[verify] ${rel(dist)}: ${built.length} files, ${mb(scanned)} MB read | build cache (not published): ${cached.length} files, ${mb(scannedCache)} MB read for private texts`);
@@ -474,6 +683,7 @@ console.log(`[verify] public/: ${publishedFiles.length} file(s), ${allowed.lengt
 if (linksFollowed > 0) console.log(`[verify] links followed, each staying in the folder it was found in: ${linksFollowed}`);
 console.log(`[verify] records: ${slugs.length} | pages: ${pageText.size} of ${expected.size} (${locales.map((locale) => `${locale} ${pagesByLocale[locale]}`).join(", ")}) + the 404 | other documents, each named and checked: ${documents.filter((document) => !known.has(document) && document !== NOT_FOUND).length}`);
 console.log(`[verify] languages: ${locales.map((locale) => `${locale} ${published[locale]}`).join(", ")} | links: ${links.status === 0 ? linkLines.find((line) => line.includes("links read"))?.replace("[links] ", "") ?? "checked" : "FAILED"}`);
+console.log(`[verify] search engines: a ${seo.stage} build, ${seo.stage === "production" ? "indexed" : "not indexed"} | origin: ${seo.origin ?? "not given"} | canonical addresses: ${seo.canonicals} | versions named: ${seo.alternates} | sitemap: ${seo.sitemap} page(s)`);
 
 if (problems.length > 0) {
   console.error(`\n[verify] FAILED — ${problems.length} problem(s). This build must not be published:`);
@@ -496,6 +706,7 @@ writeFileSync(
       languages: published,
       pages: pageText.size,
       linksChecked: true,
+      searchEngines: { stage: seo.stage, indexed: seo.stage === "production", origin: seo.origin, canonicals: seo.canonicals, sitemap: seo.sitemap },
       privateTextsLookedFor: forbidden.length,
       publicFiles: publishedFiles,
     },

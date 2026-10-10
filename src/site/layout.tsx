@@ -5,6 +5,7 @@ import { Cursor } from "@/components/cursor/Cursor";
 import { getDictionary } from "@/i18n/dictionary";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { htmlLang, localization, type Locale } from "@/i18n/locales";
+import { documentSeo } from "./seo";
 import "@/styles/tokens.css";
 import "@/styles/base.css";
 import "@/styles/view-transitions.css";
@@ -47,7 +48,8 @@ export const fontVariables = `${archivo.variable} ${plexMono.variable}`;
 /** What the site says of itself, in a language. */
 export async function siteMetadata(locale: Locale): Promise<Metadata> {
   const { meta } = await getDictionary(locale);
-  return { title: meta.site.title, description: meta.site.description };
+  // whether the document may be indexed is said here, for every page under it; each page then speaks for itself (seo.ts)
+  return { ...documentSeo(), title: meta.site.title, description: meta.site.description };
 }
 
 export const viewport: Viewport = {
