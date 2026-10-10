@@ -9,9 +9,13 @@ export function fill(template: string, values: Readonly<Record<string, string | 
   return template.replace(/\{(\w+)\}/g, (mark, key: string) => (key in values ? String(values[key]) : mark));
 }
 
-/** A count as a word in the dictionary's language; past its list, the figure. */
-export function countWord(copy: Pick<Dictionary, "countWords">, n: number): string {
-  return copy.countWords[n] ?? String(n);
+/**
+ * A count as a word in the dictionary's language; past its list, the figure.
+ * `counted` is the gender of what is being counted, where the language has
+ * one: records are counted in the masculine, frequencies in the feminine.
+ */
+export function countWord(copy: Pick<Dictionary, "countWords" | "countWordsFeminine">, n: number, counted: "masculine" | "feminine" = "masculine"): string {
+  return (counted === "feminine" ? copy.countWordsFeminine : copy.countWords)[n] ?? String(n);
 }
 
 /** How each language writes a date out. English as the archive's records are dated: day, month, year. */

@@ -227,3 +227,20 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ================================================================ pt-BR */
+/*
+ * On a phone COSTUMAVA (6 em at this weight) is a few pixels wider than the
+ * column. There, and only there, the Portuguese headline is sized by the
+ * column: the word fits it, and the headline is never larger than the English
+ * one. Wider screens keep the original scale.
+ */
+@media (max-width: 699px) {
+  .headline:lang(pt-BR) {
+    container-type: inline-size;
+  }
+
+  .line:lang(pt-BR) {
+    font-size: min(15.5vw, calc(100cqi / 6.1));
+  }
+}

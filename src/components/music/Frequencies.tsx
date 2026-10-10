@@ -107,7 +107,7 @@ export function Frequencies() {
               </button>
               <div id={metaId} className={styles.meta}>
                 <p className={styles.artists}>{artists.join(" / ")}</p>
-                <p className={styles.atmosphereWords}>{f.atmosphere.join(" · ")}</p>
+                <p className={styles.atmosphereWords}>{copy.atmosphere[f.id].join(" · ")}</p>
                 {f.status === "open" && f.href ? (
                   <Link className={styles.open} href={href(locale, f.href)}>
                     {copy.open} <span aria-hidden="true">{f.href.startsWith("#") ? "↓" : "→"}</span>

@@ -14,31 +14,39 @@
  *   - the captions of the private reference copies (content/music.ts, inside
  *     its private marks).
  */
+/** Counts as words, the way a magazine sets them: index = the number. Past the list, the figure. */
+const COUNT_WORDS = [
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+  "Thirteen",
+  "Fourteen",
+  "Fifteen",
+  "Sixteen",
+  "Seventeen",
+  "Eighteen",
+  "Nineteen",
+  "Twenty",
+] as const;
+
 export const en = {
-  /** Counts as words, the way a magazine sets them: index = the number. Past the list, the figure. */
-  countWords: [
-    "Zero",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-    "Twenty",
-  ],
+  countWords: COUNT_WORDS,
+  /**
+   * The same counts for what a language counts in another gender ("duas
+   * frequências", not "dois"). English has one form: the same list. Which a
+   * sentence takes is said where the sentence is filled (format.ts, countWord).
+   */
+  countWordsFeminine: COUNT_WORDS,
 
   home: {
     skipToManifesto: "Skip to manifesto",
@@ -94,6 +102,18 @@ export const en = {
     inPreparation: "File in preparation",
     open: "Open file",
     tunedTo: "Tuned to {code} {name}",
+    /**
+     * Each frequency's atmosphere, as the lists print it — editorial, not
+     * taxonomy. Wording, so it is here; the frequencies' names are not, and
+     * neither is the lettering of the After Hours plate, which sets its own
+     * frequency's words as drawn (content/music.ts keeps them for that).
+     */
+    atmosphere: {
+      "after-hours": ["Night city", "Glass", "Fluorescent", "Empty station"],
+      "soft-future": ["Pale plastic", "Lounge", "Diffuse light", "Calm technology"],
+      "city-frequency": ["Transit", "Signage", "Motion", "Rhythm"],
+      "alternative-signal": ["Print", "Fragment", "Analogue / digital", "Tension"],
+    },
   },
 
   afterHours: {

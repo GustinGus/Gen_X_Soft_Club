@@ -80,3 +80,9 @@
   outline: 2px solid var(--palette-ink);
   outline-offset: 4px;
 }
+
+/* pt-BR: ENTRAR NO CLUBE is a letter longer than ENTER THE CLUB. A little less air between the letters keeps it on
+   one line where the English is on one line. */
+.label:lang(pt-BR) {
+  letter-spacing: 0.2em;
+}

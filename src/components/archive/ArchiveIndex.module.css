@@ -449,3 +449,26 @@
     margin-top: 0;
   }
 }
+
+/* ================================================================ pt-BR */
+/*
+ * "Índice de / escuta": the second line (ESCUTA, light and extended, 4.77 em)
+ * is a letter longer than INDEX and, at the English size, runs past the
+ * margin. In Portuguese the title is sized so that this line, after its
+ * indent, fits the column — and never larger than the English title.
+ */
+.title:lang(pt-BR) {
+  container-type: inline-size;
+}
+
+.line:lang(pt-BR) {
+  /* the second line is indented by a quarter of the column */
+  font-size: min(15vw, 26svh, calc(75cqi / 4.9));
+}
+
+@media (max-width: 699px) {
+  .line:lang(pt-BR) {
+    /* on a phone it is indented by 12vw */
+    font-size: min(19vw, calc((100cqi - 12vw) / 4.9));
+  }
+}

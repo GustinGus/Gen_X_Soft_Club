@@ -476,3 +476,25 @@
     grid-column: 3 / -1;
   }
 }
+
+/* ================================================================ pt-BR */
+/*
+ * "A cidade / depois da / meia-noite." is wider than the English it stands
+ * for, on every line that matters: set at the English size it runs out of the
+ * title's column. So in Portuguese the title is sized by the column it has —
+ * the widest line (DEPOIS DA, light and extended, 6.45 em) fills it, with a
+ * little air — and never larger than the English title. The second line gives
+ * up its indent: it is now the line that spans the measure. Weights, widths
+ * and the order of the lines are untouched.
+ */
+.title:lang(pt-BR) {
+  container-type: inline-size;
+}
+
+.line:lang(pt-BR) {
+  font-size: min(var(--title-size), calc(100cqi / 6.6));
+}
+
+.line[data-line="1"]:lang(pt-BR) {
+  padding-left: 0;
+}

@@ -74,7 +74,7 @@ export function Colophon() {
 
       <div className={styles.body}>
         <p className={styles.deck}>
-          {fill(copy.deck, { records: countWord(dictionary, colophon.records), frequencies: countWord(dictionary, colophon.frequencies) })}
+          {fill(copy.deck, { records: countWord(dictionary, colophon.records), frequencies: countWord(dictionary, colophon.frequencies, "feminine") })}
         </p>
         <Link className={styles.cta} href={href(locale, "/music")}>
           <span className={styles.ctaIndex} aria-hidden="true">

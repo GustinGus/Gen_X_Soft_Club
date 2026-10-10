@@ -29,7 +29,7 @@ export async function indexMetadata(locale: Locale): Promise<Metadata> {
     // counted and named from the catalogue, never typed
     description: fill(copy.meta.index.description, {
       records: countWord(copy, records.length),
-      frequencies: countWord(copy, frequencies.length).toLowerCase(),
+      frequencies: countWord(copy, frequencies.length, "feminine").toLowerCase(),
       names: frequencies.map((f) => f.name).join(", "),
     }),
   };

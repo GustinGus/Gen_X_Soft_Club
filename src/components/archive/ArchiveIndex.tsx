@@ -65,7 +65,7 @@ export function ArchiveIndex({ locale, copy: dictionary }: { locale: Locale; cop
           <p className={styles.deck}>
             {fill(copy.deck, {
               records: countWord(dictionary, records.length),
-              frequencies: countWord(dictionary, frequencies.length).toLowerCase(),
+              frequencies: countWord(dictionary, frequencies.length, "feminine").toLowerCase(),
             })}
           </p>
           <p className={styles.note}>{copy.note}</p>
@@ -112,7 +112,7 @@ export function ArchiveIndex({ locale, copy: dictionary }: { locale: Locale; cop
                 {f.name}
               </h2>
               <p className={styles.drawerMeta}>
-                <span>{f.atmosphere.join(" · ")}</span>
+                <span>{dictionary.frequencies.atmosphere[f.id].join(" · ")}</span>
                 <span>
                   {spanOf(f.id)} <span aria-hidden="true">—</span> {pad2(filed.length)}
                   {` ${copy.records}`}
