@@ -12,6 +12,11 @@
   --fq-muted: var(--palette-dark-steel);
   --fq-rule: rgb(23 26 24 / 0.2);
   --fq-signal: var(--palette-transit-green);
+  /* The signal colour where it is small type: transit green is 3:1 on this
+     paper, short of the 4.5:1 that 11px text needs. The same green taken
+     deeper (as on the archive's other paper rooms) clears it. Marks drawn in
+     the signal colour — the needle, the focus ring — keep the lighter one. */
+  --fq-signal-ink: #456052;
 
   position: relative;
   z-index: var(--z-type-front);
@@ -37,6 +42,7 @@
   --fq-muted: var(--palette-steel);
   --fq-rule: rgb(231 229 219 / 0.2);
   --fq-signal: var(--palette-phosphor);
+  --fq-signal-ink: var(--palette-phosphor);
 }
 
 /* ================================================================ atmospheres */
@@ -137,7 +143,7 @@
 }
 
 .label {
-  color: var(--fq-signal);
+  color: var(--fq-signal-ink);
   transition: color var(--duration-slow) var(--ease-in-out);
 }
 
@@ -346,7 +352,7 @@
   align-items: center;
   gap: var(--space-2);
   min-height: 24px;
-  color: var(--fq-signal);
+  color: var(--fq-signal-ink);
   text-decoration: none;
   border-bottom: 1px solid currentColor;
 }
@@ -421,6 +427,7 @@
     --fq-muted: var(--palette-dark-steel);
     --fq-rule: rgb(23 26 24 / 0.2);
     --fq-signal: var(--palette-transit-green);
+    --fq-signal-ink: #456052;
   }
 
   .atmospheres,
@@ -440,6 +447,8 @@
     --fq-muted: var(--st-muted, var(--palette-dark-steel));
     --fq-ink: var(--st-ink, var(--material-paper-ink));
     --fq-signal: var(--st-signal, var(--palette-transit-green));
+    /* a dark station prints its signal in phosphor; a paper one in the deeper green */
+    --fq-signal-ink: var(--st-signal, #456052);
   }
 
   .station[data-id="after-hours"],

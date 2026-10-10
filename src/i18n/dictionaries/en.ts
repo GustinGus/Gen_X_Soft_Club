@@ -193,6 +193,7 @@ export const en = {
 
   /** /music/[slug] — the record file: its structure. What a file says of its record is the file's own text. */
   record: {
+    skip: "Skip to content",
     index: "Index",
     file: "File",
     inDeck: "Disc out — in deck SC-AU/02",

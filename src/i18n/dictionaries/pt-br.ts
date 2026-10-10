@@ -166,6 +166,7 @@ export const ptBr: Dictionary = {
   },
 
   record: {
+    skip: "Pular para o conteúdo",
     index: "Índice",
     file: "Ficha",
     inDeck: "Disco retirado — no deck SC-AU/02",

@@ -7,6 +7,10 @@
  *   A. public/        only files meant to be published (every file there ships).
  *   B. images         no image file anywhere in the build, by content, not by
  *                     name: the public edition draws its sleeves and has none.
+ *                     One exception, named and weighed: the site's own
+ *                     favicon, at the two places Next.js writes it, and only
+ *                     as the very file this inspection knows by its checksum.
+ *                     Any other icon file, or that one changed, fails.
  *   C. private data   nothing from the private blocks of content/music.ts —
  *                     paths, sources, editions, captions — in any built file.
  *                     Nor may any of it have been copied into a dictionary
@@ -53,6 +57,7 @@
  * safeguard: the safeguard is running this.
  */
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -183,8 +188,40 @@ function imageKind(bytes) {
   if (at(4, "ftyp") && /avif|avis|heic|heix|mif1/.test(bytes.subarray(8, 32).toString("latin1"))) return "AVIF/HEIF";
   if (at(0, "BM") && bytes.length > 26 && bytes.readUInt32LE(2) === bytes.length) return "BMP";
   if (at(0, "II*\0") || at(0, "MM\0*")) return "TIFF";
+  // ICO / CUR: a reserved zero, the type, a count, then a directory whose first entry points inside the file.
+  // It carries images (bitmaps or whole PNGs) under a header of its own, so it is none of the formats above.
+  if (bytes.length >= 22 && bytes.readUInt16LE(0) === 0 && (bytes.readUInt16LE(2) === 1 || bytes.readUInt16LE(2) === 2)) {
+    const count = bytes.readUInt16LE(4);
+    const directory = 6 + 16 * count;
+    if (count >= 1 && count <= 64 && bytes.length >= directory && bytes[9] === 0) {
+      const size = bytes.readUInt32LE(14);
+      const offset = bytes.readUInt32LE(18);
+      if (size > 0 && offset >= directory && offset + size <= bytes.length) return "ICO";
+    }
+  }
   return null;
 }
+
+/*
+  THE ONE IMAGE A PUBLIC BUILD MAY HOLD: the site's favicon — the archive's own
+  mark (src/app/icon.svg, a drawing), set as an .ico for the browsers and
+  services that ask for /favicon.ico. It is allowed as this file and no other:
+  at the two paths Next.js builds it to — what /favicon.ico answers with, and
+  the copy it keeps among the static files under a name of its own making —
+  and with these exact bytes in both. A favicon that has been changed is a
+  different image, and has to be looked at and named here again before it may
+  be published.
+*/
+const FAVICON = {
+  built: "server/app/favicon.ico.body",
+  /** The copy among the static files: favicon.<a name Next.js derives>.ico, nowhere but in static/media. */
+  copy: /^static\/media\/favicon\.[a-z0-9_-]+\.ico$/,
+  source: "src/app/favicon.ico",
+  sha256: "114d5accf30af124f1076ce322af881048aedec3525450bee80ecc36247283a3",
+};
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+let faviconBuilt = false;
+let faviconCopies = 0;
 
 const cache = join(dist, "cache") + sep;
 const everything = filesUnder(dist, "build");
@@ -240,9 +277,31 @@ for (const path of built) {
   if (bytes === null) continue;
   scanned += bytes.length;
   const kind = imageKind(bytes);
-  if (kind) fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)`);
+  const within = rel(path).slice(rel(dist).length + 1);
+  if (within === FAVICON.built || FAVICON.copy.test(within)) {
+    // a favicon's place: what is there must be the favicon, whole and unchanged — whatever its bytes look like
+    if (within === FAVICON.built) faviconBuilt = true;
+    else faviconCopies += 1;
+    const sum = sha256(bytes);
+    if (sum !== FAVICON.sha256) fail("images", `${rel(path)} is not the favicon this inspection knows (${kind ? `a ${kind} image` : "not an icon file"}, sha256 ${sum.slice(0, 16)}…, ${bytes.length} bytes): a changed favicon is a new image, to be reviewed and named in scripts/verify-public-build.mjs before it is published`);
+  } else if (kind) {
+    fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)${kind === "ICO" ? `: the only icon file a public build may hold is the favicon, at ${FAVICON.built} and as static/media/favicon.<name>.ico` : ""}`);
+  }
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} carries ${found.length} private text(s): ${quoted(found)}`);
+}
+
+// The favicon's source is weighed too: what will be built next is what was reviewed.
+{
+  const source = join(root, FAVICON.source);
+  if (existsSync(source)) {
+    const sum = sha256(bytesOf(source, "images") ?? Buffer.alloc(0));
+    if (sum !== FAVICON.sha256) fail("images", `${FAVICON.source} is not the favicon this inspection knows (sha256 ${sum.slice(0, 16)}…)`);
+    if (!faviconBuilt) fail("images", `${FAVICON.source} exists but ${rel(join(dist, FAVICON.built))} was not built: the build is not laid out as this inspection knows it`);
+  } else if (faviconBuilt || faviconCopies > 0) {
+    fail("images", `a favicon was built, but ${FAVICON.source} is not in the project`);
+  }
+  if (faviconCopies > 1) fail("images", `${faviconCopies} copies of the favicon among the static files: one is expected`);
 }
 
 // The cache is not published, and is read for the private texts all the same (see the note at the top).
@@ -706,6 +765,7 @@ writeFileSync(
       languages: published,
       pages: pageText.size,
       linksChecked: true,
+      favicon: faviconBuilt ? { path: FAVICON.built, copies: faviconCopies, sha256: FAVICON.sha256 } : null,
       searchEngines: { stage: seo.stage, indexed: seo.stage === "production", origin: seo.origin, canonicals: seo.canonicals, sitemap: seo.sitemap },
       privateTextsLookedFor: forbidden.length,
       publicFiles: publishedFiles,
@@ -714,5 +774,5 @@ writeFileSync(
     2,
   ) + "\n",
 );
-console.log(`[verify] OK — no image, no private artwork data, ${slugs.length} sleeves, every language whole: nothing private or unfinished in what would be published.`);
+console.log(`[verify] OK — ${faviconBuilt ? "no image but the site's own favicon (the one file, by its checksum)" : "no image"}, no private artwork data, ${slugs.length} sleeves, every language whole: nothing private or unfinished in what would be published.`);
 console.log(`[verify] recorded in ${rel(join(dist, STAMP))} for build ${buildId}`);

@@ -330,6 +330,42 @@
   }
 }
 
+/* ================================================================ tablet: the motion switch */
+/* Between the phone's layout and the desktop's, the rail's second row ran
+   into the title: GEN X starts at a fixed height, and the row under the
+   masthead — taller still where the pointer is a finger — reached past it.
+   The switch leaves the row for the corner the rail keeps free, under the
+   language switch: at the page's margin, below that switch's target, and to
+   the right of the title. The rail is one row again and its rule clears the
+   title; the title, the disc and ENTER stay where they were. */
+@media (min-width: 700px) and (max-width: 1023px) {
+  .motion {
+    position: absolute;
+    /* an absolutely placed grid item is positioned in its grid area: the whole first row */
+    grid-column: 1 / -1;
+    grid-row: 1;
+    /* clear of the language switch's 44px target above it, with room between the two */
+    top: calc(var(--space-6) + var(--space-1));
+    /* the rail stops short of the page's margin by 9rem (see .rail above); a
+       step further out keeps the longest label 12px and more from the title's
+       last letter at the narrowest of these widths */
+    right: calc(-9rem - var(--space-1));
+  }
+}
+
+/* ================================================================ narrow tablet: the axes */
+/* At the narrow end of the tablet's layout the rail is at its shortest and
+   the axes end where the language switch begins: in Portuguese, whose axes
+   run longer ("Em breve" under "Imagem"), the two met. The axes start one
+   column earlier here — the masthead does not reach that far — and end clear
+   of the switch in both languages. From 800px up the rail is long enough
+   as it is. */
+@media (min-width: 700px) and (max-width: 799px) {
+  .axes {
+    grid-column: 6 / span 7;
+  }
+}
+
 /* ================================================================ mobile */
 /* Its own vertical composition — not the desktop shrunk. */
 @media (max-width: 699px) {

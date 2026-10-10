@@ -61,6 +61,10 @@ export function RecordSheet({ record, file, locale, copy: dictionary }: Props) {
       data-theme={frequency.tone === "night" ? "night" : undefined}
       aria-labelledby={titleId}
     >
+      {/* As on the home and the index: shown when the keyboard reaches it, it leads past the folio to the file's heading. */}
+      <a className="skip-link" href={`#${titleId}`}>
+        {copy.skip}
+      </a>
       <span className={atmosphere.atmosphere} data-atmosphere={frequency.id} aria-hidden="true" />
 
       <header className={styles.folio}>
