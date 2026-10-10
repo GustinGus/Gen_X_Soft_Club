@@ -8,6 +8,7 @@ import { enterTimeline } from "@/motion/tokens";
 import { usePointerField } from "@/motion/usePointerField";
 import { CURSOR_RESET_EVENT } from "@/components/cursor/Cursor";
 import { useFinePointer, useReducedMotion } from "@/motion/useMediaQuery";
+import { Colophon } from "./Colophon";
 import { Hero } from "./Hero";
 import { Manifesto } from "./Manifesto";
 import { AfterHours } from "@/components/music/AfterHours";
@@ -113,6 +114,7 @@ export function HomeExperience() {
         <Frequencies />
         <AfterHours />
       </main>
+      <Colophon />
       <DiscLayer />
       <div ref={flashRef} className={styles.flash} aria-hidden="true" />
     </>

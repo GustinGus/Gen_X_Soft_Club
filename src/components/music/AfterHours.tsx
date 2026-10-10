@@ -139,12 +139,6 @@ export function AfterHours() {
           ))}
         </ol>
       </div>
-
-      <p className={styles.continues}>
-        <Link className={styles.continuesLink} href="/music">
-          {copy.continues} <span aria-hidden="true">→</span>
-        </Link>
-      </p>
     </section>
   );
 }

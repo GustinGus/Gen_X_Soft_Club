@@ -277,6 +277,12 @@ export function spanOf(id: FrequencyId) {
   return min === max ? String(min) : `${min}—${max}`;
 }
 
+/** Year span of the whole catalogue, derived from every record in it. */
+export const catalogueSpan = (() => {
+  const years = records.map((r) => r.year);
+  return `${Math.min(...years)}—${Math.max(...years)}`;
+})();
+
 /** Reference copies present on this machine (file names), listed by next.config.ts when it starts. */
 const referenceCovers = (process.env.NEXT_PUBLIC_REFERENCE_COVERS ?? "").split(",").filter(Boolean);
 
@@ -321,7 +327,8 @@ export function archiveSpan() {
 export const soundOfTheClub = {
   archive: "ARCHIVE_002",
   material: "Audio material",
-  range: "1994—2003",
+  /** The years of the audio material: the records themselves, never typed here. */
+  range: catalogueSpan,
   /** Red Book CD audio format — a medium fact, not a claim about any record. */
   format: ["DISC 01", "44.1 kHz", "16-BIT", "STEREO"],
   titleLines: ["The sound", "of the club"],
@@ -396,5 +403,4 @@ export const afterHours = {
     platform: "Platform 02",
     time: "00:47",
   },
-  continues: "File continues — the full listening index, ARCHIVE_002",
 } as const;

@@ -1,0 +1,325 @@
+/*
+ * COLOPHON — the back of the sleeve.
+ * Picks up exactly where After Hours' ground ends and settles into deep green.
+ * Static: no reveal, no transition beyond the links' own hover.
+ */
+
+.colophon {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  padding: var(--space-8) var(--margin) var(--space-7);
+  color: var(--ink-night);
+  background:
+    radial-gradient(60% 40% at 12% 100%, rgb(198 216 167 / 0.06), transparent 70%),
+    linear-gradient(180deg, #0b0f0d 0%, var(--palette-night) 45%, var(--palette-deep-green) 100%);
+}
+
+.muted {
+  color: var(--ink-night-muted);
+}
+
+.folio,
+.imprint,
+.foot,
+.endMark p {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------ folio */
+.folio {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule-night);
+}
+
+.code {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--signal-night);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--signal-night);
+}
+
+.right {
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------ title */
+/* Light and extended, then heavy: the same pair the other sections close on. */
+.title {
+  grid-column: 1 / span 9;
+  padding-top: var(--space-9);
+  font-size: clamp(2.75rem, 7.2vw, 8.75rem);
+  line-height: 0.86;
+  letter-spacing: var(--tracking-headline);
+  text-transform: uppercase;
+}
+
+.lineLight,
+.lineHeavy {
+  display: block;
+  white-space: nowrap;
+}
+
+.lineLight {
+  font-weight: var(--weight-light);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: -0.04em;
+}
+
+.lineHeavy {
+  font-weight: var(--weight-black);
+  font-variation-settings: "wdth" var(--width-normal);
+}
+
+/* ------------------------------------------------------------ end mark */
+.endMark {
+  grid-column: 11 / -1;
+  grid-row: 2;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+  text-align: right;
+}
+
+.mark {
+  display: block;
+  width: clamp(4.5rem, 8vw, 7.5rem);
+  height: auto;
+}
+
+/* ------------------------------------------------------------ deck + way on */
+.body {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: end;
+  row-gap: var(--space-6);
+  padding-top: var(--space-8);
+}
+
+.deck {
+  grid-column: 1 / span 5;
+  max-width: 26em;
+  font-size: var(--type-deck);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+/* The hero's transit-sign panel, inverted: a paper plate on the night ground. */
+.cta {
+  grid-column: 7 / -1;
+  justify-self: end;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-5);
+  width: min(100%, 30rem);
+  min-height: 3.5rem;
+  padding: 0 var(--space-5) 0 var(--space-4);
+  background: var(--ink-night);
+  color: var(--palette-ink);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: var(--weight-bold);
+  font-variation-settings: "wdth" var(--width-extended);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.ctaIndex {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-meta);
+  /* transit green taken deeper, so small type clears AA on paper */
+  color: #456052;
+}
+
+.ctaArrow {
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+
+/* ------------------------------------------------------------ imprint */
+.rule {
+  grid-column: 1 / -1;
+  display: block;
+  width: min(100%, 250px);
+  height: 12px;
+  margin-top: var(--space-9);
+}
+
+.imprint {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  row-gap: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule-night);
+}
+
+.imprint > div {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.imprint dt {
+  color: var(--ink-night-muted);
+}
+
+/* ------------------------------------------------------------ foot */
+.foot {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding-top: var(--space-8);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  color: var(--signal-night);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    background: var(--signal-night);
+  }
+
+  .back:hover {
+    color: var(--ink-night);
+  }
+}
+
+/* ================================================================ narrow desktop */
+@media (max-width: 1279px) {
+  .cta {
+    gap: var(--space-4);
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* ================================================================ tablet */
+@media (max-width: 1023px) {
+  .title {
+    grid-column: 1 / -1;
+    padding-top: var(--space-8);
+  }
+
+  .endMark {
+    grid-column: 10 / -1;
+  }
+
+  .deck {
+    grid-column: 1 / span 7;
+  }
+
+  .cta {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .imprint > div {
+    grid-column: span 6;
+  }
+}
+
+/* ================================================================ mobile */
+@media (max-width: 699px) {
+  .colophon {
+    padding-top: var(--space-7);
+  }
+
+  .folio {
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  .right {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+
+  .title {
+    padding-top: var(--space-7);
+    font-size: 10.2vw;
+  }
+
+  /* Under the title, its code beside it. */
+  .endMark {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
+    flex-direction: row;
+    align-items: flex-end;
+    padding-top: var(--space-6);
+    text-align: left;
+  }
+
+  .mark {
+    width: 4rem;
+  }
+
+  .body {
+    padding-top: var(--space-6);
+  }
+
+  .deck {
+    grid-column: 1 / -1;
+  }
+
+  .cta {
+    width: 100%;
+    gap: var(--space-3);
+    padding: 0 var(--space-4) 0 var(--space-3);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+
+  .rule {
+    margin-top: var(--space-8);
+  }
+
+  .foot {
+    padding-top: var(--space-7);
+  }
+}
+
+/* The narrowest phones: the plate's line may take two rows rather than run off it. */
+@media (max-width: 359px) {
+  .cta {
+    padding-block: var(--space-3);
+    line-height: 1.25;
+    white-space: normal;
+  }
+}
