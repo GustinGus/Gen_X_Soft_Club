@@ -122,7 +122,7 @@
   position: relative;
   z-index: 3;
   width: min(15rem, 100%);
-  /* rides the plate's edge, clear of its "to come" mark */
+  /* rides the plate's edge, clear of its hour */
   margin-bottom: calc(var(--space-9) + var(--space-8));
   padding: var(--space-4) var(--space-4) var(--space-4) var(--space-6);
   display: flex;
@@ -479,7 +479,7 @@
     grid-column: 1 / -1;
     grid-row: 4;
     justify-self: start;
-    /* below the plate's caption — never over the placeholder label */
+    /* below the plate's caption — never over the print */
     margin: var(--space-6) 0 0;
   }
 

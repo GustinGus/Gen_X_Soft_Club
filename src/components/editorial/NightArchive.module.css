@@ -1,0 +1,72 @@
+/* ================================================================ night archive plate */
+.plate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* The print: 4:5, the proportion the section is composed around. */
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--palette-night);
+  box-shadow: inset 0 0 0 1px rgb(231 229 219 / 0.08);
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Sizes below are in the drawing's own units (800 × 1000), so the type scales with the print. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.small {
+  font-size: 15px;
+  letter-spacing: 3.2px;
+}
+
+/* The hour, transit-sign condensed; a night-coloured outline lifts it off the platform's lines. */
+.time {
+  font-family: var(--font-grotesk);
+  font-size: 236px;
+  font-weight: var(--weight-black);
+  font-variation-settings: "wdth" var(--width-condensed);
+  letter-spacing: -5px;
+  paint-order: stroke;
+  stroke: var(--palette-night);
+  stroke-width: 14px;
+  stroke-linejoin: round;
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  letter-spacing: var(--tracking-meta);
+  line-height: var(--leading-meta);
+  text-transform: uppercase;
+  color: var(--ink-night-muted);
+}
+
+.caption span:first-child {
+  color: var(--ink-night);
+}
+
+.flag {
+  margin-left: auto;
+  color: var(--signal-night);
+}

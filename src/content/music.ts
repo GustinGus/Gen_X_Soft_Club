@@ -391,6 +391,10 @@ export const afterHours = {
   plate: {
     number: "Plate 02",
     subject: "Station platform, after midnight",
+    /** Art direction, not record: the lines the plate and the ticket share. */
+    line: "Last train",
+    platform: "Platform 02",
+    time: "00:47",
   },
   continues: "File continues — the full listening index, ARCHIVE_002",
 } as const;

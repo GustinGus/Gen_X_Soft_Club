@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useRef, type CSSProperties } from "react";
 import { ArchiveSleeve } from "@/components/archive/ArchiveSleeve";
-import { PhotoPlate } from "@/components/editorial/Placeholders";
+import { NightArchivePlate } from "@/components/editorial/NightArchive";
 import { afterHours as copy, frequencies, pad2, recordsIn, spanOf } from "@/content/music";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./AfterHours.module.css";
 
 const frequency = frequencies.find((f) => f.id === "after-hours")!;
+
+/** "SC—AH—01" → "SC—AH": the shelf a catalogue number is filed on. */
+const shelfOf = (catalogue: string) => catalogue.split("—").slice(0, 2).join("—");
 
 /**
  * 01 / AFTER HOURS — the first real listening file.
@@ -58,7 +61,17 @@ export function AfterHours() {
         ))}
       </h2>
 
-      <PhotoPlate className={styles.plate} number={copy.plate.number} subject={copy.plate.subject} ratio="4 / 5" />
+      <NightArchivePlate
+        className={styles.plate}
+        number={copy.plate.number}
+        subject={copy.plate.subject}
+        frequency={frequency}
+        shelf={shelfOf(filed[0].catalogue)}
+        span={spanOf("after-hours")}
+        line={copy.plate.line}
+        platform={copy.plate.platform}
+        time={copy.plate.time}
+      />
 
       {/* The archive's own ticket — a designed object, not a historical document. */}
       <div className={styles.ticket} aria-hidden="true">
@@ -68,8 +81,8 @@ export function AfterHours() {
           Frequency {frequency.code} — {frequency.name}
         </span>
         <span className={styles.ticketRow}>
-          <span>Platform —</span>
-          <span>00:47</span>
+          <span>{copy.plate.platform}</span>
+          <span>{copy.plate.time}</span>
         </span>
       </div>
 
