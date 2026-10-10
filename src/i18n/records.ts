@@ -10,8 +10,9 @@ export type RecordTexts = Loosen<typeof en>;
   interface dictionary, and loaded only by a record's page (content/records.ts,
   fileFor): the home and the index never carry it.
 
-  A language that is not written yet has a stand-in here (records/pt-br) and
-  says so in locales.ts: it can be built and worked on, not published.
+  Brazilian Portuguese (records/pt-br) is written in full. Being written is
+  not being published: the language is still "in-progress" in locales.ts, so
+  it can be built and read here, and waits to be released.
 */
 const loaders: { readonly [L in Locale]: () => Promise<RecordTexts> } = {
   en: () => import("./records/en").then((module) => module.en),

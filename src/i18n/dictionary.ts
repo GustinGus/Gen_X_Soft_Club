@@ -12,8 +12,9 @@ export type Dictionary = Loosen<typeof en>;
   when its language is asked for: the server reads one, and hands that one to
   the browser (I18nProvider). The other never leaves the server.
 
-  A language that is not written yet has a stand-in here (dictionaries/pt-br)
-  and says so in locales.ts: it can be built and worked on, not published.
+  Brazilian Portuguese (dictionaries/pt-br) is written in full. Being written
+  is not being published: the language is still "in-progress" in locales.ts,
+  so it can be built and read here, and waits to be released.
 */
 const loaders: { readonly [L in Locale]: () => Promise<Dictionary> } = {
   en: () => import("./dictionaries/en").then((module) => module.en),
