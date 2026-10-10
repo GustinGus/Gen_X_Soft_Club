@@ -2,6 +2,7 @@
 
 import type { CSSProperties, MouseEvent, Ref } from "react";
 import { archive, axes, hero } from "@/content/home";
+import { useCopy } from "@/i18n/I18nProvider";
 import { DiscAnchor } from "@/experience/disc/DiscAnchor";
 import { EnterButton } from "./EnterButton";
 import { MiniDisc, PaperSlip } from "./HeroObjects";
@@ -23,6 +24,7 @@ type Props = {
  * `data-parallax` + `--depth` opt a layer into pointer parallax.
  */
 export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Props) {
+  const copy = useCopy().hero;
   const [back, front] = hero.titleLines;
   const [frontA, frontB] = front.split(" ");
 
@@ -36,19 +38,19 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
       <header className={styles.rail} data-shot="chrome">
         <p className={styles.masthead}>
           <span>{archive.name}</span>
-          <span className={styles.muted}>{archive.issue}</span>
+          <span className={styles.muted}>{copy.issue}</span>
         </p>
-        <ul className={styles.axes} aria-label="Editorial axes">
+        <ul className={styles.axes} aria-label={copy.axesLabel}>
           {axes.map((axis) => (
             <li key={axis.code} data-open={axis.open || undefined}>
               <span className={styles.muted} aria-hidden="true">
                 {axis.code}
               </span>
               <span className={styles.axis}>
-                {axis.label}
+                {copy.axes[axis.id].label}
                 <span className={styles.axisIssue}>
                   <span className="visually-hidden"> — </span>
-                  {axis.issue}
+                  {copy.axes[axis.id].issue}
                 </span>
               </span>
             </li>
@@ -56,7 +58,7 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
         </ul>
         {onToggleMotion && (
           <button type="button" className={styles.motion} aria-pressed={!motionPaused} onClick={onToggleMotion}>
-            <span className={styles.muted}>Motion</span> {motionPaused ? "Off" : "On"}
+            <span className={styles.muted}>{copy.motion}</span> {motionPaused ? copy.motionOff : copy.motionOn}
           </button>
         )}
       </header>
@@ -73,7 +75,7 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
       <DiscAnchor name="hero" rotatable className={styles.disc} />
 
       <p className={styles.caption} data-shot="aside" data-parallax aria-hidden="true">
-        {hero.objectCaption.map((line) => (
+        {copy.objectCaption.map((line) => (
           <span key={line}>{line}</span>
         ))}
       </p>
@@ -83,15 +85,15 @@ export function Hero({ ref, onEnter, motionPaused = false, onToggleMotion }: Pro
       </p>
 
       <MiniDisc className={styles.minidisc} data-shot="object" data-parallax="" style={{ "--depth": 0.9 } as CSSProperties} />
-      <PaperSlip className={styles.slip} data-shot="object" data-parallax="" style={{ "--depth": 1.8 } as CSSProperties} />
+      <PaperSlip className={styles.slip} artwork={copy.entranceArtwork} data-shot="object" data-parallax="" style={{ "--depth": 1.8 } as CSSProperties} />
 
       <div className={styles.entry} data-shot="entry">
         <p className={styles.intro}>
-          {hero.intro[0]}
+          {copy.intro[0]}
           <br />
-          {hero.intro[1]}
+          {copy.intro[1]}
         </p>
-        <EnterButton label={hero.cta} onEnter={onEnter} />
+        <EnterButton label={copy.cta} onEnter={onEnter} />
       </div>
     </section>
   );

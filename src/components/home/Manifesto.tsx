@@ -3,6 +3,8 @@
 import type { CSSProperties, Ref } from "react";
 import { manifesto } from "@/content/home";
 import { DiscAnchor } from "@/experience/disc/DiscAnchor";
+import { fill } from "@/i18n/format";
+import { useCopy } from "@/i18n/I18nProvider";
 import styles from "./Manifesto.module.css";
 
 type Props = {
@@ -18,6 +20,8 @@ type Props = {
  * re-render): absent = server / no-JS, fully visible; "pending"; "revealed".
  */
 export function Manifesto({ ref, headingRef }: Props) {
+  const copy = useCopy().manifesto;
+
   return (
     <section
       ref={ref}
@@ -28,11 +32,11 @@ export function Manifesto({ ref, headingRef }: Props) {
     >
       <header className={styles.folio}>
         <p className={styles.id}>{manifesto.id}</p>
-        <p className={styles.range}>{manifesto.range}</p>
+        <p className={styles.range}>{copy.range}</p>
       </header>
 
       <h2 id="manifesto-title" ref={headingRef} tabIndex={-1} className={styles.headline}>
-        {manifesto.lines.map((line, i) => (
+        {copy.lines.map((line, i) => (
           <span key={line} className={styles.line} data-line={i}>
             <span className={styles.lineInner} style={{ "--i": i } as CSSProperties}>
               {line}
@@ -44,10 +48,10 @@ export function Manifesto({ ref, headingRef }: Props) {
       <DiscAnchor name="manifesto" className={styles.disc} />
 
       <div className={styles.body}>
-        <p className={styles.deck}>{manifesto.intro}</p>
+        <p className={styles.deck}>{copy.intro}</p>
         <p className={styles.status}>
           <span className={styles.dot} aria-hidden="true" />
-          {manifesto.status}
+          {fill(copy.status, { records: manifesto.records })}
         </p>
       </div>
     </section>

@@ -5,8 +5,9 @@ import styles from "./NightArchive.module.css";
  *
  * Original artwork of the Soft Club Archive, drawn here: one inline SVG of
  * plain shapes and type. It is not a photograph and reproduces none; nothing
- * is loaded, filtered or animated. The lines of text are the section's own
- * data, so the plate and the ticket beside it cannot disagree.
+ * is loaded, filtered or animated. The lettering is the section's own data,
+ * so the plate and the ticket beside it cannot disagree, and it is set as
+ * drawn in every language; the caption and the description are the page's.
  */
 
 /* The site's palette (tokens.css), as values: SVG paint attributes take no custom properties. */
@@ -26,10 +27,8 @@ const SLEEPERS = [0.16, 0.3, 0.45, 0.61, 0.78, 0.95].map((t) => (VP_Y + 415 * t 
 const TICKS = Array.from({ length: 23 }, (_, i) => ({ y: 120 + i * 20, x: i % 5 === 0 ? 62 : 52 }));
 
 type Props = {
-  /** "Plate 02" */
+  /** "Plate 02", as lettered on the plate. */
   number: string;
-  /** What the plate shows, for the caption and the accessible label. */
-  subject: string;
   /** The frequency this plate belongs to. */
   frequency: { code: string; name: string; atmosphere: readonly string[] };
   /** The archive's shelf mark for the frequency, e.g. "SC—AH". */
@@ -40,10 +39,14 @@ type Props = {
   line: string;
   platform: string;
   time: string;
+  /** Under the plate, in the page's language: its number, what it shows, and what kind of image it is. */
+  caption: { number: string; subject: string; flag: string };
+  /** What the plate shows, for those who cannot see it, in the page's language. */
+  artwork: string;
   className?: string;
 };
 
-export function NightArchivePlate({ number, subject, frequency, shelf, span, line, platform, time, className }: Props) {
+export function NightArchivePlate({ number, frequency, shelf, span, line, platform, time, caption, artwork, className }: Props) {
   const [hours, minutes] = time.split(":");
 
   return (
@@ -51,7 +54,7 @@ export function NightArchivePlate({ number, subject, frequency, shelf, span, lin
       <div
         className={styles.frame}
         role="img"
-        aria-label={`Original artwork of the Soft Club Archive: ${subject}. A screened lamp, eclipsed, hangs over an empty platform crossed by one line of fluorescent light. The time reads ${time}.`}
+        aria-label={artwork}
       >
         <svg className={styles.art} viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
           <defs>
@@ -172,9 +175,9 @@ export function NightArchivePlate({ number, subject, frequency, shelf, span, lin
         </svg>
       </div>
       <figcaption className={styles.caption}>
-        <span>{number}</span>
-        <span>{subject}</span>
-        <span className={styles.flag}>Original artwork</span>
+        <span>{caption.number}</span>
+        <span>{caption.subject}</span>
+        <span className={styles.flag}>{caption.flag}</span>
       </figcaption>
     </figure>
   );

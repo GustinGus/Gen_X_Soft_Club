@@ -8,6 +8,7 @@ import { enterTimeline } from "@/motion/tokens";
 import { usePointerField } from "@/motion/usePointerField";
 import { CURSOR_RESET_EVENT } from "@/components/cursor/Cursor";
 import { useFinePointer, useReducedMotion } from "@/motion/useMediaQuery";
+import { useCopy } from "@/i18n/I18nProvider";
 import { Colophon } from "./Colophon";
 import { Hero } from "./Hero";
 import { Manifesto } from "./Manifesto";
@@ -32,6 +33,7 @@ export function HomeExperience() {
   const flashRef = useRef<HTMLDivElement>(null);
   const entering = useRef(false);
 
+  const copy = useCopy();
   const reducedMotion = useReducedMotion();
   const finePointer = useFinePointer();
 
@@ -100,7 +102,7 @@ export function HomeExperience() {
   return (
     <>
       <a className="skip-link" href="#manifesto">
-        Skip to manifesto
+        {copy.home.skipToManifesto}
       </a>
       <main className={styles.home}>
         <Hero

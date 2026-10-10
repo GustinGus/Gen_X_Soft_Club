@@ -40,7 +40,7 @@ const TICKS = Array.from({ length: 9 }, (_, i) => ({ y: 150 + i * 16, x: i % 4 =
  * reproduces none; nothing is loaded, filtered or animated. No circle and no
  * large type: the disc and the title own those.
  */
-export function PaperSlip({ className, ...rest }: ObjectProps) {
+export function PaperSlip({ className, artwork, ...rest }: ObjectProps & { /** What the plate shows, in the page's language. */ artwork: string }) {
   return (
     <div className={[styles.slip, className].filter(Boolean).join(" ")} data-artwork="original" {...rest}>
       <span className={styles.folio} aria-hidden="true">
@@ -50,7 +50,7 @@ export function PaperSlip({ className, ...rest }: ObjectProps) {
       <span
         className={styles.plate}
         role="img"
-        aria-label="Original artwork of the Soft Club Archive: an entrance. A doorway of screened light stands in the dark."
+        aria-label={artwork}
       >
         <svg className={styles.art} viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
           <defs>

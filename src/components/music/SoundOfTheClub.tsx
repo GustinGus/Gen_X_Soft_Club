@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { soundOfTheClub as copy } from "@/content/music";
+import { soundOfTheClub as sound } from "@/content/music";
 import { DiscAnchor } from "@/experience/disc/DiscAnchor";
+import { useCopy } from "@/i18n/I18nProvider";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./SoundOfTheClub.module.css";
 
@@ -14,6 +15,7 @@ import styles from "./SoundOfTheClub.module.css";
  * (third DiscAnchor station) settles large behind the title.
  */
 export function SoundOfTheClub() {
+  const copy = useCopy().sound;
   const ref = useRef<HTMLElement>(null);
   useReveal(ref, 0.12);
 
@@ -27,13 +29,13 @@ export function SoundOfTheClub() {
       </div>
 
       <header className={styles.archive}>
-        <p className={styles.archiveId}>{copy.archive}</p>
+        <p className={styles.archiveId}>{sound.archive}</p>
         <p>{copy.material}</p>
-        <p className={styles.muted}>{copy.range}</p>
+        <p className={styles.muted}>{sound.range}</p>
       </header>
 
       <p className={styles.format}>
-        {copy.format.map((item) => (
+        {sound.format.map((item) => (
           <span key={item}>{item}</span>
         ))}
       </p>
@@ -52,7 +54,7 @@ export function SoundOfTheClub() {
 
       <div className={styles.question}>
         <p className={styles.questionLabel} aria-hidden="true">
-          Q.
+          {copy.questionMark}
         </p>
         <p className={styles.questionText}>
           {copy.question.map((line) => (

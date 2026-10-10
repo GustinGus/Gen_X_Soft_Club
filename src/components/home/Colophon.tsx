@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { colophon as copy } from "@/content/home";
+import { colophon } from "@/content/home";
 import { pad2 } from "@/content/music";
+import { countWord, fill } from "@/i18n/format";
+import { useCopy } from "@/i18n/I18nProvider";
 import styles from "./Colophon.module.css";
 
 /* The site's palette (tokens.css), as values: SVG paint attributes take no custom properties. */
@@ -15,9 +19,12 @@ const TICKS = Array.from({ length: 25 }, (_, i) => ({ x: i * 10 + 0.5, y: i % 6 
  *
  * The back of the sleeve: what this is, who made it, and the way on to the
  * listening index. Every count and year is read from the catalogue
- * (content/home.ts). Static on purpose: nothing here reveals or moves.
+ * (content/home.ts); the wording is the page's language. Static on purpose:
+ * nothing here reveals or moves.
  */
 export function Colophon() {
+  const dictionary = useCopy();
+  const copy = dictionary.colophon;
   const [first, last] = copy.titleLines;
 
   return (
@@ -29,7 +36,7 @@ export function Colophon() {
         </p>
         <p className={styles.muted}>{copy.issue}</p>
         <p className={`${styles.muted} ${styles.right}`}>
-          {copy.end} <span aria-hidden="true">—</span> {copy.span}
+          {copy.end} <span aria-hidden="true">—</span> {colophon.span}
         </p>
       </div>
 
@@ -57,14 +64,16 @@ export function Colophon() {
           <path d="M0 8v-8h8M112 0h8v8M120 112v8h-8M8 120h-8v-8" fill="none" stroke={CREAM} strokeWidth="1.25" opacity="0.45" />
         </svg>
         <p className={styles.muted}>
-          {copy.mark}
+          {colophon.mark}
           <br />
-          {pad2(copy.records)} / {pad2(copy.frequencies)}
+          {pad2(colophon.records)} / {pad2(colophon.frequencies)}
         </p>
       </div>
 
       <div className={styles.body}>
-        <p className={styles.deck}>{copy.deck}</p>
+        <p className={styles.deck}>
+          {fill(copy.deck, { records: countWord(dictionary, colophon.records), frequencies: countWord(dictionary, colophon.frequencies) })}
+        </p>
         <Link className={styles.cta} href="/music">
           <span className={styles.ctaIndex} aria-hidden="true">
             02

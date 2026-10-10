@@ -2,12 +2,9 @@
 
 import Link from "next/link";
 import { useId, useRef, useState, type CSSProperties } from "react";
-import {
-  artistsIn,
-  frequencies,
-  frequenciesCopy as copy,
-  type FrequencyId,
-} from "@/content/music";
+import { artistsIn, frequencies, type FrequencyId } from "@/content/music";
+import { fill } from "@/i18n/format";
+import { useCopy } from "@/i18n/I18nProvider";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./Frequencies.module.css";
 
@@ -21,6 +18,7 @@ import styles from "./Frequencies.module.css";
  * are always printed. On touch, each station carries its own atmosphere.
  */
 export function Frequencies() {
+  const copy = useCopy().frequencies;
   const ref = useRef<HTMLElement>(null);
   useReveal(ref, 0.15);
 
@@ -122,7 +120,7 @@ export function Frequencies() {
       </ol>
 
       <p className="visually-hidden" role="status" aria-live="polite">
-        {tunedFrequency ? `Tuned to ${tunedFrequency.code} ${tunedFrequency.name}` : ""}
+        {tunedFrequency ? fill(copy.tunedTo, { code: tunedFrequency.code, name: tunedFrequency.name }) : ""}
       </p>
     </section>
   );

@@ -318,32 +318,18 @@ export function archiveSpan() {
   return `${Math.min(...years)}—${Math.max(...years)}`;
 }
 
-// ---------------------------------------------------------------- section copy
+// ---------------------------------------------------------------- section data
 
-/**
- * PHASE 2A PROTOTYPE COPY. Short, identity-level, and every sentence that is
- * interpretation is labelled as such in the UI ("Curatorial note").
- */
+/*
+  What the Home's sections know that is not wording: codes, formats, and what
+  the catalogue derives. Their sentences are in the dictionaries (src/i18n).
+*/
 export const soundOfTheClub = {
   archive: "ARCHIVE_002",
-  material: "Audio material",
   /** The years of the audio material: the records themselves, never typed here. */
   range: catalogueSpan,
   /** Red Book CD audio format — a medium fact, not a claim about any record. */
   format: ["DISC 01", "44.1 kHz", "16-BIT", "STEREO"],
-  titleLines: ["The sound", "of the club"],
-  question: ["What did", "this future", "sound like?"],
-  deck: "Sound is the archive's first room. What follows is a listening index, not a history — four frequencies we tune the records to.",
-} as const;
-
-export const frequenciesCopy = {
-  label: "Index",
-  title: "Frequencies",
-  note: "Editorial curation — atmospheres, not genres.",
-  tuner: "Tuning",
-  idle: "Select a frequency",
-  inPreparation: "File in preparation",
-  open: "Open file",
 } as const;
 
 /** /music — the complete ARCHIVE_002 index. */
@@ -389,15 +375,15 @@ export const recordFileCopy = {
 
 export const afterHours = {
   file: "ARCHIVE_002.1",
-  titleLines: ["The city", "after", "midnight."],
-  /** Genre descriptors commonly used for these records; editorial tags, not definitions. */
+  /** Genre descriptors commonly used for these records; editorial tags, not definitions. They keep their names. */
   scene: ["Trip-hop", "Downtempo", "Leftfield"],
-  place: "United Kingdom",
-  curatorialNote:
-    "Filed here for how they feel, not where they came from: slow tempos, low light, the long walk home after the last train.",
+  /**
+   * The lettering of the plate and of the ticket: part of the drawings, set as
+   * drawn in every language. The plate's caption and description are wording,
+   * and are in the dictionaries.
+   */
   plate: {
     number: "Plate 02",
-    subject: "Station platform, after midnight",
     /** Art direction, not record: the lines the plate and the ticket share. */
     line: "Last train",
     platform: "Platform 02",
