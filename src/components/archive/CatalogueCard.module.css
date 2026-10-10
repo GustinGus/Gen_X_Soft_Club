@@ -118,3 +118,19 @@
     gap: var(--space-3);
   }
 }
+
+/* ---------------------------------------------------------------- portuguese */
+/* On a phone the Portuguese card ran a little long for the English measures:
+   "Cartão 01 / 12" broke before its last number, and "Nº de arquivo" took two
+   lines of the label column, short of fitting by two pixels. The number
+   stays whole and the labels get a quarter of a rem more. Nothing else
+   moves; English is not touched. */
+@media (max-width: 699px) {
+  .number:lang(pt-BR) {
+    white-space: nowrap;
+  }
+
+  .row:lang(pt-BR) {
+    grid-template-columns: 6.75rem 1fr;
+  }
+}

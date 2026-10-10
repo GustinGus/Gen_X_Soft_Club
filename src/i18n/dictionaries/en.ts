@@ -263,6 +263,17 @@ export const en = {
     region: "Archive deck SC-AU/02",
     display: "Deck display",
     controls: "Deck controls",
+    /** What the counter says to a screen reader: nothing can be played, so it shows no time. */
+    noPlaybackTime: "No playback time",
+    /**
+     * The keys are lettered in English on the unit, in every language. Where
+     * the page is in another, what each key does is said after its lettering.
+     * English has nothing to add.
+     */
+    keys: {
+      insert: "",
+      eject: "",
+    },
     announce: {
       empty: "Disc returned to its case.",
       reading: "Reading disc.",

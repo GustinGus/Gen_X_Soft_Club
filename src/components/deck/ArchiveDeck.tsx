@@ -6,7 +6,7 @@ import { catalogueSpan, type MusicRecord } from "@/content/music";
 import type { RecordFile } from "@/content/records";
 import { CanvasBoundary } from "@/experience/disc/CanvasBoundary";
 import { fill } from "@/i18n/format";
-import { useCopy } from "@/i18n/I18nProvider";
+import { useCopy, useLocale } from "@/i18n/I18nProvider";
 import { DeckControls } from "./DeckControls";
 import { DeckDiscPoster } from "./DeckDiscPoster";
 import { DeckDisplay } from "./DeckDisplay";
@@ -117,6 +117,8 @@ export function ArchiveDeck({ record, file, className }: Props) {
 
   // How the deck is named and what it says to a screen reader: the page's language. Its lettering is the unit's own.
   const copy = useCopy().deck;
+  // The lettering is English: said so where the page is not, so that it is read as English.
+  const lettering = useLocale() === "en" ? undefined : "en";
   const announcement: Record<DeckState, string> = {
     empty: copy.announce.empty,
     // Silent: the pressed key is its own feedback; two announcements per insert.
@@ -179,14 +181,24 @@ export function ArchiveDeck({ record, file, className }: Props) {
 
         <header className={styles.brand}>
           <p className={styles.maker}>Gen X Soft Club</p>
-          <p className={styles.model}>Archive Audio Unit</p>
+          <p className={styles.model} lang={lettering}>Archive Audio Unit</p>
           <p className={styles.code}>SC-AU/02</p>
         </header>
 
-        <DeckDisplay className={styles.lcd} label={copy.display} state={state} record={record} file={file} />
+        <DeckDisplay
+          className={styles.lcd}
+          label={copy.display}
+          noPlaybackTime={copy.noPlaybackTime}
+          lettering={lettering}
+          state={state}
+          record={record}
+          file={file}
+        />
         <DeckControls
           className={styles.controls}
           label={copy.controls}
+          actions={copy.keys}
+          lettering={lettering}
           state={state}
           onInsert={forced ? undefined : insert}
           onEject={forced ? undefined : eject}

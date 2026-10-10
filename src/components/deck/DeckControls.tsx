@@ -10,6 +10,10 @@ type Props = {
   onEject?: () => void;
   /** The keys' group name, in the page's language. */
   label: string;
+  /** What each key does, said after its lettering where the page is not in the lettering's language; empty where it is. */
+  actions: { insert: string; eject: string };
+  /** The language of the keys' own lettering, where the page is in another. */
+  lettering?: string;
   className?: string;
 };
 
@@ -17,12 +21,16 @@ type Props = {
  * Two keys, nothing else. Native buttons with visible labels, so they work
  * without the custom cursor. No play key: nothing can be played.
  *
+ * The lettering is the unit's own and is the same in every language. Where
+ * the page is in another, a key's name keeps its lettering (what is seen is
+ * what is said) and adds what the key does, in the page's language.
+ *
  * Focus follows the machine: when the key in use goes dead (INSERT once
  * the disc is taken, EJECT once it is out), focus moves to the live key —
  * or holds on the panel while neither is live — instead of dropping to the
  * page. Only while the user is working the keys.
  */
-export function DeckControls({ state, onInsert, onEject, label, className }: Props) {
+export function DeckControls({ state, onInsert, onEject, label, actions, lettering, className }: Props) {
   const group = useRef<HTMLDivElement>(null);
   const insert = useRef<HTMLButtonElement>(null);
   const eject = useRef<HTMLButtonElement>(null);
@@ -68,11 +76,13 @@ export function DeckControls({ state, onInsert, onEject, label, className }: Pro
         <span className={styles.glyph} aria-hidden="true">
           ▸
         </span>
-        <span>Insert disc</span>
+        <span lang={lettering}>Insert disc</span>
+        {actions.insert ? <span className="visually-hidden">{` — ${actions.insert}`}</span> : null}
       </button>
       <button ref={eject} type="button" className={styles.key} disabled={!canEject(state)} onClick={onEject}>
         <span className={styles.glyph} data-glyph="eject" aria-hidden="true" />
-        <span>Eject</span>
+        <span lang={lettering}>Eject</span>
+        {actions.eject ? <span className="visually-hidden">{` — ${actions.eject}`}</span> : null}
       </button>
     </div>
   );

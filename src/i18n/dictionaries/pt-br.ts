@@ -1,15 +1,13 @@
 import type { Dictionary } from "../dictionary";
-import { en } from "./en";
 
 /**
  * BRAZILIAN PORTUGUESE — BEING WRITTEN.
  *
- * Written so far: the home and the listening index — everything a reader of
- * those two pages is told, shown or read aloud. Still standing in for
- * English, taken from the English dictionary below and named as such: the
- * record file's own structure, the deck's announcements and a record page's
- * title and description. The language is "in-progress" (../locales.ts) and is
- * not published while it is.
+ * The whole interface is written here: the home, the listening index, the
+ * record file's structure, the deck's names and announcements, and what each
+ * page says of itself. What a record file says of its record is not in this
+ * dictionary (../records/pt-br.ts) and is still partly English: the language
+ * stays "in-progress" (../locales.ts) and is not published while it is.
  *
  * What is not translated, here or anywhere: the archive's own names (Gen X
  * Soft Club, Soft Club Archive), the names of records, artists, tracks,
@@ -157,8 +155,67 @@ export const ptBr: Dictionary = {
     back: "Voltar à entrada",
   },
 
-  // STILL ENGLISH — the record file's structure, to be written with the record pages.
-  record: en.record,
+  record: {
+    index: "Índice",
+    file: "Ficha",
+    inDeck: "Disco retirado — no deck SC-AU/02",
+    year: "Ano",
+    card: {
+      title: "Cartão de catálogo",
+      number: "Cartão",
+      fields: {
+        artist: "Artista",
+        album: "Álbum",
+        year: "Ano",
+        archiveNo: "Nº de arquivo",
+        frequency: "Frequência",
+        released: "Lançamento",
+        origin: "Origem",
+        label: "Gravadora",
+        format: "Formato",
+        runtime: "Duração",
+      },
+    },
+    pending: "Pendente",
+    sourceRequired: "Fonte necessária",
+    curatorialNote: "Nota curatorial",
+    interpretation: "Interpretação editorial — Gen X Soft Club",
+    context: "Contexto",
+    documented: "História documentada",
+    tracklist: "Lista de faixas",
+    linerNotes: "Notas de encarte",
+    tracks: "faixas",
+    untitled: "Sem título na listagem da fonte",
+    length: "Duração",
+    credits: "Créditos",
+    creditsSources: "Conforme documentado pelas fontes",
+    notes: "Notas e fontes",
+    source: "Fonte {n}",
+    sourceKinds: {
+      official: "Oficial",
+      label: "Gravadora",
+      "editorial-reference": "Referência editorial",
+    },
+    read: "Ler",
+    newTab: "(abre em nova aba)",
+    research: {
+      sourcesOnly: "Os valores vêm apenas das fontes listadas. Campos sem fonte confirmável permanecem pendentes.",
+      officialToCome: "As fontes oficiais do artista e da gravadora ainda serão consultadas para esta ficha.",
+      noListeningCopy: "Não há cópia para escuta: o arquivo não hospeda gravações.",
+      listeningCopy: "Cópia para escuta: {provider}.",
+      attached: "anexada",
+    },
+    sleeveNote: "Capa exibida: arte original do Soft Club Archive, desenhada a partir das durações das faixas desta ficha. A capa original do disco não é reproduzida.",
+    artworkNote: "Arte não digitalizada — aguardando digitalização licenciada.",
+    tabs: {
+      label: "Fichas do arquivo",
+      prev: "Ficha anterior",
+      next: "Próxima ficha",
+      startOfIndex: "Início do índice",
+      endOfIndex: "Fim do índice",
+      backToIndex: "Voltar ao índice",
+    },
+  },
 
   sleeve: {
     coverAlt: "Capa de {album}, de {artist}",
@@ -168,8 +225,23 @@ export const ptBr: Dictionary = {
     scanPending: "Digitalização pendente",
   },
 
-  // STILL ENGLISH — what the deck says to a screen reader, to be written with the record pages.
-  deck: en.deck,
+  // The unit's own lettering stays English (it is part of the object); this is how it is named and what it says aloud.
+  deck: {
+    region: "Deck do arquivo SC-AU/02",
+    display: "Visor do deck",
+    controls: "Controles do deck",
+    noPlaybackTime: "Sem tempo de reprodução",
+    keys: {
+      insert: "inserir disco",
+      eject: "ejetar",
+    },
+    announce: {
+      empty: "Disco devolvido à caixa.",
+      reading: "Lendo o disco.",
+      ready: "Disco pronto: {artist}, {album}, {year}. Não há cópia para escuta.",
+      ejecting: "Ejetando o disco.",
+    },
+  },
 
   meta: {
     site: {
@@ -180,7 +252,10 @@ export const ptBr: Dictionary = {
       title: "{archive} — Índice de escuta — Soft Club Archive",
       description: "{records} discos arquivados em {frequencies} frequências: {names}.",
     },
-    // STILL ENGLISH — a record page's title and description.
-    record: en.meta.record,
+    record: {
+      // names and a code only: the same in every language
+      title: "{artist} — {album} · {catalogue} — Soft Club Archive",
+      description: "{archive} / {code} {frequency}. Ficha do disco: {artist}, {album} ({year}).",
+    },
   },
 };
