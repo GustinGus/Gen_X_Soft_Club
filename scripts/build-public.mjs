@@ -3,14 +3,17 @@
  *
  * The one way to build the public edition: it sets the switch, builds into a
  * folder of its own that starts empty, and then inspects what was built. It
- * succeeds only if all three do.
+ * succeeds only if every step does; if one fails, what was built is removed.
  *
  *   1. PUBLIC_BUILD=1 — next.config.ts stops unless public/ is clean and every
  *      record has a sleeve.
  *   2. next build → .next-public (emptied first, so nothing a private build
  *      left behind can be in it).
- *   3. scripts/verify-public-build.mjs — reads the result and fails on any
- *      trace of the private artwork.
+ *   3. scripts/check-links.mjs — reads the pages built and fails if a link
+ *      leaves its page's language or leads nowhere.
+ *   4. scripts/verify-public-build.mjs — reads the result and fails on any
+ *      trace of the private artwork, on a page nobody listed, or on a language
+ *      that is not finished. It leaves the record of the inspection, last.
  */
 import { spawnSync } from "node:child_process";
 import { rmSync } from "node:fs";
@@ -37,5 +40,6 @@ function run(label, args) {
 
 rmSync(join(root, DIST), { recursive: true, force: true });
 run("next build", [join(root, "node_modules/next/dist/bin/next"), "build"]);
+run("check links", [join(root, "scripts/check-links.mjs"), DIST]);
 run("verify", [join(root, "scripts/verify-public-build.mjs")]);
 console.log(`\n[public build] OK — ${DIST} holds the public edition.`);
