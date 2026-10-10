@@ -1,7 +1,7 @@
 /**
  * RECORD FILES — the catalogue behind /music/[slug].
  *
- * Two kinds of text live here and must never be confused:
+ * Two kinds of text make a file and must never be confused:
  *
  *   DOCUMENTED  — `Sourced` fields. A value can only exist together with the
  *                 source it was taken from; otherwise the field stays
@@ -11,6 +11,11 @@
  *   EDITORIAL   — `curatorialNote`. The archive's own interpretation, written
  *                 by Gen X Soft Club and always labelled as such in the UI.
  *                 It makes no historical claims.
+ *
+ * This module holds each file's DATA: what is the same in every language,
+ * and which sources answer for which field. What a file says — its context,
+ * its notes, the wording of its short fields — is in each language's record
+ * texts (src/i18n/records). See "data and wording" below.
  *
  * Research pass (2026-09-29): values below were read from the cited
  * articles' infobox / track listing (wikitext), not from summaries.
@@ -110,10 +115,9 @@ export type RecordFile = {
   the shape every component reads.
 
   So a footnote can never drift from its claim: the numbers stay here, with
-  the field, and a translation carries wording only.
-
-  Still written here in full, and moving to the record texts next: context,
-  curatorialNote and researchNotes.
+  the field, and a translation carries wording only. The same holds for what
+  is counted: how many paragraphs a context has and how many research notes a
+  file carries are said here, and every language must bring exactly as many.
 */
 
 /** Wording kept in the record's own texts, under this key. */
@@ -130,6 +134,12 @@ type Documented = { status: "pending" } | { status: "documented"; sources: reado
  */
 type Dated = { status: "pending" } | { status: "dated"; date: string; sources: readonly number[]; note?: string };
 
+/**
+ * Documented history: here, how many paragraphs it runs to and the sources
+ * that answer for the whole of it. The paragraphs are in the record texts.
+ */
+type Narrated = { status: "pending" } | { status: "narrated"; paragraphs: number; sources: readonly number[] };
+
 type CreditData = {
   role: keyof RecordTexts["roles"];
   /** Names as they are; a place or a description that is wording is a TextKey. */
@@ -138,12 +148,15 @@ type CreditData = {
 };
 
 /** A record file before it is given a language. */
-export type RecordData = Omit<RecordFile, "released" | "origin" | "format" | "tracklist" | "credits"> & {
+export type RecordData = Omit<RecordFile, "released" | "origin" | "format" | "tracklist" | "context" | "credits" | "curatorialNote" | "researchNotes"> & {
   released: Dated;
   origin: Documented;
   format: Documented;
   tracklist: Sourced<{ edition: keyof RecordTexts["editions"]; rows: readonly TrackRow[] }>;
+  context: Narrated;
   credits: Sourced<readonly CreditData[]>;
+  /** How many archivist's notes the file carries. Absent: none. */
+  researchNotes?: number;
 };
 
 // ---------------------------------------------------------------- helpers
@@ -177,6 +190,8 @@ const credit = (role: CreditData["role"], names: CreditData["names"], note?: Cre
   note ? { role, names, note } : { role, names };
 
 const documented = (sources: readonly number[] = [0]): Documented => ({ status: "documented", sources });
+
+const narrated = (paragraphs: number, sources: readonly number[]): Narrated => ({ status: "narrated", paragraphs, sources });
 
 const dated = (date: string, sources: readonly number[] = [0], note?: string): Dated =>
   note ? { status: "dated", date, sources, note } : { status: "dated", date, sources };
@@ -213,19 +228,12 @@ const recordData: readonly RecordData[] = [
     label: sourced("Go! Beat / London"),
     format: documented([6]),
     runtime: pending,
-    researchNotes: [
-      "Runtime held: the reference lists 49:21, its listed track lengths add up to 48:48, and the current digital edition runs 49:03.",
-    ],
+    researchNotes: 1,
     tracklist: sourced({
       edition: "standard",
       rows: tracklists["SC—AH—01"],
     }),
-    context: sourced(
-      "Portishead took shape around Bristol's Coach House Studios. Geoff Barrow was working there as a studio junior while Massive Attack recorded Blue Lines in 1991, and was given studio time for his own material; he met singer Beth Gibbons the same year. Guitarist Adrian Utley and engineer Dave McDonald completed the working group." +
-      "\n\n" +
-      "Rather than sample other people's records alone, the band recorded their own sessions, had them cut to vinyl and then sampled the worn results, looking for the grain of old recordings. The cover is a still of Gibbons from To Kill a Dead Man, the short black-and-white film the band made and scored in 1994. Dummy was released in August 1994 and went on to win the Mercury Music Prize.",
-      [2, 3, 4, 5],
-    ),
+    context: narrated(2, [2, 3, 4, 5]),
     credits: sourced(
       [
         credit("vocals", ["Beth Gibbons"]),
@@ -236,8 +244,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2, 3, 4, 5],
     ),
-    curatorialNote:
-      "Filed first because it sets the light for the whole drawer: one lamp left on, a slow pulse under the floor, a voice that sounds overheard rather than performed.",
     audio: none,
   },
   {
@@ -254,19 +260,12 @@ const recordData: readonly RecordData[] = [
     label: sourced("Clean Up / Virgin"),
     format: documented([0]),
     runtime: pending,
-    researchNotes: [
-      "Runtime held: the reference lists 52:57, the original version's track lengths add up to 48:47, and the current official edition runs 46:28 with shorter versions of three tracks.",
-    ],
+    researchNotes: 1,
     tracklist: sourced({
       edition: "original",
       rows: tracklists["SC—AH—02"],
     }),
-    context: sourced(
-      "Sneaker Pimps began in Hartlepool with Chris Corner and Liam Howe, who had been recording on an eight-track machine in Howe's bedroom since 1992 and released an EP as Line of Flight on the Clean Up label in 1993. Wanting a voice for what had been instrumental music, they recruited Kelli Dayton after hearing her sing in a pub; the songs had first been written with Corner singing, with lyrics by Ian Pickering." +
-      "\n\n" +
-      "Becoming X was first released in the United Kingdom on 19 August 1996. Against the band's own predictions it became a hit, and they went on to tour the record for eighteen months.",
-      [0, 2, 3],
-    ),
+    context: narrated(2, [0, 2, 3]),
     credits: sourced(
       [
         credit("vocals", ["Kelli Dayton"]),
@@ -274,8 +273,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2, 3],
     ),
-    curatorialNote:
-      "The hour when the house lights come up and nobody wants to leave yet. Sweet on the surface, something colder underneath — filed here for that double exposure.",
     audio: none,
   },
   {
@@ -298,12 +295,7 @@ const recordData: readonly RecordData[] = [
       edition: "standard",
       rows: tracklists["SC—AH—03"],
     }),
-    context: sourced(
-      "Mezzanine was made by a group pulling apart. Neil Davidge, producing with Massive Attack, worked with the three members largely one at a time, and has described sessions in which one would leave the room as another arrived. Mark “Spike” Stent mixed the record, and has recalled finished mixes being taken away and reworked into parts of other tracks. Elizabeth Fraser of Cocteau Twins sings “Teardrop”; Horace Andy is the other guest voice. The working title was Damaged Goods." +
-      "\n\n" +
-      "The sleeve was art-directed by Robert Del Naja and Tom Hingston around Nick Knight's photographs of a stag beetle, taken at the Natural History Museum in London and combined into one image. The album was released on 20 April 1998.",
-      [2, 3, 4, 5],
-    ),
+    context: narrated(2, [2, 3, 4, 5]),
     credits: sourced(
       [
         credit("production", ["Neil Davidge", "Massive Attack"]),
@@ -315,8 +307,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2, 3, 4],
     ),
-    curatorialNote:
-      "The heaviest object in this drawer. We hear it as concrete after rain: low ceilings, long corridors, the bass arriving a moment before the room does.",
     audio: none,
   },
 
@@ -340,12 +330,7 @@ const recordData: readonly RecordData[] = [
       edition: "standard",
       rows: tracklists["SC—SF—04"],
     }),
-    context: sourced(
-      "Jean-Benoît Dunckel and Nicolas Godin recorded Moon Safari on an eight-track machine with analogue instruments from the 1970s — Godin has said they bought them because they were the most affordable instruments available. The string parts were recorded at Abbey Road Studios in London with the arranger David Whitaker, and the American singer Beth Hirsch sings “All I Need” and “You Make It Easy”. Stéphane Briat engineered." +
-      "\n\n" +
-      "The album was released on 16 January 1998 and reached number 6 in the United Kingdom and number 21 in France.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("engineering", ["Stéphane Briat"]),
@@ -356,8 +341,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2, 3],
     ),
-    curatorialNote:
-      "Pale plastic and afternoon light. The archive's picture of a future that arrived softly, with the windows open and nothing urgent left to do.",
     audio: none,
   },
   {
@@ -388,12 +371,7 @@ const recordData: readonly RecordData[] = [
       edition: "standard",
       rows: tracklists["SC—SF—05"],
     }),
-    context: sourced(
-      "Moby made Play alone in his home studio on Mott Street in Manhattan, on mostly second-hand equipment. Several of its tracks are built around voices sampled from Sounds of the South, a box set of field recordings made by Alan Lomax. Warner Bros., Sony and RCA turned the record down before V2 took it for North America; Mute released it elsewhere on 17 May 1999." +
-      "\n\n" +
-      "It entered the UK chart at number 33 and sold slowly at first. All eighteen tracks were eventually licensed for commercial use, which is how many listeners first heard them, and the album went on to sell around twelve million copies.",
-      [2, 3, 4, 5],
-    ),
+    context: narrated(2, [2, 3, 4, 5]),
     credits: sourced(
       [
         credit("production", ["Moby"]),
@@ -401,8 +379,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2, 4],
     ),
-    curatorialNote:
-      "An early-morning record in this archive: the city through a train window, grey turning to white, calm arriving before the day does.",
     audio: none,
   },
   {
@@ -429,20 +405,13 @@ const recordData: readonly RecordData[] = [
       edition: "standard",
       rows: tracklists["SC—SF—06"],
     }),
-    context: sourced(
-      "Henry Binns and Sam Hardaker learned their trade as tape operators at RAK Studios in London, working on their own material in a small programming room during downtime. Their first public work as Zero 7 was a 1997 remix of Radiohead's “Climbing Up the Walls”, followed by two limited EPs." +
-      "\n\n" +
-      "Simple Things was released in the United Kingdom on 23 April 2001 on Ultimate Dilemma, with vocals from Sia Furler, Sophie Barker and Mozez; Binns has said Sia came in at the last minute. The album was shortlisted for the Mercury Music Prize, and an edition with additional tracks followed in the United States in November 2001.",
-      [2, 3, 4, 5],
-    ),
+    context: narrated(2, [2, 3, 4, 5]),
     credits: sourced(
       [
         credit("vocals", ["Sia Furler", "Sophie Barker", "Mozez"]),
       ],
       [2, 3],
     ),
-    curatorialNote:
-      "Filed at the far end of the frequency, where the future turns domestic: a quiet flat, a record left playing, light moving slowly across the floor.",
     audio: none,
   },
 
@@ -474,12 +443,7 @@ const recordData: readonly RecordData[] = [
       edition: "listed",
       rows: tracklists["SC—CF—07"],
     }),
-    context: sourced(
-      "Josh Davis built Endtroducing..... from records. He worked on an Akai MPC60 sampler bought in October 1992, a turntable and an Alesis ADAT recorder, drawing on vinyl found in the basement of Rare Records in Sacramento, where he had spent years earning the owner's trust. The album was mixed at the Glue Factory, Dan “the Automator” Nakamura's studio in San Francisco. The cover photograph was taken in the same record shop." +
-      "\n\n" +
-      "It was released on James Lavelle's Mo' Wax label in September 1996. In 2001 Guinness World Records listed it as the first completely sampled album.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("production", ["DJ Shadow"]),
@@ -488,8 +452,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2],
     ),
-    curatorialNote:
-      "We file it as a map more than a record: fragments laid end to end until they read like streets, stations and long stretches of night between them.",
     audio: none,
   },
   {
@@ -519,20 +481,13 @@ const recordData: readonly RecordData[] = [
       edition: "listed",
       rows: tracklists["SC—CF—08"],
     }),
-    context: sourced(
-      "Dig Your Own Hole was released on 7 April 1997 and went to number one in the United Kingdom. It carried two UK number-one singles: “Setting Sun”, sung by Noel Gallagher of Oasis, which reached the top in late 1996, and “Block Rockin' Beats”." +
-      "\n\n" +
-      "The record also travelled: it was certified gold in the United States within five months, and “Block Rockin' Beats” won the 1998 Grammy Award for Best Rock Instrumental Performance.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("vocals", ["Noel Gallagher"], "“Setting Sun”"),
       ],
       [3],
     ),
-    curatorialNote:
-      "The frequency at full volume: signage, strobe, a crowd moving in one direction. Filed here for momentum — the city as something that carries you.",
     audio: none,
   },
   {
@@ -558,12 +513,7 @@ const recordData: readonly RecordData[] = [
       edition: "listed",
       rows: tracklists["SC—CF—09"],
     }),
-    context: sourced(
-      "Norman Cook made his second Fatboy Slim album at home in Brighton, on an Atari ST computer and two Akai S950 samplers, with engineer Simon Thornton. “Praise You” is built on the voice of Camille Yarbrough, from her 1975 recording “Take Yo' Praise”." +
-      "\n\n" +
-      "The album was released on Skint in October 1998, entered the UK chart at number 2 and later reached number 1. The cover photograph was taken at the 1983 Fat People's Festival in Virginia; the man in it has never been identified.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("production", ["Norman Cook"]),
@@ -572,8 +522,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2],
     ),
-    curatorialNote:
-      "Daylight after a night out: loud, bright, slightly delirious. Kept in this drawer for its sense of the city in motion, never quite standing still.",
     audio: none,
   },
 
@@ -592,17 +540,12 @@ const recordData: readonly RecordData[] = [
     label: sourced("Parlophone / Capitol"),
     format: documented(),
     runtime: sourced("53:21"),
-    researchNotes: ["Released first in Japan on 21 May 1997; the card prints the United Kingdom date."],
+    researchNotes: 1,
     tracklist: sourced({
       edition: "listed",
       rows: tracklists["SC—AS—10"],
     }),
-    context: sourced(
-      "Radiohead recorded at St Catherine's Court, a mansion near Bath owned by the actress Jane Seymour. The band produced the record themselves with Nigel Godrich. The artwork was made by Stanley Donwood and Thom Yorke on a computer, under a rule that nothing could be erased." +
-      "\n\n" +
-      "The album appeared in Japan on 21 May 1997 and in the United Kingdom on 16 June 1997, where it reached number 1; it entered the US Billboard 200 at number 21.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("production", ["Nigel Godrich", "Radiohead"]),
@@ -611,8 +554,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2],
     ),
-    curatorialNote:
-      "Filed for the tension it holds between calm and alarm: the smooth surfaces of new technology, heard from somewhere just behind the glass.",
     audio: none,
   },
   {
@@ -634,8 +575,6 @@ const recordData: readonly RecordData[] = [
     }),
     context: pending,
     credits: pending,
-    curatorialNote:
-      "Printed matter set to sound: repeating patterns, clean lines, colours laid slightly off-register. The most graphic record in this drawer.",
     audio: none,
   },
   {
@@ -660,12 +599,7 @@ const recordData: readonly RecordData[] = [
       edition: "listed",
       rows: tracklists["SC—AS—12"],
     }),
-    context: sourced(
-      "Psyence Fiction was three years in the making. James Lavelle, who ran Mo' Wax, conceived the record and recruited its guests; DJ Shadow built the music, largely from samples, on an Akai MPC3000 at home. Jim Abbiss then spent the best part of a year mixing it." +
-      "\n\n" +
-      "The guests include Richard Ashcroft on “Lonely Soul”, Thom Yorke, Mike D of Beastie Boys, Badly Drawn Boy on “Nursery Rhyme”, Jason Newsted of Metallica on bass and Mark Hollis of Talk Talk, with string arrangements by Wil Malone. The album was released on Mo' Wax on 24 August 1998.",
-      [2, 3],
-    ),
+    context: narrated(2, [2, 3]),
     credits: sourced(
       [
         credit("production", ["UNKLE"], "James Lavelle, DJ Shadow"),
@@ -679,8 +613,6 @@ const recordData: readonly RecordData[] = [
       ],
       [2],
     ),
-    curatorialNote:
-      "A record filed as a poster: bold, layered, assembled from other signals. It closes the first index on a note of tension rather than rest.",
     audio: none,
   },
 ];
@@ -688,7 +620,19 @@ const recordData: readonly RecordData[] = [
 // ---------------------------------------------------------------- assembly
 
 /** What a record's own texts may hold. Which of these a record has is decided by its data, and checked. */
-type OwnTexts = { origin?: string; originNote?: string; format?: string; formatNote?: string; credits?: Readonly<Record<string, string>> };
+type OwnTexts = {
+  origin?: string;
+  originNote?: string;
+  format?: string;
+  formatNote?: string;
+  context?: readonly string[];
+  credits?: Readonly<Record<string, string>>;
+  curatorialNote?: string;
+  researchNotes?: readonly string[];
+};
+
+/** How a context's paragraphs are set apart in a RecordFile: a blank line (the sheet splits on it). */
+const PARAGRAPH = "\n\n";
 
 /**
  * A record's data given a language: the RecordFile the page and the deck read.
@@ -708,7 +652,7 @@ function assemble(data: RecordData, texts: RecordTexts, locale: Locale): RecordF
     for (const index of sources) if (!Number.isInteger(index) || index < 0 || index >= data.sources.length) stop(`${field} cites source ${index + 1}, which the file does not list`);
     return sources;
   };
-  for (const field of ["label", "runtime", "context"] as const) {
+  for (const field of ["label", "runtime"] as const) {
     const value = data[field];
     if (value.status === "sourced") cited(field, value.sources);
   }
@@ -752,6 +696,40 @@ function assemble(data: RecordData, texts: RecordTexts, locale: Locale): RecordF
     return { ...state, sources: cited("tracklist", state.sources), value: { edition, tracks } };
   })();
 
+  const context = ((): Sourced<string> => {
+    const state = data.context;
+    const paragraphs = own.context;
+    if (state.status === "pending") {
+      if (paragraphs !== undefined) stop("context is pending, but its texts hold wording for it");
+      return { status: "pending" };
+    }
+    if (!paragraphs || paragraphs.length === 0) return stop("context is documented, but its texts hold no wording for it");
+    if (paragraphs.length !== state.paragraphs) stop(`context runs to ${state.paragraphs} paragraph(s), but its texts hold ${paragraphs.length}`);
+    paragraphs.forEach((paragraph, i) => {
+      if (typeof paragraph !== "string" || paragraph.trim() === "") stop(`context: paragraph ${i + 1} is empty`);
+      if (paragraph.includes("\n")) stop(`context: paragraph ${i + 1} holds a line break; a paragraph is one item of the list`);
+    });
+    return { status: "sourced", value: paragraphs.join(PARAGRAPH), sources: cited("context", state.sources) };
+  })();
+
+  const curatorialNote = own.curatorialNote;
+  if (typeof curatorialNote !== "string" || curatorialNote.trim() === "") return stop("its texts hold no curatorial note");
+
+  const researchNotes = ((): readonly string[] | undefined => {
+    const expected = data.researchNotes ?? 0;
+    const notes = own.researchNotes;
+    if (!Number.isInteger(expected) || expected < 0) stop(`researchNotes: ${expected} is not a number of notes`);
+    if ((notes?.length ?? 0) !== expected) stop(`the file carries ${expected} research note(s), but its texts hold ${notes?.length ?? 0}`);
+    if (expected === 0) {
+      if (notes !== undefined) stop("the file carries no research notes, but its texts hold a list of them");
+      return undefined;
+    }
+    notes!.forEach((note, i) => {
+      if (typeof note !== "string" || note.trim() === "") stop(`research note ${i + 1} is empty`);
+    });
+    return notes;
+  })();
+
   const asked = new Set<string>();
   const wording = (value: string | TextKey): string => {
     if (typeof value === "string") return value;
@@ -771,7 +749,23 @@ function assemble(data: RecordData, texts: RecordTexts, locale: Locale): RecordF
   const unasked = Object.keys(own.credits ?? {}).filter((key) => !asked.has(key));
   if (unasked.length > 0) stop(`its texts hold credit wording nothing asks for: ${unasked.join(", ")}`);
 
-  return { ...data, released, origin: worded("origin"), format: worded("format"), tracklist, credits };
+  // Field by field, in the order a file has always been written in: the deck is handed this object as it is.
+  return {
+    catalogue: data.catalogue,
+    titleLines: data.titleLines,
+    sources: data.sources,
+    released,
+    origin: worded("origin"),
+    label: data.label,
+    format: worded("format"),
+    runtime: data.runtime,
+    ...(researchNotes ? { researchNotes } : {}),
+    tracklist,
+    context,
+    credits,
+    curatorialNote,
+    audio: data.audio,
+  };
 }
 
 /** The file of a record, in a language: its data here, its wording from that language's record texts. */
