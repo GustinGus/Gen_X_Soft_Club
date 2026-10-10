@@ -22,7 +22,7 @@
  * (public-edition-verified.json), tied to its BUILD_ID. It is a record, not a
  * safeguard: the safeguard is running this.
  */
-import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -34,12 +34,83 @@ const STAMP = "public-edition-verified.json";
 const problems = [];
 const fail = (check, message) => problems.push(`[${check}] ${message}`);
 
-function filesUnder(dir) {
+/** More entries than any build of this site holds: past this, the folder is not what it is taken for. */
+const MOST_ENTRIES = 200_000;
+let linksFollowed = 0;
+
+/**
+ * Every file under a folder, as the paths they are found at.
+ *
+ * Each entry is taken for what it is once links are followed, never for what
+ * its directory entry says: a link to a folder is a folder (read as a file it
+ * stops the inspection — EISDIR). Links are followed only while they stay in
+ * the folder being read. One that leads out of it, or to nothing, is a
+ * problem: what it points to was not built here, and what cannot be read
+ * cannot be vouched for. A link back to a folder it sits in is followed once.
+ * Whatever is wrong is reported with its path, under `check`.
+ */
+function filesUnder(dir, check) {
   if (!existsSync(dir)) return [];
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    return entry.isDirectory() ? filesUnder(path) : [path];
-  });
+  let home;
+  try {
+    home = realpathSync(dir);
+  } catch (error) {
+    fail(check, `${rel(dir)} cannot be resolved (${error.code})`);
+    return [];
+  }
+  const within = (real) => real === home || real.startsWith(home + sep);
+  const files = [];
+  let entries = 0;
+
+  const walk = (current, above) => {
+    let listing;
+    try {
+      listing = readdirSync(current, { withFileTypes: true });
+    } catch (error) {
+      fail(check, `${rel(current)} cannot be listed (${error.code})`);
+      return;
+    }
+    for (const entry of listing) {
+      const path = join(current, entry.name);
+      if (++entries > MOST_ENTRIES) {
+        if (entries === MOST_ENTRIES + 1) fail(check, `${rel(dir)} holds more than ${MOST_ENTRIES} entries (at ${rel(path)}): not read to the end`);
+        return;
+      }
+      let real, stat;
+      try {
+        real = realpathSync(path);
+        stat = statSync(path);
+      } catch (error) {
+        fail(check, `${rel(path)} cannot be read (${error.code}): a link to nothing, or one that never ends?`);
+        continue;
+      }
+      if (!within(real)) {
+        fail(check, `${rel(path)} is a link out of ${rel(dir)}, to ${real}: what it points to is not part of what was inspected`);
+        continue;
+      }
+      if (entry.isSymbolicLink()) linksFollowed += 1;
+      if (stat.isDirectory()) {
+        // already being read, further up: a loop
+        if (!above.includes(real)) walk(path, [...above, real]);
+      } else if (stat.isFile()) {
+        files.push(path);
+      } else {
+        fail(check, `${rel(path)} is neither a file nor a folder`);
+      }
+    }
+  };
+  walk(dir, [home]);
+  return files;
+}
+
+/** A file's bytes, or null with the problem reported: a file that cannot be read cannot be vouched for. */
+function bytesOf(path, check) {
+  try {
+    return readFileSync(path);
+  } catch (error) {
+    fail(check, `${rel(path)} cannot be read (${error.code})`);
+    return null;
+  }
 }
 
 if (!existsSync(join(dist, "BUILD_ID"))) {
@@ -64,7 +135,7 @@ function publicFilesAllowed() {
 }
 
 const allowed = publicFilesAllowed();
-const published = filesUnder(join(root, "public")).map((path) => relative(join(root, "public"), path).replaceAll("\\", "/"));
+const published = filesUnder(join(root, "public"), "public/").map((path) => relative(join(root, "public"), path).replaceAll("\\", "/"));
 const unexpected = published.filter((file) => !allowed.includes(file));
 if (unexpected.length > 0) fail("public/", `${unexpected.length} file(s) would be published that are not meant to be: ${unexpected.slice(0, 12).join(", ")}`);
 
@@ -83,10 +154,10 @@ function imageKind(bytes) {
 }
 
 const cache = join(dist, "cache") + sep;
-const everything = filesUnder(dist);
+const everything = filesUnder(dist, "build");
 const built = everything.filter((path) => !path.startsWith(cache));
 const cached = everything.filter((path) => path.startsWith(cache));
-const kept = filesUnder(join(dist, "cache", "images"));
+const kept = filesUnder(join(dist, "cache", "images"), "images");
 if (kept.length > 0) fail("images", `${kept.length} optimised image(s) are kept in ${rel(join(dist, "cache", "images"))}`);
 
 // ---------------------------------------------------------------- C. private data
@@ -100,9 +171,9 @@ if (blocks.length === 0 || !blocks.some((block) => block[1] === "reference-artwo
 /** Everything else the project says: a word the private blocks share with it cannot tell a leak from the archive's own text. */
 const elsewhere =
   source.replace(BLOCK, "") +
-  filesUnder(join(root, "src"))
+  filesUnder(join(root, "src"), "source")
     .filter((path) => /\.(ts|tsx|css)$/.test(path) && !path.endsWith(join("content", "music.ts")))
-    .map((path) => readFileSync(path, "utf8"))
+    .map((path) => bytesOf(path, "source")?.toString("utf8") ?? "")
     .join("\n");
 
 const literals = new Set();
@@ -120,10 +191,11 @@ const quoted = (found) => `${found.slice(0, 4).map((text) => JSON.stringify(text
 
 let scanned = 0;
 for (const path of built) {
-  const bytes = readFileSync(path);
+  const bytes = bytesOf(path, "build");
+  if (bytes === null) continue;
   scanned += bytes.length;
   const kind = imageKind(bytes);
-  if (kind) fail("images", `${rel(path)} is a ${kind} image (${statSync(path).size} bytes)`);
+  if (kind) fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)`);
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} carries ${found.length} private text(s): ${quoted(found)}`);
 }
@@ -131,7 +203,8 @@ for (const path of built) {
 // The cache is not published, and is read for the private texts all the same (see the note at the top).
 let scannedCache = 0;
 for (const path of cached) {
-  const bytes = readFileSync(path);
+  const bytes = bytesOf(path, "build");
+  if (bytes === null) continue;
   scannedCache += bytes.length;
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} (build cache) carries ${found.length} private text(s): ${quoted(found)}`);
@@ -156,7 +229,8 @@ const home = read(page("index.html"));
 if (home === null) fail("edition", "the home (/) was not built");
 
 for (const path of built.filter((file) => /\.(html|rsc)$/.test(file))) {
-  const text = readFileSync(path, "utf8");
+  const text = bytesOf(path, "edition")?.toString("utf8");
+  if (text === undefined) continue;
   if (text.includes("/_next/image")) fail("edition", `${rel(path)} asks the image optimiser for a file`);
   if (/<img\b/.test(text)) fail("edition", `${rel(path)} contains an <img>`);
 }
@@ -165,6 +239,7 @@ for (const path of built.filter((file) => /\.(html|rsc)$/.test(file))) {
 const mb = (bytes) => (bytes / 1e6).toFixed(1);
 console.log(`[verify] ${rel(dist)}: ${built.length} files, ${mb(scanned)} MB read | build cache (not published): ${cached.length} files, ${mb(scannedCache)} MB read for private texts`);
 console.log(`[verify] public/: ${published.length} file(s), ${allowed.length} allowed | private texts looked for: ${forbidden.length} | shared with the archive's own text, not looked for: ${shared.length}`);
+if (linksFollowed > 0) console.log(`[verify] links followed, each staying in the folder it was found in: ${linksFollowed}`);
 console.log(`[verify] records: ${slugs.length} | pages with the archive's sleeve: ${slugs.filter((slug) => sleeves(read(page(`music/${slug}.html`)) ?? "") > 0).length}`);
 
 if (problems.length > 0) {
