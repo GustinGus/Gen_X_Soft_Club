@@ -14,6 +14,8 @@ import type { RecordFile } from "@/content/records";
 import { sleeveOf } from "@/content/sleeves";
 import type { Dictionary } from "@/i18n/dictionary";
 import { fill } from "@/i18n/format";
+import { href } from "@/i18n/href";
+import type { Locale } from "@/i18n/locales";
 import { ArchiveDeck } from "@/components/deck/ArchiveDeck";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import { CardStock } from "./CardStock";
@@ -41,7 +43,9 @@ import styles from "./RecordSheet.module.css";
  * Each file is lit by its frequency's room. Documented fields are sourced
  * or PENDING; the curatorial note is labelled as interpretation.
  */
-export function RecordSheet({ record, file, copy: dictionary }: { record: MusicRecord; file: RecordFile; copy: Dictionary }) {
+type Props = { record: MusicRecord; file: RecordFile; locale: Locale; copy: Dictionary };
+
+export function RecordSheet({ record, file, locale, copy: dictionary }: Props) {
   const copy = dictionary.record;
   const frequency = frequencyOf(record.frequency);
   const { prev, next } = neighboursOf(record);
@@ -59,7 +63,7 @@ export function RecordSheet({ record, file, copy: dictionary }: { record: MusicR
       <span className={atmosphere.atmosphere} data-atmosphere={frequency.id} aria-hidden="true" />
 
       <header className={styles.folio}>
-        <Link className={styles.back} href={`/music#${frequency.id}`} transitionTypes={["archive-return"]}>
+        <Link className={styles.back} href={href(locale, `/music#${frequency.id}`)} transitionTypes={["archive-return"]}>
           <span aria-hidden="true">←</span> {copy.index}
         </Link>
         <p className={styles.fileCode}>
@@ -199,7 +203,7 @@ export function RecordSheet({ record, file, copy: dictionary }: { record: MusicR
       </section>
 
       <div className={styles.tabs}>
-        <FileTabs prev={prev} next={next} copy={copy.tabs} />
+        <FileTabs prev={prev} next={next} locale={locale} copy={copy.tabs} />
       </div>
 
       <SheetFocus targetId={titleId} />

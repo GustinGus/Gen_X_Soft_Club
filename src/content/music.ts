@@ -12,6 +12,8 @@
  * index (/music) and one file per record (/music/[slug]).
  */
 
+import type { SiteHref } from "@/i18n/href";
+
 export type FrequencyId = "after-hours" | "soft-future" | "city-frequency" | "alternative-signal";
 
 /** Where a piece of data stands editorially. */
@@ -73,8 +75,8 @@ export type Frequency = {
   status: "open" | "in-preparation";
   /** Atmosphere words for the index — editorial, not taxonomy. */
   atmosphere: readonly string[];
-  /** Where "Open file" leads: the home's own file (AFTER HOURS) or its drawer in /music. */
-  href?: string;
+  /** Where "Open file" leads: the home's own file (AFTER HOURS) or its drawer in /music. As English addresses it. */
+  href?: SiteHref;
   /** Night frequencies print light on dark (same split as the tuner). */
   tone: "night" | "day";
 };

@@ -56,7 +56,7 @@ export default async function RecordPage({ params }: PageProps<"/music/[slug]">)
       default="none"
     >
       <main>
-        <RecordSheet record={record} file={file} copy={await getDictionary(defaultLocale)} />
+        <RecordSheet record={record} file={file} locale={defaultLocale} copy={await getDictionary(defaultLocale)} />
       </main>
     </ViewTransition>
   );

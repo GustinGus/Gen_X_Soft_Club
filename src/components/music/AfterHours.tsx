@@ -6,7 +6,8 @@ import { ArchiveSleeve } from "@/components/archive/ArchiveSleeve";
 import { NightArchivePlate } from "@/components/editorial/NightArchive";
 import { afterHours as section, frequencies, pad2, recordsIn, spanOf } from "@/content/music";
 import { fill } from "@/i18n/format";
-import { useCopy } from "@/i18n/I18nProvider";
+import { href } from "@/i18n/href";
+import { useCopy, useLocale } from "@/i18n/I18nProvider";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./AfterHours.module.css";
 
@@ -24,6 +25,7 @@ const shelfOf = (catalogue: string) => catalogue.split("—").slice(0, 2).join("
  * the records themselves. The curatorial note is labelled as interpretation.
  */
 export function AfterHours() {
+  const locale = useLocale();
   const dictionary = useCopy();
   const copy = dictionary.afterHours;
   const ref = useRef<HTMLElement>(null);
@@ -121,7 +123,7 @@ export function AfterHours() {
                   <h3 id={`record-${record.number}`} className={styles.recordTitle}>
                     <Link
                       className={styles.recordLink}
-                      href={`/music/${record.slug}`}
+                      href={href(locale, `/music/${record.slug}`)}
                       transitionTypes={["archive-open"]}
                       data-cursor="open"
                     >

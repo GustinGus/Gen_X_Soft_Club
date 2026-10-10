@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useId, useRef, useState, type CSSProperties } from "react";
 import { artistsIn, frequencies, type FrequencyId } from "@/content/music";
 import { fill } from "@/i18n/format";
-import { useCopy } from "@/i18n/I18nProvider";
+import { href } from "@/i18n/href";
+import { useCopy, useLocale } from "@/i18n/I18nProvider";
 import { useReveal } from "@/motion/useReveal";
 import styles from "./Frequencies.module.css";
 
@@ -18,6 +19,7 @@ import styles from "./Frequencies.module.css";
  * are always printed. On touch, each station carries its own atmosphere.
  */
 export function Frequencies() {
+  const locale = useLocale();
   const copy = useCopy().frequencies;
   const ref = useRef<HTMLElement>(null);
   useReveal(ref, 0.15);
@@ -107,7 +109,7 @@ export function Frequencies() {
                 <p className={styles.artists}>{artists.join(" / ")}</p>
                 <p className={styles.atmosphereWords}>{f.atmosphere.join(" · ")}</p>
                 {f.status === "open" && f.href ? (
-                  <Link className={styles.open} href={f.href}>
+                  <Link className={styles.open} href={href(locale, f.href)}>
                     {copy.open} <span aria-hidden="true">{f.href.startsWith("#") ? "↓" : "→"}</span>
                   </Link>
                 ) : (

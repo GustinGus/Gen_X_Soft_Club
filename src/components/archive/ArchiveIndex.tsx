@@ -10,6 +10,8 @@ import {
   spanOf,
 } from "@/content/music";
 import type { Dictionary } from "@/i18n/dictionary";
+import { href } from "@/i18n/href";
+import type { Locale } from "@/i18n/locales";
 import { countWord, fill } from "@/i18n/format";
 import { IndexEntry } from "./IndexEntry";
 import atmosphere from "./Atmosphere.module.css";
@@ -22,7 +24,7 @@ import styles from "./ArchiveIndex.module.css";
  * (night / paper alternate as in the tuner). Every record is an object
  * that opens into its file at /music/[slug].
  */
-export function ArchiveIndex({ copy: dictionary }: { copy: Dictionary }) {
+export function ArchiveIndex({ locale, copy: dictionary }: { locale: Locale; copy: Dictionary }) {
   const copy = dictionary.index;
 
   return (
@@ -33,7 +35,7 @@ export function ArchiveIndex({ copy: dictionary }: { copy: Dictionary }) {
 
       <header className={styles.head} data-theme="night">
         <div className={styles.folio}>
-          <Link className={styles.back} href="/#frequencies">
+          <Link className={styles.back} href={href(locale, "/#frequencies")}>
             <span aria-hidden="true">←</span> {copy.entrance}
           </Link>
           <p className={styles.fileCode}>
@@ -120,7 +122,7 @@ export function ArchiveIndex({ copy: dictionary }: { copy: Dictionary }) {
 
             <ol className={styles.entries}>
               {filed.map((record, i) => (
-                <IndexEntry key={record.slug} record={record} index={i} copy={dictionary} />
+                <IndexEntry key={record.slug} record={record} index={i} locale={locale} copy={dictionary} />
               ))}
             </ol>
           </section>
@@ -132,7 +134,7 @@ export function ArchiveIndex({ copy: dictionary }: { copy: Dictionary }) {
           {`${copy.end} — `}
           {archiveIndex.archive}
         </p>
-        <Link className={styles.back} href="/">
+        <Link className={styles.back} href={href(locale, "/")}>
           {`${copy.back} `}
           <span aria-hidden="true">↑</span>
         </Link>

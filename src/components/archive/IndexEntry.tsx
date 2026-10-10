@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { pad2, type MusicRecord } from "@/content/music";
 import type { Dictionary } from "@/i18n/dictionary";
+import { href } from "@/i18n/href";
+import type { Locale } from "@/i18n/locales";
 import { ArchiveSleeve } from "./ArchiveSleeve";
 import styles from "./IndexEntry.module.css";
 
@@ -12,7 +14,9 @@ import styles from "./IndexEntry.module.css";
  * the link's name stays short: artist + album. Under the hand the case
  * rises out of the drawer — the first centimetre of pulling it out.
  */
-export function IndexEntry({ record, index, copy: dictionary }: { record: MusicRecord; index: number; copy: Dictionary }) {
+type Props = { record: MusicRecord; index: number; locale: Locale; copy: Dictionary };
+
+export function IndexEntry({ record, index, locale, copy: dictionary }: Props) {
   const copy = dictionary.index;
   const titleId = `entry-${record.slug}`;
 
@@ -27,7 +31,7 @@ export function IndexEntry({ record, index, copy: dictionary }: { record: MusicR
           <h3 id={titleId} className={styles.title}>
             <Link
               className={styles.link}
-              href={`/music/${record.slug}`}
+              href={href(locale, `/music/${record.slug}`)}
               transitionTypes={["archive-open"]}
               data-cursor="open"
             >

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { colophon } from "@/content/home";
 import { pad2 } from "@/content/music";
 import { countWord, fill } from "@/i18n/format";
-import { useCopy } from "@/i18n/I18nProvider";
+import { href } from "@/i18n/href";
+import { useCopy, useLocale } from "@/i18n/I18nProvider";
 import styles from "./Colophon.module.css";
 
 /* The site's palette (tokens.css), as values: SVG paint attributes take no custom properties. */
@@ -23,6 +24,7 @@ const TICKS = Array.from({ length: 25 }, (_, i) => ({ x: i * 10 + 0.5, y: i % 6 
  * nothing here reveals or moves.
  */
 export function Colophon() {
+  const locale = useLocale();
   const dictionary = useCopy();
   const copy = dictionary.colophon;
   const [first, last] = copy.titleLines;
@@ -74,7 +76,7 @@ export function Colophon() {
         <p className={styles.deck}>
           {fill(copy.deck, { records: countWord(dictionary, colophon.records), frequencies: countWord(dictionary, colophon.frequencies) })}
         </p>
-        <Link className={styles.cta} href="/music">
+        <Link className={styles.cta} href={href(locale, "/music")}>
           <span className={styles.ctaIndex} aria-hidden="true">
             02
           </span>

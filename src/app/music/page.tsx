@@ -19,5 +19,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MusicIndexPage() {
-  return <ArchiveIndex copy={await getDictionary(defaultLocale)} />;
+  return <ArchiveIndex locale={defaultLocale} copy={await getDictionary(defaultLocale)} />;
 }
