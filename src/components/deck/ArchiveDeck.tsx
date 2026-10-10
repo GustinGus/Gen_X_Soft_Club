@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useReducer, useRef, useState, useSyncExternalStore } from "react";
-import type { MusicRecord } from "@/content/music";
+import { catalogueSpan, type MusicRecord } from "@/content/music";
 import type { RecordFile } from "@/content/records";
 import { CanvasBoundary } from "@/experience/disc/CanvasBoundary";
 import { DeckControls } from "./DeckControls";
@@ -189,7 +189,7 @@ export function ArchiveDeck({ record, file, className }: Props) {
 
         <footer className={styles.foot} aria-hidden="true">
           <span className={styles.grille} />
-          <span>ARCHIVE_002 · 1994—2003 · CD-DA</span>
+          <span>ARCHIVE_002 · {catalogueSpan} · CD-DA</span>
         </footer>
 
         <span className={styles.screw} data-corner="tl" aria-hidden="true" />
