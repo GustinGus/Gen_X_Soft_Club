@@ -22,9 +22,13 @@
 }
 
 /* ---------------------------------------------------------------- head */
+/* The issuer's line, then the card's name with its number beside it. They are
+   laid out by what fits: where a reader's larger type leaves no room for the
+   two side by side, the number takes a line of its own under the name, and
+   either breaks rather than leave the card. */
 .head {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: var(--space-1) var(--space-4);
   padding-bottom: var(--space-3);
@@ -51,12 +55,17 @@
 }
 
 .issuer {
-  grid-column: 1 / -1;
+  flex: 0 0 100%;
   /* same deepened transit green as the paper rooms' signal — AA on card stock */
   color: #456052;
 }
 
 .kind {
+  /* all the room the number leaves, as before; never less than a short word's
+     worth of its own type, or the number goes under it */
+  flex: 1 1 0;
+  min-width: min(100%, 5.5em);
+  overflow-wrap: break-word;
   font-family: var(--font-grotesk);
   font-size: clamp(1.25rem, 0.9rem + 1vw, 1.75rem);
   font-weight: var(--weight-black);
@@ -65,6 +74,8 @@
 }
 
 .number {
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--palette-dark-steel);
 }
 
@@ -74,16 +85,26 @@
   flex-direction: column;
 }
 
+/* A label and its value, side by side while the value keeps a column worth
+   reading (5rem); past that — a reader's larger type on a narrow card — the
+   value goes under its label and has the card's whole width. Nothing is set
+   smaller and nothing leaves the card: the card grows downward instead. */
 .row {
-  display: grid;
-  grid-template-columns: 8.5rem 1fr;
-  gap: var(--space-4);
+  --label: 8.5rem;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
   align-items: baseline;
   padding-block: var(--space-2);
   border-bottom: 1px dotted var(--card-rule);
 }
 
 .row dt {
+  flex: 0 0 auto;
+  width: var(--label);
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: var(--type-meta);
   letter-spacing: var(--tracking-meta);
@@ -92,6 +113,9 @@
 }
 
 .row dd {
+  flex: 1 1 5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: var(--type-caption);
   font-weight: var(--weight-medium);
@@ -114,8 +138,9 @@
   }
 
   .row {
-    grid-template-columns: 6.5rem 1fr;
-    gap: var(--space-3);
+    --label: 6.5rem;
+
+    gap: var(--space-1) var(--space-3);
   }
 }
 
@@ -127,10 +152,18 @@
    moves; English is not touched. */
 @media (max-width: 699px) {
   .number:lang(pt-BR) {
-    white-space: nowrap;
+    /* whole wherever it fits beside the name (the head no longer squeezes it);
+       where it cannot fit at all, it breaks into even lines */
+    text-wrap: balance;
+  }
+
+  /* "Catálogo" is two pixels wider than the room the number left it on the
+     narrowest phones: a step less between the two, so the word stays whole. */
+  .head:lang(pt-BR) {
+    column-gap: var(--space-3);
   }
 
   .row:lang(pt-BR) {
-    grid-template-columns: 6.75rem 1fr;
+    --label: 6.75rem;
   }
 }

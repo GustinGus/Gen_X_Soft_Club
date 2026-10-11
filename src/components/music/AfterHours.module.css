@@ -62,6 +62,16 @@
   margin-right: var(--space-4);
 }
 
+/* In a reader's larger type the three no longer fit one line: they wrap rather
+   than leave the page. Not on the narrowest phones, where the line is already
+   fitted by breaking "Trip-hop" at its hyphen and is left as it is. */
+@media (min-width: 340px) {
+  .scene {
+    flex-wrap: wrap;
+    row-gap: var(--space-1);
+  }
+}
+
 /* ------------------------------------------------------------ title */
 .title {
   grid-column: 1 / span 8;

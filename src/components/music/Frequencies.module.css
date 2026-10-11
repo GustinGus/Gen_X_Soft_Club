@@ -154,6 +154,11 @@
   letter-spacing: var(--tracking-headline);
   line-height: 1;
   text-transform: uppercase;
+  /* one word: where a reader's larger type makes it wider than the page, it
+     breaks (at a syllable where the browser knows the language) rather than
+     leave it */
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .note {
@@ -360,6 +365,21 @@
 .open:focus-visible {
   outline: 2px solid var(--fq-signal);
   outline-offset: 3px;
+}
+
+/* Touch: the link is a line of type, 24px tall. Its target is 44px, taken from
+   the clear space above and below it; nothing is drawn and nothing moves. */
+@media (pointer: coarse) {
+  .open {
+    position: relative;
+  }
+
+  .open::after {
+    content: "";
+    position: absolute;
+    /* 10px above the line and 11 below its rule: 44px in all */
+    inset: -10px 0 -11px;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

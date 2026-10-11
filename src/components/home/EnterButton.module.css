@@ -2,12 +2,16 @@
 .enter {
   position: relative;
   display: inline-grid;
-  grid-template-columns: auto 1fr auto;
+  /* never wider than where it stands: in a reader's larger type the label
+     runs to a second row inside the panel instead of being cut at its edge
+     (the panel's height is its minimum, so one row sits exactly as it did) */
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-5);
   min-width: min(100%, 22rem);
+  max-width: 100%;
   min-height: 3.5rem;
-  padding: 0 var(--space-5) 0 var(--space-4);
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-4);
   background: var(--palette-ink);
   color: var(--palette-off-white);
   text-decoration: none;
@@ -49,6 +53,7 @@
   letter-spacing: var(--tracking-signage);
   text-transform: uppercase;
   line-height: 1;
+  overflow-wrap: anywhere;
   transition: color var(--duration-quick) linear;
 }
 
