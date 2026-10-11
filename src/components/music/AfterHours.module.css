@@ -52,23 +52,27 @@
 }
 
 .scene {
+  --scene-gap: var(--space-4);
+
   display: flex;
-  gap: var(--space-4);
+  /* one line wherever the three fit; in a reader's larger type they wrap
+     rather than leave the page */
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--scene-gap);
   color: var(--ink-night-muted);
 }
 
 .scene li + li::before {
   content: "·";
-  margin-right: var(--space-4);
+  margin-right: var(--scene-gap);
 }
 
-/* In a reader's larger type the three no longer fit one line: they wrap rather
-   than leave the page. Not on the narrowest phones, where the line is already
-   fitted by breaking "Trip-hop" at its hyphen and is left as it is. */
-@media (min-width: 340px) {
+/* The narrowest phones: the three were four pixels wider than the line, which
+   was made to fit by breaking "Trip-hop" at its hyphen. Two pixels less in each
+   of the four spaces between them, and they fit it whole. */
+@media (max-width: 339px) {
   .scene {
-    flex-wrap: wrap;
-    row-gap: var(--space-1);
+    --scene-gap: 0.875rem;
   }
 }
 

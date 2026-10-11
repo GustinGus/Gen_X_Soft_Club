@@ -126,7 +126,10 @@
   font-size: var(--type-meta);
   letter-spacing: var(--tracking-meta);
   text-transform: uppercase;
-  white-space: nowrap;
+  /* one line at the type's own size (the longest is 456px of the 462 clear of
+     the card); in a reader's larger type it takes a second line there rather
+     than run on under the card */
+  max-width: calc(100% - 3.5rem);
   opacity: 0.7;
 }
 
