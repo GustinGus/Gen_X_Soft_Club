@@ -147,6 +147,8 @@
   text-transform: uppercase;
   overflow-wrap: anywhere;
   touch-action: manipulation;
+  /* measured in rem by the rule after .ctaArrow, below */
+  container-type: inline-size;
 }
 
 .ctaIndex {
@@ -161,6 +163,23 @@
 .ctaArrow {
   font-size: 1.25rem;
   letter-spacing: 0;
+}
+
+/* In a reader's larger type, on the narrowest phones, the plate is only a
+   few of its own letters wide and the line broke letter by letter between the
+   index and the arrow. Under 12rem — in the type's own size the plate is
+   never under 18 — the two ornaments (hidden from assistive technology
+   already) step aside and the line has the plate's whole width: it breaks
+   between its words, at the reader's size. */
+@container (max-width: 12rem) {
+  .ctaIndex,
+  .ctaArrow {
+    display: none;
+  }
+
+  .cta > span {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ------------------------------------------------------------ imprint */

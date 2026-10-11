@@ -91,3 +91,35 @@
 .label:lang(pt-BR) {
   letter-spacing: 0.2em;
 }
+
+/* ---------------------------------------------------------------- a reader's larger type */
+/* In a reader's larger type, on a phone, the panel is only a few of its own
+   letters wide: with the index and the arrow beside it the label had a
+   sliver of a column and broke letter by letter.
+ *
+   --enter-room is the page's width, less its margins, over 17.5rem: positive
+   where the panel has room, negative where it is cramped. At the type's own
+   size it is positive on every screen from 320px up (the page is 18rem
+   there), so nothing below applies. Where it is negative the two ornaments
+   (both hidden from assistive technology already) are folded to nothing and
+   the label takes the room they and their gaps held: it breaks between its
+   words, at the reader's size. */
+.enter {
+  --enter-room: calc(100vw - 2 * var(--margin) - 17.5rem);
+}
+
+.index,
+.arrow {
+  max-width: clamp(0px, calc(var(--enter-room) * 9999), 10rem);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.label {
+  /* the two gaps that stood beside the ornaments, and most of the panel's own
+     padding (a quarter of a rem is left each side): the longest word stays
+     whole on a 320px page at twice the type's size, at the reader's size and
+     with the sign's own letter-spacing */
+  margin-left: max(calc((var(--space-5) + var(--space-3)) * -1), min(0px, calc(var(--enter-room) * 9999)));
+  margin-right: max(calc((var(--space-5) * 2 - var(--space-1)) * -1), min(0px, calc(var(--enter-room) * 9999)));
+}

@@ -205,6 +205,39 @@
   text-transform: uppercase;
   color: var(--ink-day-muted);
   --depth: 0.3;
+
+  /* The caption is placed by the disc and the entry text by the foot of the
+     page: in a reader's larger type both grow, and past a certain size —
+     which depends on how wide the page is — the caption stood on the entry
+     text. It is an ornament (hidden from assistive technology), so past
+     that size it is not shown: --caption-holds is the reader's type size up
+     to which it still clears the text at this width, and the height below is
+     all of it up to there and none beyond. At 16px, all of it, at every
+     width. */
+  --caption-holds: 16.8px;
+
+  max-height: clamp(0px, calc((var(--caption-holds) - 1rem) * 9999), 100rem);
+  overflow: hidden;
+}
+
+/* How far the caption holds, by the width of the page (measured in both
+   languages; Portuguese, whose entry text runs longer, sets each limit). */
+@media (min-width: 1600px) {
+  .caption {
+    --caption-holds: 20px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .caption {
+    --caption-holds: 26px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .caption {
+    --caption-holds: 100px;
+  }
 }
 
 /* Leader line from the caption back to the object. */
@@ -313,6 +346,8 @@
   }
 
   .caption {
+    --caption-holds: 20px;
+
     left: auto;
     right: var(--margin);
     top: calc(var(--disc-y) + var(--disc-size) * 0.42);
