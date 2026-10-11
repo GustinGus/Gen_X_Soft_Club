@@ -128,12 +128,15 @@
   grid-column: 7 / -1;
   justify-self: end;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* the line takes what the index and the arrow leave; in a reader's larger
+     type it runs to a second row inside the plate instead of out of it (the
+     plate's height is its minimum, so one row sits exactly as it did) */
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-5);
   width: min(100%, 30rem);
   min-height: 3.5rem;
-  padding: 0 var(--space-5) 0 var(--space-4);
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-4);
   background: var(--ink-night);
   color: var(--palette-ink);
   text-decoration: none;
@@ -142,7 +145,7 @@
   font-variation-settings: "wdth" var(--width-extended);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   touch-action: manipulation;
 }
 
@@ -183,6 +186,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  /* a value wider than its column breaks within it rather than run over the next */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .imprint dt {
@@ -218,6 +224,21 @@
   color: var(--signal-night);
   text-decoration: none;
   border-bottom: 1px solid currentColor;
+}
+
+/* Touch: the link is a line of type, 24px tall. Its target is 44px, taken from
+   the clear space above and below it; nothing is drawn and nothing moves. */
+@media (pointer: coarse) {
+  .back {
+    position: relative;
+  }
+
+  .back::after {
+    content: "";
+    position: absolute;
+    /* 10px above the line and 11 below its rule: 44px in all */
+    inset: -10px 0 -11px;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -311,7 +332,7 @@
   .cta {
     width: 100%;
     gap: var(--space-3);
-    padding: 0 var(--space-4) 0 var(--space-3);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3);
     font-size: 0.6875rem;
     letter-spacing: 0.08em;
   }

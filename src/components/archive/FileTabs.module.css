@@ -4,7 +4,9 @@
  */
 .tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* two halves of the page, whatever is written in them: a name set in a
+     reader's larger type breaks within its tab rather than widen the page */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--grid-gap);
   border-top: 1px solid var(--sh-rule);
 }
@@ -18,7 +20,13 @@
   padding: var(--space-5) var(--space-4) var(--space-4);
   color: var(--sh-ink);
   text-decoration: none;
+  overflow-wrap: break-word;
   transition: translate var(--duration-quick) var(--ease-out);
+}
+
+/* Each line of a tab is as wide as its text, and never wider than the tab. */
+.tab > * {
+  max-width: 100%;
 }
 
 /* The tab's raised lip — sits on the drawer's rule. */
@@ -94,7 +102,7 @@ a.tab:active {
 
 @media (max-width: 699px) {
   .tabs {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 

@@ -84,6 +84,21 @@
   text-transform: uppercase;
 }
 
+/* Touch: the link is a line of type, 24px tall. Its target is 44px, taken from
+   the clear space above and below it; nothing is drawn and nothing moves. */
+@media (pointer: coarse) {
+  .back {
+    position: relative;
+  }
+
+  .back::after {
+    content: "";
+    position: absolute;
+    /* 10px above the line and 11 below its rule: 44px in all */
+    inset: -10px 0 -11px;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .back:hover {
     color: var(--sh-ink);
@@ -160,7 +175,10 @@
 
 .dirLink {
   display: grid;
-  grid-template-columns: 3ch 1fr auto;
+  /* the name takes what the code and the count leave, and no more: set in a
+     reader's larger type it breaks within its column instead of pushing the
+     count off the page */
+  grid-template-columns: 3ch minmax(0, 1fr) auto;
   gap: var(--space-4);
   align-items: baseline;
   min-height: var(--target-min);
@@ -198,6 +216,7 @@
   letter-spacing: -0.02em;
   line-height: 1;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 /* ================================================================ drawers */
