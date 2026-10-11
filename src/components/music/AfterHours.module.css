@@ -439,6 +439,21 @@
     padding-top: var(--space-7);
   }
 
+  /* The title is sized by the screen, and its column by the margins, which
+     grow with a reader's larger type: MIDNIGHT. (5.2 em at this weight) then
+     ran a few pixels past the column and was cut by the line's mask. So the
+     line is sized by the column where the column is the smaller of the two.
+     At the type's own size the limit is above the title's size at every
+     width, and the mask and its reveal are as they were. Portuguese has a
+     rule of its own, below, which still applies. */
+  .title {
+    container-type: inline-size;
+  }
+
+  .line {
+    font-size: min(var(--title-size), calc(100cqi / 5.3));
+  }
+
   .where {
     margin-left: 0;
   }

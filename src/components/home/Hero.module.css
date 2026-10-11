@@ -428,3 +428,187 @@
     display: none;
   }
 }
+
+/* ================================================================ a reader's larger type */
+/*
+ * The rail is set in rem and grows with the reader's type; the title is set
+ * by the screen and does not, and it stands at a fixed offset under a rail
+ * two lines deep. Past a certain size the rail's lines wrap, it grows taller
+ * than that offset, and its text ran over GEN X; the axes ran into Motion and
+ * the language switch.
+ *
+ * So the title follows the rail. The rail is named as an anchor, and each of
+ * the title's two lines keeps the offset it has or stands just under the
+ * rail, whichever is lower:
+ *
+ *   top: max(<the offset as it is>, <the rail's bottom edge> + a gap)
+ *
+ * At the type's own size the first is the larger at every width, with a
+ * mouse and with a finger, and nothing moves: the gaps below are each a
+ * little less than the room the composition already leaves there. No script
+ * measures anything, so nothing shifts after the page is drawn; and the ENTER
+ * sequence and the parallax, which move these layers by transform and
+ * translate, are not concerned — an anchor is read from the layout.
+ *
+ * Where the pointer is a finger the Motion key is 44px tall whatever the
+ * type, and the rail with it: that part of the rail's height is clear space,
+ * not text, and is taken off the gap again.
+ */
+@supports (top: anchor(--hero-rail bottom)) {
+  .rail {
+    anchor-name: --hero-rail;
+  }
+
+  /* The axes wrap inside their own room instead of running out of it. */
+  .axes {
+    flex-wrap: wrap;
+    row-gap: var(--space-1);
+  }
+
+  .titleBack,
+  .titleFront {
+    --rail-gap: 0.5rem;
+    --title-offset: 3.25rem;
+    --front-drop: 0.86;
+  }
+
+  .titleBack {
+    top: max(calc(var(--margin) + var(--title-offset)), calc(anchor(--hero-rail bottom) + var(--rail-gap)));
+  }
+
+  .titleFront {
+    top: max(
+      calc(var(--margin) + var(--title-offset) + var(--display-back) * var(--front-drop)),
+      calc(anchor(--hero-rail bottom) + var(--rail-gap) + var(--display-back) * var(--front-drop))
+    );
+  }
+
+  /* Desktop: at the narrow end of this layout the Portuguese axes and the
+     Portuguese Motion label each run a little past their own columns, into
+     the empty one between them. Their boxes are given that room, so both stay
+     as they are at the type's own size; past it, the axes wrap inside their
+     box and Motion's two words stand one over the other, instead of the two
+     growing into each other. */
+  @media (min-width: 1024px) {
+    .axes {
+      margin-right: -3rem;
+    }
+
+    .motion {
+      margin-left: -0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      text-align: right;
+    }
+  }
+
+  @media (min-width: 1024px) and (pointer: coarse) {
+    .titleBack,
+    .titleFront {
+      --rail-gap: calc(0.5rem - 15px);
+    }
+  }
+
+  /* Tablet: the Portuguese axes already run a little past the rail's end,
+     toward the language switch. Their box is given that room (1.5rem of the 9
+     the rail keeps clear), so they stay one line at the type's own size and
+     wrap only when they would reach the switch. */
+  @media (min-width: 700px) and (max-width: 1023px) {
+    .axes {
+      margin-right: -1.5rem;
+    }
+  }
+
+  @media (max-width: 699px) {
+    .titleBack,
+    .titleFront {
+      --rail-gap: 0.25rem;
+      --title-offset: 4.5rem;
+      --front-drop: 0.9;
+    }
+
+    /* On a phone the entry text grows up from the foot of the page while the
+       title comes down from the rail: at twice the type's size, in
+       Portuguese, the two met. The page's least height is given a little
+       more for every pixel the reader's type is above 16 — nothing at 16,
+       24px at 32 — and the two keep their distance. */
+    .hero {
+      min-height: calc(40rem + (1rem - 16px) * 1.5);
+    }
+  }
+
+  @media (max-width: 699px) and (pointer: coarse) {
+    .titleBack,
+    .titleFront {
+      --rail-gap: calc(0.25rem - 20px);
+    }
+  }
+}
+
+/*
+ * A browser that cannot anchor (older than 2025–26) cannot make the title
+ * follow the rail. There the rail's text is not left to run over the title:
+ * the rail keeps the spacing it has at the type's own size, and its type —
+ * and the language switch's — grows with the reader's setting only as far as
+ * the rail still holds it on two lines (--rail-type):
+ *
+ *   desktop   in proportion to the rail's width, from 1024px, where the
+ *             type's own size is what fits (nothing there; half as much
+ *             again at 1440; all of it at 1920);
+ *   tablet    not at all — the axes, Motion and the switch are already
+ *             fitted to one another to the pixel;
+ *   phone     as far as the masthead's longest line fits the rail, and the
+ *             switch the corner (a third more, at most).
+ *
+ * Never smaller than at the type's own size, whole and legible, and the page
+ * can still be zoomed. Everything else on the page grows as it does
+ * everywhere.
+ */
+@supports not (top: anchor(--hero-rail bottom)) {
+  .hero {
+    --rail-type: clamp(11px, 0.6875rem, calc((100vw - 2 * var(--margin) - 192px) / 70.4));
+  }
+
+  .rail {
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 32px;
+    --grid-gap: clamp(12px, 8px + 1vw, 24px);
+
+    right: calc(var(--margin) + 192px);
+    font-size: var(--rail-type);
+  }
+
+  .hero .language {
+    font-size: var(--rail-type);
+  }
+
+  @media (max-width: 1023px) {
+    .hero {
+      --rail-type: 11px;
+    }
+
+    .rail {
+      right: calc(var(--margin) + 144px);
+    }
+  }
+
+  @media (min-width: 700px) and (max-width: 1023px) {
+    .motion {
+      top: 36px;
+      right: -148px;
+    }
+  }
+
+  @media (max-width: 699px) {
+    .hero {
+      --rail-type: clamp(11px, 0.6875rem, min(calc((100vw - 2 * var(--margin) - 120px) / 14.2), 14.8px));
+    }
+
+    .rail {
+      right: calc(var(--margin) + 120px);
+    }
+  }
+}
