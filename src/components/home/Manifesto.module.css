@@ -244,3 +244,21 @@
     font-size: min(15.5vw, calc(100cqi / 6.1));
   }
 }
+
+/*
+ * Wider screens: the headline's smallest size is set in rem, so a reader's
+ * larger type makes it grow past the column, and the line's mask cuts
+ * COSTUMAVA at its edge. The same limit, then, for the room that line has
+ * (it is indented by a twelfth of the column). At the type's own size the
+ * limit is well above the headline's size at every width: the original scale
+ * is kept, and the mask and its reveal are as they were.
+ */
+@media (min-width: 700px) {
+  .headline:lang(pt-BR) {
+    container-type: inline-size;
+  }
+
+  .line:lang(pt-BR) {
+    font-size: min(1em, calc(100cqi * 11 / 12 / 6.1));
+  }
+}

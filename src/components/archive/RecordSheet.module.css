@@ -524,6 +524,16 @@
     white-space: normal;
   }
 
+  /* The longest name of the twelve, PORTISHEAD (6.4 em at this weight), is
+     wider than the column and runs a little into the page's margin. Set in a
+     reader's larger type the margins grow and it would leave the page: there,
+     and only there, the name is sized by the room it has — from the left
+     margin to the page's edge. At the type's own size that limit is above the
+     title's size at every width, and nothing changes. */
+  .artist {
+    font-size: min(var(--title-size), calc((100vw - var(--margin)) / 6.4));
+  }
+
   .sleeve {
     grid-column: 1 / span 11;
     grid-row: 3;
