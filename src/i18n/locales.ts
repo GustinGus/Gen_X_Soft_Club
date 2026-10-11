@@ -26,7 +26,7 @@ export const htmlLang: Record<Locale, string> = {
  */
 export const localization: Record<Locale, "complete" | "in-progress"> = {
   en: "complete",
-  "pt-br": "in-progress",
+  "pt-br": "complete",
 };
 
 /** How a language is named where a reader chooses one: short, and the same in every language. */
