@@ -8,8 +8,10 @@
  *   B. images         no image file anywhere in the build, by content, not by
  *                     name: the public edition draws its sleeves and has none.
  *                     One exception, named and weighed: the site's own
- *                     favicon, at the two places Next.js writes it, and only
- *                     as the very file this inspection knows by its checksum.
+ *                     favicon, at the two places Next.js writes it (the
+ *                     second being its media folder, static/media or, on
+ *                     Vercel, static/immutable/media), and only as the very
+ *                     file this inspection knows by its checksum.
  *                     Any other icon file, or that one changed, fails.
  *   C. private data   nothing from the private blocks of content/music.ts —
  *                     paths, sources, editions, captions — in any built file.
@@ -238,8 +240,13 @@ function imageKind(bytes) {
 */
 const FAVICON = {
   built: "server/app/favicon.ico.body",
-  /** The copy among the static files: favicon.<a name Next.js derives>.ico, nowhere but in static/media. */
-  copy: /^static\/media\/favicon\.[a-z0-9_-]+\.ico$/,
+  /**
+   * The copy among the static files: favicon.<a name Next.js derives>.ico, in the media folder and nowhere else.
+   * That folder is static/media in a build made here, and static/immutable/media in one made on Vercel, whose
+   * adapter has Next.js keep the files that are named after their own contents apart (supportsImmutableAssets).
+   * One folder or the other, never both: the count below allows a single copy.
+   */
+  copy: /^static\/(?:immutable\/)?media\/favicon\.[a-z0-9_-]+\.ico$/,
   source: "src/app/favicon.ico",
   sha256: "114d5accf30af124f1076ce322af881048aedec3525450bee80ecc36247283a3",
 };
@@ -404,7 +411,7 @@ for (const path of built) {
     const sum = sha256(bytes);
     if (sum !== FAVICON.sha256) fail("images", `${rel(path)} has the favicon's name in Vercel's copy of the build but is not the favicon this inspection knows (${kind ? `a ${kind} image` : "not an icon file"}, sha256 ${sum.slice(0, 16)}…, ${bytes.length} bytes)`);
   } else if (kind) {
-    fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)${kind === "ICO" ? `: the only icon file a public build may hold is the favicon, at ${FAVICON.built} and as static/media/favicon.<name>.ico` : ""}`);
+    fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)${kind === "ICO" ? `: the only icon file a public build may hold is the favicon, at ${FAVICON.built} and as favicon.<name>.ico in static/media or static/immutable/media` : ""}`);
   }
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} carries ${found.length} private text(s): ${quoted(found)}`);
