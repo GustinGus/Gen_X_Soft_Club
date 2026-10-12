@@ -317,7 +317,7 @@ const recordData: readonly RecordData[] = [
     sources: [
       wiki("Moon Safari", "Moon_Safari"),
       wiki("Air (French band)", "Air_(French_band)"),
-      ref("uDiscover Music", "Revisiting Air's Retro-Futurist 'Moon Safari'", "https://www.udiscovermusic.com/stories/rediscover-airs-moon-safari"),
+      ref("uDiscover Music", "Revisiting Air's Retro-Futurist 'Moon Safari'", "https://www.udiscovermusic.com/stories/rediscover-airs-moon-safari/"),
       ref("Happy Mag", "Engineering the Sound: Air's 'Moon Safari'", "https://happymag.tv/engineering-the-sound-air-moon-safari/"),
       releases("Moon Safari", "b0bf2b77-b8cf-32f6-8893-9741d757b400"),
     ],
@@ -387,7 +387,7 @@ const recordData: readonly RecordData[] = [
     sources: [
       wiki("Simple Things (Zero 7 album)", "Simple_Things_(Zero_7_album)"),
       wiki("Zero 7", "Zero_7"),
-      ref("Songwriting Magazine", "Interview: Henry Binns", "https://www.songwritingmagazine.co.uk/?p=44402"),
+      ref("Songwriting Magazine", "Interview: Henry Binns", "https://www.songwritingmagazine.co.uk/interviews/interview-henry-binns"),
       ref(
         "Albumism",
         "Zero 7's Debut Album 'Simple Things' Turns 25 | Album Anniversary",
@@ -500,7 +500,7 @@ const recordData: readonly RecordData[] = [
       ref(
         "Long Live Vinyl",
         "Fatboy Slim – You've Come A Long Way, Baby",
-        "https://www.longlivevinyl.net/celebrate-you-baby-20-years-of-fatboy-slims-youve-come-a-long-way-baby/",
+        "https://longlivevinyl.net/2018/05/02/celebrate-you-baby-20-years-of-fatboy-slims-youve-come-a-long-way-baby/",
       ),
       releases("You've Come a Long Way, Baby", "435fe38e-404c-3887-8300-cc94420a121c"),
     ],
@@ -532,7 +532,7 @@ const recordData: readonly RecordData[] = [
     sources: [
       wiki("OK Computer", "OK_Computer"),
       wiki("Radiohead", "Radiohead"),
-      ref("NME", "'OK Computer': 50 geeky facts about Radiohead's iconic 1997 album", "https://www.nme.com/?p=2087519"),
+      ref("NME", "'OK Computer': 50 geeky facts about Radiohead's iconic 1997 album", "https://www.nme.com/blogs/nme-blogs/ok-computer-50-facts-radiohead-1997-album-2087519"),
       releases("OK Computer", "b1392450-e666-3926-a536-22c65f834433"),
     ],
     released: dated("1997-06-16", [2, 3], "UK"),

@@ -5,6 +5,12 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+# Settings and secrets of a machine or an account, never versioned. An example file, which holds none, may be.
+.env
+.env.*
+!.env.example
+# The link between this folder and a Vercel project, written by its CLI.
+.vercel/
 .DS_Store
 npm-debug.log*
 
