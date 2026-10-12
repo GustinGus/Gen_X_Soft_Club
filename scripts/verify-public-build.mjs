@@ -45,6 +45,30 @@
  *                     offered to a search engine or a share card, anywhere.
  *                     The rules are src/site/seo.ts's; they are worked out
  *                     again here, from the environment, not taken from it.
+ *   J. sensitive files nothing that belongs to a machine or an account and
+ *                     not to a site: environment files, private keys and key
+ *                     stores, credentials, the folders of tools that hold
+ *                     them, leftovers of a working copy — by name, wherever
+ *                     they are in the build (Vercel's copy and the cache
+ *                     included) or in public/; and, in every file that may be
+ *                     published, by what they contain: a private key, a
+ *                     token of a known make, a file of NAME=value settings.
+ *                     This looks for what such files look like. It cannot
+ *                     know a secret it has never seen: a password written
+ *                     into a sentence passes. What keeps secrets out is that
+ *                     the site has none to build with.
+ *
+ * VERCEL'S COPY. On Vercel, `next build` ends by handing the finished build to
+ * Vercel's adapter, which lays out under <dist>/output what will be deployed:
+ * the static files as they are served, and beside each function a copy of
+ * every prerendered page's document. That happens before this inspection
+ * runs, so the copies are in what it reads — and they are read like the rest
+ * (images, private texts, <img>). Three kinds of copy would otherwise be taken
+ * for an image or a page nobody listed, and each is allowed as a copy and as
+ * nothing else: byte for byte the file it is a copy of, which was inspected
+ * in its own place; at a path of the one shape Vercel gives it; and no more
+ * often than a copy is made (see OUTPUT, below). Anything else under output/
+ * that is an image or an HTML document fails as it does anywhere.
  *
  * The build's own cache (<dist>/cache) is not part of what is published. It
  * is read all the same for the private texts, and no optimised image may be
@@ -223,6 +247,96 @@ const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 let faviconBuilt = false;
 let faviconCopies = 0;
 
+/*
+  VERCEL'S COPY OF THE BUILD (<dist>/output — see the note at the top). What is
+  allowed there beyond what is allowed anywhere, each as an exact copy:
+
+    the favicon     under a name it has in the build itself (favicon.ico,
+                    favicon.ico.body, favicon.<name>.ico), with the very bytes
+                    this inspection knows — at most as many times as Vercel
+                    was seen to copy it;
+    a page's copy   output/functions/<route>.prerender-fallback.html, where
+                    server/app/<route>.html is a page of the edition or one of
+                    the documents Next.js makes itself, and the two are the
+                    same bytes — one copy per document;
+    the error pages output/static/404.html and output/static/500.html, the
+                    same bytes as server/pages/404.html and 500.html.
+
+  A copy is vouched for by what it copies: that file is inspected where it was
+  built, and a copy that differs from it by one byte is not a copy.
+*/
+const OUTPUT = {
+  favicon: /^output\/(?:.*\/)?favicon\.(?:ico|ico\.body|[a-z0-9_-]+\.ico)$/,
+  /** Vercel was seen to keep three: the static copy, /favicon.ico, and one more. */
+  mostFavicons: 3,
+  fallback: /^output\/functions\/(.+)\.prerender-fallback\.html$/,
+  errorPages: new Map([
+    ["output/static/404.html", "server/pages/404.html"],
+    ["output/static/500.html", "server/pages/500.html"],
+  ]),
+};
+let faviconOutput = 0;
+
+/*
+  J. SENSITIVE FILES. What a public build must never hold, whatever it says:
+  told by its name, or by what is in it. The names are those such files are
+  given by the tools that write them — never a name a build may rightly use
+  (a config.json or a manifest is neither here nor there). Each rule says what
+  it found, so that a file wrongly taken for one can be argued with.
+*/
+const SENSITIVE_NAMES = [
+  [/^\.env(\..+)?$|\.env$|^\.envrc$/i, "an environment file"],
+  [/\.(pem|key|p8|p12|pfx|jks|keystore|ppk|kdbx|gpg|pgp|asc)$/i, "a private key, a certificate with its key, or a key store"],
+  [/^(id_(rsa|dsa|ecdsa|ed25519)|authorized_keys|known_hosts)$/i, "an SSH key file"],
+  [/^(\.npmrc|\.yarnrc|\.yarnrc\.yml|\.netrc|_netrc|\.pypirc|\.htpasswd|\.pgpass|\.git-credentials|\.dockercfg|\.boto|kubeconfig)$/i, "a credentials file"],
+  [/^(credentials|credentials\.(json|ya?ml|toml|ini|csv)|secrets?\.(json|ya?ml|toml|ini|env|txt)|service[-_]?account.*\.json|auth\.json|\.htaccess)$/i, "a credentials or sign-in file"],
+  [/\.(tfstate|tfvars)(\.backup)?$/i, "infrastructure state, which holds secrets"],
+  [/\.(sqlite3?|db|sql|bak|orig|swp|swo)$|^(\.ds_store|thumbs\.db|npm-debug\.log.*|yarn-error\.log)$/i, "a local or leftover file"],
+];
+/** Folders of tools that keep an account's or a machine's settings: nothing under one is part of a site. */
+const SENSITIVE_FOLDERS = /^(\.git|\.ssh|\.aws|\.gnupg|\.vercel|\.docker|\.kube|\.azure|\.gcloud|\.idea|\.vscode)$/i;
+const SENSITIVE_CONTENTS = [
+  // the header and at least a line of the key itself: the bare words, as a library spells them, are not a key
+  [/-----BEGIN (?:(?:RSA|EC|DSA|OPENSSH|ENCRYPTED|PGP) )?PRIVATE KEY(?: BLOCK)?-----(?:\\[rn]|[\sA-Za-z0-9+/=:,.-]){64,}/, "a private key"],
+  [/\bgh[pousr]_[A-Za-z0-9]{36,}\b|\bgithub_pat_[A-Za-z0-9_]{50,}\b/, "a GitHub token"],
+  [/\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/, "an AWS access key"],
+  [/\bxox[baprs]-[0-9A-Za-z-]{10,}/, "a Slack token"],
+  [/\b[sr]k_live_[0-9A-Za-z]{20,}/, "a Stripe live key"],
+  [/\bsk-(?:ant|proj)-[A-Za-z0-9_-]{20,}/, "an AI provider's key"],
+  [/\bAIza[0-9A-Za-z_-]{35}\b/, "a Google API key"],
+  [/\bnpm_[A-Za-z0-9]{36}\b/, "an npm token"],
+  [/_authToken\s*=\s*\S{8,}/, "a registry sign-in token"],
+  [/\bmachine\s+\S+\s+login\s+\S+\s+password\s+\S+/, "a .netrc sign-in"],
+  [/"type"\s*:\s*"service_account"/, "a service account's credentials"],
+];
+/** A small text file that is mostly NAME=value lines: an environment file under any name. */
+function settingsFile(bytes) {
+  if (bytes.length === 0 || bytes.length > 65536 || bytes.includes(0)) return false;
+  const lines = bytes.toString("latin1").split(/\r?\n/).map((line) => line.trim()).filter((line) => line !== "" && !line.startsWith("#"));
+  if (lines.length < 2 || lines.length > 400) return false;
+  return lines.filter((line) => /^(?:export\s+)?[A-Z][A-Z0-9_]{2,}\s*=\s*\S/.test(line) && !/[;{(]\s*$/.test(line)).length / lines.length >= 0.8;
+}
+/** What a file's place and name say it is, if it is one of these; `within` is its path inside the folder read. */
+function sensitiveName(within) {
+  const parts = within.split("/");
+  const folder = parts.slice(0, -1).find((part) => SENSITIVE_FOLDERS.test(part));
+  if (folder) return `is under ${folder}/, a tool's own folder`;
+  const named = SENSITIVE_NAMES.find(([name]) => name.test(parts.at(-1)));
+  return named ? `is ${named[1]}, by its name` : null;
+}
+/** What a file's bytes say it holds, if they hold one of these. */
+function sensitiveContents(bytes) {
+  const text = bytes.toString("latin1");
+  const found = SENSITIVE_CONTENTS.filter(([shape]) => shape.test(text)).map(([, what]) => what);
+  if (settingsFile(bytes)) found.push("NAME=value settings, as an environment file does");
+  return found.length > 0 ? `holds ${found.join(", ")}` : null;
+}
+let sensitiveRead = 0;
+for (const file of publishedFiles) {
+  const named = sensitiveName(file);
+  if (named) fail("sensitive files", `public/${file} ${named}`);
+}
+
 const cache = join(dist, "cache") + sep;
 const everything = filesUnder(dist, "build");
 const built = everything.filter((path) => !path.startsWith(cache));
@@ -284,11 +398,18 @@ for (const path of built) {
     else faviconCopies += 1;
     const sum = sha256(bytes);
     if (sum !== FAVICON.sha256) fail("images", `${rel(path)} is not the favicon this inspection knows (${kind ? `a ${kind} image` : "not an icon file"}, sha256 ${sum.slice(0, 16)}…, ${bytes.length} bytes): a changed favicon is a new image, to be reviewed and named in scripts/verify-public-build.mjs before it is published`);
+  } else if (OUTPUT.favicon.test(within)) {
+    // Vercel's copy of the favicon: the favicon, whole and unchanged, or it is not a copy
+    faviconOutput += 1;
+    const sum = sha256(bytes);
+    if (sum !== FAVICON.sha256) fail("images", `${rel(path)} has the favicon's name in Vercel's copy of the build but is not the favicon this inspection knows (${kind ? `a ${kind} image` : "not an icon file"}, sha256 ${sum.slice(0, 16)}…, ${bytes.length} bytes)`);
   } else if (kind) {
     fail("images", `${rel(path)} is a ${kind} image (${bytes.length} bytes)${kind === "ICO" ? `: the only icon file a public build may hold is the favicon, at ${FAVICON.built} and as static/media/favicon.<name>.ico` : ""}`);
   }
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} carries ${found.length} private text(s): ${quoted(found)}`);
+  sensitiveRead += 1;
+  for (const said of [sensitiveName(within), sensitiveContents(bytes)]) if (said) fail("sensitive files", `${rel(path)} ${said}`);
 }
 
 // The favicon's source is weighed too: what will be built next is what was reviewed.
@@ -302,6 +423,8 @@ for (const path of built) {
     fail("images", `a favicon was built, but ${FAVICON.source} is not in the project`);
   }
   if (faviconCopies > 1) fail("images", `${faviconCopies} copies of the favicon among the static files: one is expected`);
+  if (faviconOutput > OUTPUT.mostFavicons) fail("images", `${faviconOutput} copies of the favicon in Vercel's copy of the build (${rel(join(dist, "output"))}): at most ${OUTPUT.mostFavicons} are expected`);
+  if (faviconOutput > 0 && !faviconBuilt) fail("images", `Vercel's copy of the build holds the favicon, but ${rel(join(dist, FAVICON.built))} was not built: there is nothing it is a copy of`);
 }
 
 // The cache is not published, and is read for the private texts all the same (see the note at the top).
@@ -312,6 +435,9 @@ for (const path of cached) {
   scannedCache += bytes.length;
   const found = privateTexts(bytes);
   if (found.length > 0) fail("private data", `${rel(path)} (build cache) carries ${found.length} private text(s): ${quoted(found)}`);
+  // by its name only: the cache is a compiler's store, not published, and its bytes are not text to be read as such
+  const named = sensitiveName(rel(path).slice(rel(dist).length + 1));
+  if (named) fail("sensitive files", `${rel(path)} (build cache) ${named}`);
 }
 
 // ---------------------------------------------------------------- what the site is, read from its source
@@ -379,12 +505,35 @@ const INTERNAL = new Map([
 ]);
 const known = new Set([...expected.keys()].map((path) => rel(htmlOf(path)).slice(rel(dist).length + 1)));
 const documents = built.filter((path) => path.endsWith(".html")).map((path) => rel(path).slice(rel(dist).length + 1));
+/** The same bytes: a copy is that, or it is another document. */
+const sameBytes = (a, b) => {
+  const [x, y] = [bytesOf(join(dist, a), "edition"), bytesOf(join(dist, b), "edition")];
+  return x !== null && y !== null && x.equals(y);
+};
+/** Vercel's copies (see OUTPUT): how many were found of each document. */
+const copied = new Map();
+function vercelCopyOf(document) {
+  const fallback = document.match(OUTPUT.fallback);
+  const original = fallback ? `server/app/${fallback[1]}.html` : OUTPUT.errorPages.get(document);
+  if (!original) return null;
+  if (!known.has(original) && !INTERNAL.has(original)) return { problem: `is Vercel's copy of ${original}, which is not a page of any language nor one of the documents Next.js makes itself` };
+  if (!documents.includes(original)) return { problem: `is Vercel's copy of ${original}, which was not built` };
+  if (!sameBytes(document, original)) return { problem: `is not the copy of ${original} it stands for: the two differ` };
+  copied.set(original, (copied.get(original) ?? 0) + 1);
+  if (copied.get(original) > 1) return { problem: `is a second copy of ${original} in Vercel's copy of the build: one is expected` };
+  return { original };
+}
 for (const document of documents) {
   if (known.has(document)) continue;
   const check = INTERNAL.get(document);
-  if (!check) { fail("edition", `${rel(dist)}/${document} is a page nobody listed: not a page of any language, nor one of the documents Next.js makes itself`); continue; }
-  const wrong = check(read(join(dist, document)) ?? "");
-  if (wrong) fail("edition", `${rel(dist)}/${document} ${wrong}`);
+  if (check) {
+    const wrong = check(read(join(dist, document)) ?? "");
+    if (wrong) fail("edition", `${rel(dist)}/${document} ${wrong}`);
+    continue;
+  }
+  const copy = vercelCopyOf(document);
+  if (copy === null) fail("edition", `${rel(dist)}/${document} is a page nobody listed: not a page of any language, nor one of the documents Next.js makes itself`);
+  else if (copy.problem) fail("edition", `${rel(dist)}/${document} ${copy.problem}`);
 }
 for (const document of INTERNAL.keys()) if (!documents.includes(document)) fail("edition", `${rel(dist)}/${document} was expected and is not there: the build is not laid out as this inspection knows it`);
 
@@ -739,8 +888,11 @@ const seo = { stage: process.env.VERCEL === "1" && process.env.VERCEL_ENV === "p
 const mb = (bytes) => (bytes / 1e6).toFixed(1);
 console.log(`[verify] ${rel(dist)}: ${built.length} files, ${mb(scanned)} MB read | build cache (not published): ${cached.length} files, ${mb(scannedCache)} MB read for private texts`);
 console.log(`[verify] public/: ${publishedFiles.length} file(s), ${allowed.length} allowed | private texts looked for: ${forbidden.length} | shared with the archive's own text, not looked for: ${shared.length}`);
+console.log(`[verify] sensitive files: ${sensitiveRead} file(s) read for ${SENSITIVE_CONTENTS.length + 1} kinds of content, ${built.length + cached.length + publishedFiles.length} name(s) against ${SENSITIVE_NAMES.length} kinds of file and ${SENSITIVE_FOLDERS.source.split("|").length} tools' folders`);
 if (linksFollowed > 0) console.log(`[verify] links followed, each staying in the folder it was found in: ${linksFollowed}`);
-console.log(`[verify] records: ${slugs.length} | pages: ${pageText.size} of ${expected.size} (${locales.map((locale) => `${locale} ${pagesByLocale[locale]}`).join(", ")}) + the 404 | other documents, each named and checked: ${documents.filter((document) => !known.has(document) && document !== NOT_FOUND).length}`);
+console.log(`[verify] records: ${slugs.length} | pages: ${pageText.size} of ${expected.size} (${locales.map((locale) => `${locale} ${pagesByLocale[locale]}`).join(", ")}) + the 404 | other documents, each named and checked: ${documents.filter((document) => INTERNAL.has(document) && document !== NOT_FOUND).length}`);
+const copies = [...copied.values()].reduce((sum, n) => sum + n, 0);
+if (copies > 0 || faviconOutput > 0) console.log(`[verify] Vercel's copy of the build (${rel(join(dist, "output"))}): ${copies} document(s), each the same bytes as the one it copies | the favicon, by its checksum: ${faviconOutput} time(s)`);
 console.log(`[verify] languages: ${locales.map((locale) => `${locale} ${published[locale]}`).join(", ")} | links: ${links.status === 0 ? linkLines.find((line) => line.includes("links read"))?.replace("[links] ", "") ?? "checked" : "FAILED"}`);
 console.log(`[verify] search engines: a ${seo.stage} build, ${seo.stage === "production" ? "indexed" : "not indexed"} | origin: ${seo.origin ?? "not given"} | canonical addresses: ${seo.canonicals} | versions named: ${seo.alternates} | sitemap: ${seo.sitemap} page(s)`);
 
@@ -766,13 +918,15 @@ writeFileSync(
       pages: pageText.size,
       linksChecked: true,
       favicon: faviconBuilt ? { path: FAVICON.built, copies: faviconCopies, sha256: FAVICON.sha256 } : null,
+      vercelCopy: copies > 0 || faviconOutput > 0 ? { documents: copies, favicons: faviconOutput } : null,
       searchEngines: { stage: seo.stage, indexed: seo.stage === "production", origin: seo.origin, canonicals: seo.canonicals, sitemap: seo.sitemap },
       privateTextsLookedFor: forbidden.length,
+      sensitiveFiles: { read: sensitiveRead, found: 0 },
       publicFiles: publishedFiles,
     },
     null,
     2,
   ) + "\n",
 );
-console.log(`[verify] OK — ${faviconBuilt ? "no image but the site's own favicon (the one file, by its checksum)" : "no image"}, no private artwork data, ${slugs.length} sleeves, every language whole: nothing private or unfinished in what would be published.`);
+console.log(`[verify] OK — ${faviconBuilt ? "no image but the site's own favicon (the one file, by its checksum)" : "no image"}, no private artwork data, no sensitive file, ${slugs.length} sleeves, every language whole: nothing private or unfinished in what would be published.`);
 console.log(`[verify] recorded in ${rel(join(dist, STAMP))} for build ${buildId}`);
