@@ -107,8 +107,50 @@ if (publicBuild) {
 */
 const referenceCovers = !publicBuild && existsSync(REFERENCE_COVERS) ? readdirSync(REFERENCE_COVERS).join(",") : "";
 
+/*
+  WHAT EVERY ANSWER SAYS ABOUT ITSELF. The site is read, not signed in to: it
+  has no form, no account, and asks nothing of any other address. The headers
+  say so, to a browser that would otherwise have to assume the opposite.
+
+  The policy allows what the site is made of and no more: its own scripts,
+  styles, fonts and images. Two allowances are wider than one would like.
+  Scripts written into the page ('unsafe-inline'): Next.js hands each page its
+  data that way, and the pages are built once, ahead of time, so there is no
+  request to make a nonce for. Styles written into the page: React sets them on
+  elements as they move. The grain is an image written into the stylesheet
+  (data:). Nothing here loads from another site, is shown inside another site,
+  or is sent to one.
+
+  The policy is left out of `next dev`, whose tooling evaluates code and keeps
+  a socket open; the other headers are sent there too.
+*/
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // The same as frame-ancestors above, for a browser that does not read it.
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  ...(process.env.NODE_ENV === "development" ? [] : [{ key: "Content-Security-Policy", value: contentSecurityPolicy }]),
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Not said: which framework answers.
+  poweredByHeader: false,
+  headers: async () => [{ source: "/:path*", headers: securityHeaders }],
   // The public edition is built apart, and without server source maps: a map carries the source it was made from,
   // private blocks included.
   ...(publicBuild ? { distDir: ".next-public" } : {}),
